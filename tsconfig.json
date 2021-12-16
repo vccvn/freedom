@@ -1,0 +1,43 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "noImplicitAny": false,
+        "module": "es6",
+        "target": "es5",
+        // "skipLibCheck": true,
+        // "noImplicitAny": false,
+        // "jsx": "react",
+        "allowJs": true,
+        // "moduleResolution": "node",
+        // "baseUrl": "./",
+        // "outDir": "./dist/out-tsc",
+        "sourceMap": false,
+        "declaration": false,
+        "downlevelIteration": true,
+        "experimentalDecorators": true,
+        // "module": "esnext",
+        "moduleResolution": "node",
+        "importHelpers": true,
+        // "target": "es5",
+        "lib": [
+            "es2018",
+            "dom"
+        ],
+        "resolveJsonModule": true,
+        "baseUrl": "./", // This must be specified if "paths" is.
+        
+       "paths": {
+           "@app/*": ["src/app/*"],
+           "@assets/*": ["src/assets/*"],
+           "@config/*": ["src/app/_config/*"],
+           "@environment/*": ["src/environments/*"],
+           "@shared/*": ["src/app/_shared/*"],
+           "@helpers/*": ["src/app/_core/helpers/*"]
+       },
+    },
+    "angularCompilerOptions": {
+        "fullTemplateTypeCheck": true,
+        "strictInjectionParameters": true
+    }
+}
