@@ -5762,7 +5762,7 @@ const createClass = function (className, makeGlobal) {
 
         var __constructs = [];
         var copyConstructs = [];
-
+        var commitProps = {};
         function _commit(BaseClass) {
 
             if (commited) {
@@ -5832,6 +5832,8 @@ const createClass = function (className, makeGlobal) {
 
             commited = true;
 
+            commitProps = props;
+
             // if (classData.constructs) {
             //     for (var fn in classData.constructs) {
             //         if (classData.constructs.hasOwnProperty(fn)) {
@@ -5883,36 +5885,7 @@ const createClass = function (className, makeGlobal) {
         }
 
         function parseDataProps() {
-            var props = {};
-            if (classData.extends) {
-                for (var std in classData.extends) {
-                    if (classData.extends.hasOwnProperty(std)) {
-                        var _extends = classData.extends[std];
-                        for (var prop in _extends.props) {
-                            if (_extends.props.hasOwnProperty(prop)) {
-                                var cb = _extends.props[prop];
-                                props[prop] = cb;
-
-                            }
-                        }
-
-                    }
-                }
-            }
-
-            if (classData.uses) {
-                for (var key in classData.uses) {
-                    if (classData.uses.hasOwnProperty(key)) {
-                        var val = classData.uses[key];
-                        if (typeof val != "function") {
-                            // if ((!override && typeof this[key] == "undefined") || override == true) {
-                            props[key] = val;
-                            // }
-                        }
-                    }
-                }
-            }
-
+            var props = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .assignValue */ .MP)({}, commitProps);
             for (var prop in classData.props) {
                 if (classData.props.hasOwnProperty(prop)) {
                     var cb = classData.props[prop];
@@ -9342,12 +9315,12 @@ Html.static({
 
 const Component = (0,es5_class/* _class */.nN)("Component").extends(dom/* default */.ZP)({
     static$isComponentClass: true,
-    const$isComponentClass: true,
-    autoRender: false,
+    const$isComponent: true,
+    autoRender: true,
     constructor: function(args){
 
     },
-    bulder: function(){
+    builder: function(){
         return null;
     }
 });

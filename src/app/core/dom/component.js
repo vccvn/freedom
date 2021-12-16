@@ -3,12 +3,12 @@ import Dom from "./dom.js";
 
 export const Component = _class("Component").extends(Dom)({
     static$isComponentClass: true,
-    const$isComponentClass: true,
-    autoRender: false,
+    const$isComponent: true,
+    autoRender: true,
     constructor: function(args){
 
     },
-    bulder: function(){
+    builder: function(){
         return null;
     }
 });
