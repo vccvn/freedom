@@ -3,8 +3,8 @@
     "compilerOptions": {
         "outDir": "./dist/",
         "noImplicitAny": false,
-        "module": "es6",
-        "target": "es5",
+        "module": "ES2015",
+        "target": "es2018",
         // "skipLibCheck": true,
         // "noImplicitAny": false,
         // "jsx": "react",

@@ -8,7 +8,7 @@ const mode = 'production';
 module.exports = {
     mode: mode,
     entry: {
-        freedom: './src/main.ts',
+        main: './src/main.ts',
         // components: './src/components.ts',
         // shared: 'lodash',
     },
@@ -16,8 +16,8 @@ module.exports = {
         filename: '[name].js',
         path: path.resolve(__dirname, 'dist'),
         clean: true,
-        // publicPath: '/',
-        library: 'freedom',
+        publicPath: '/',
+        // library: 'freedom',
         libraryTarget: 'umd',
     },
     optimization: {
