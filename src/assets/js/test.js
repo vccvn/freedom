@@ -13,7 +13,7 @@ var AppComponent = _class("AppComponent").extends(Component)({
                     P('#paragraph', 'Lorem'),
                     P('#paragraph', 'Lorem2'),
                     Div('.net', {
-                        receiveMessage: function (params) {
+                        receiveMessage: function (message) {
                             this.callParent('reciveMessage', [this, message]);
                             return false;
                         },
@@ -28,5 +28,10 @@ var AppComponent = _class("AppComponent").extends(Component)({
                 }
             }))
         ]
-    }
-})
+    },
+    receiveMessage: function (child, message) {
+        console.log(child, message);
+    },
+});
+var ac = AppComponent({name: "Doãn"});
+ac.appendTo(document.body)
