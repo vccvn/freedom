@@ -16,8 +16,8 @@ module.exports = {
         filename: '[name].js',
         path: path.resolve(__dirname, 'dist'),
         clean: true,
-        publicPath: '/',
-        // library: 'freedom',
+        // publicPath: '/',
+        // library: 'FD',
         libraryTarget: 'umd',
     },
     optimization: {
