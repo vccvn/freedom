@@ -8,16 +8,16 @@ const mode = 'production';
 module.exports = {
     mode: mode,
     entry: {
-        fd: './src/main.ts',
+        freedom: './src/main.ts',
         // components: './src/components.ts',
         // shared: 'lodash',
     },
     output: {
-        filename: '[name].bundle.js',
+        filename: '[name].js',
         path: path.resolve(__dirname, 'dist'),
         clean: true,
         // publicPath: '/',
-        library: 'FD',
+        library: 'freedom',
         libraryTarget: 'umd',
     },
     optimization: {
