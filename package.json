@@ -1,11 +1,15 @@
 {
-  "name": "freedom",
+  "name": "freedomjs",
   "version": "1.0.0",
   "description": "Dom Library",
   "keywords": [],
   "author": "Doanln",
   "license": "ISC",
-  "main": "dist/freedon.js",
+  "main": "dist/main.js",
+  "browser": "dist/freedom.min.js",
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vccvn/freedom.git"
@@ -15,34 +19,42 @@
   },
   "homepage": "https://github.com/vccvn/freedom#readme",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "watch": "webpack --watch",
     "start": "webpack serve --open",
     "devsev": "webpack-dev-server --https --open",
     "server": "node server.js",
-    "build": "webpack"
+    "build": "webpack",
+    "tsc": "tsc"
   },
   "export": "NODE_ENV='development' sapper export",
   "devDependencies": {
+    "@types/jest": "^27.0.3",
     "@types/lodash": "^4.14.175",
+    "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.4.0",
     "csv-loader": "^3.0.3",
     "express": "^4.17.1",
     "html-webpack-plugin": "^5.4.0",
+    "jest": "^27.4.5",
     "json5": "^2.2.0",
+    "rollup": "^2.61.1",
+    "rollup-plugin-babel-minify": "^10.0.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
     "style-loader": "^3.3.0",
     "toml": "^3.0.0",
+    "ts-jest": "^27.1.2",
     "ts-loader": "^9.2.6",
-    "typescript": "^4.4.4",
+    "tsconfig-paths-webpack-plugin": "^3.5.1",
+    "typescript": "^4.5.4",
     "webpack": "^5.58.2",
     "webpack-cli": "^4.9.0",
     "webpack-dev-middleware": "^5.2.1",
     "webpack-dev-server": "^4.3.1",
     "webpack-merge": "^5.8.0",
     "xml-loader": "^1.2.1",
-    "yamljs": "^0.3.0",
-    "copy-webpack-plugin": "^9.0.1",
-    "tsconfig-paths-webpack-plugin": "^3.5.1"
+    "yamljs": "^0.3.0"
   },
   "dependencies": {}
 }

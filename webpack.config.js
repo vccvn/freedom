@@ -47,7 +47,7 @@ module.exports = {
         new HtmlWebpackPlugin({ template: './src/index.html' }),
         new CopyPlugin({
             patterns: [
-                { from: "src/assets", to: "assets" },
+                { from: "assets", to: "assets" },
             ],
         }),
     ],

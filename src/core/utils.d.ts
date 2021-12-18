@@ -24,90 +24,51 @@ declare function isNull(variable: any): boolean
  * kiềm tra có phải array
  * @param {*} variable biến bất kỳ
  */
-declare function isArray(variable: any) {
-    return getType(variable) == "array" || Array.isArray(variable);
-}
+declare function isArray(variable: any): boolean
 /**
  * kiềm tra có phải object
  * @param {*} variable biến bất kỳ
  */
-declare function isObject(variable: any) {
-    return getType(variable) == "object";
-}
+declare function isObject(variable: any): boolean
 /**
  * kiềm tra có phải number
  * @param {*} variable biến bất kỳ
  */
-declare function isNumber(variable: any) {
-    var type = getType(variable);
-    return (type === "number" || type === "string") && !isNaN(variable - parseFloat(variable));
-}
+declare function isNumber(variable: any): boolean
 /**
  * kiềm tra có phải loat
  * @param {*} variable biến bất kỳ
  */
-declare function isFloat(variable: any) {
-    var type = getType(variable);
-    return (type === "number" || type === "string") && !isNaN(variable - parseFloat(variable));
-}
-
+declare function isFloat(variable: any): boolean
 /**
  * kiềm tra có phải number
  * @param {*} variable biến bất kỳ
  */
-declare function isInteger(variable: any) {
-    return isNumber(variable) && String(parseInt(variable)) == String(variable);
-}
+declare function isInteger(variable: any): boolean
 
 
 /**
  * kiềm tra có phải boolean
  * @param {*} variable biến bất kỳ
  */
-declare function isBoolean(variable: any) {
-    return getType(variable) == "boolean";
-}
+declare function isBoolean(variable: any): boolean
 
 /**
  * kiềm tra có phải Formdata
  * @param {*} variable biến bất kỳ
  */
-declare function isFormData(variable: any) {
-    return getType(variable) == "formdata";
-}
+declare function isFormData(variable: any): boolean
 
 /**
  * kiềm tra có phải chuỗi
  * @param {*} variable biến bất kỳ
  */
-declare function isEmail(email: any) {
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-};
+declare function isEmail(email: any): boolean
 
-declare function isEmpty(obj: any) {
-
-    if (typeof obj == "undefined") return true;
-
-    // console.log(any.constructor)
-    var type = getType(obj);
-
-    if (type == "object") {
-        for (var key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    else if (type == "array" || type == 'string') {
-        return obj.length == 0;
-    }
-    else return !obj;
-}
+declare function isEmpty(obj: any): boolean
 declare function emptyFunc(): void
 
-declare function newObj(obj: any = undefined): any
+declare function newObj(obj?: any): any
 declare function emptyObject(): any
 /**
  *
@@ -115,30 +76,28 @@ declare function emptyObject(): any
  * @param {object} src
  * @returns {object}
  */
-declare function merge(dst: {}, src: {} = {}): { [prop: string]: any }
+declare function merge(dst: {[prop: string]: any }, src: {[prop: string]: any }): { [prop: string]: any }
 
 /**
  * sao chep gia tri trong mang
  * @param {array|object} src mang doi tuong  can sao chep
  */
-declare function copyArray(src: any = []): any[]
+declare function copyArray(src: any): any[]
 declare function combine(list: any): any[]
 
 
 declare function objectKeys(obj: object): string[]
-declare function objectValues(obj: {} = {}): any[]
+declare function objectValues(obj: {[prop: string]: any }): any[]
 
-declare function isProperty(obj: any, key: any) {
-    return Object.hasOwnProperty.call(obj, key);
-}
-declare function isisMethod(obj: {} = {}, key: string = ""): boolean 
+declare function isProperty(obj: any, key: any): boolean
+declare function isisMethod(obj: {[prop: string]: any }, key?: string): boolean 
 /**
  * kiểm tra giá trị có trong mảng / object hay không
  * @param {array} arr mảng
  * @param {*} value
  * @returns {boolean}
  */
-declare function hasValue(arr: Array<any> = [], value: any = null, checkType: boolean = false): boolean
+declare function hasValue(arr: Array<any>, value: any, checkType: boolean): boolean
 /**
  * kiểm tra giá trị có trong mảng / object hay không
  * @param {array} arr mảng
@@ -147,9 +106,9 @@ declare function hasValue(arr: Array<any> = [], value: any = null, checkType: bo
  */
 declare function inArray(arr: any[], value: any, checkType?: boolean): boolean;
 
-declare function cutWithout(obj: {} = {}, keys: any): { [key: string]: any }
+declare function cutWithout(obj: {[prop: string]: any }, keys: any): { [key: string]: any }
 
-declare function copyWithout(obj: {} = {}, keys: any): { [key: string]: any }
+declare function copyWithout(obj: {[prop: string]: any }, keys: any): { [key: string]: any }
 
 declare function copyByList(obj: any, keys?: any): { [key: string]: any }
 
@@ -243,9 +202,9 @@ declare function arrayJoin(target: Array<any>, ...args: any) : any[]
  * @param delimiter 
  * @returns 
  */
-declare function getEl(obj: any, key: any = undefined, delimiter: any = undefined): any
+declare function getEl(obj: any, key?: any, delimiter?: string): any
 export interface Num {
-    rand(from: number = 0, to: number = 9999): number
+    rand(from: number, to: number): number
     currency(x: string): string
 }
 export interface Str {

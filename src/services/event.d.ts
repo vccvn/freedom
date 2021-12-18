@@ -16,11 +16,11 @@ type OnEventListener = {
 declare class EventService {
     [prop:string]: any;
     app: any;
-    _listeners = {};
-    _dispatchedEvents = {};
+    _listeners: {[event:string]: Listener[]};
+    _dispatchedEvents: {[event:string]: any};
     __subServices: {
         [id:string]: EventService
-    } = {};
+    };
     constructor()
 
     sub(id:string): this

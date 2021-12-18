@@ -21,21 +21,30 @@
         "importHelpers": true,
         // "target": "es5",
         "lib": [
+            "es5",
             "es2018",
             "dom"
         ],
         "resolveJsonModule": true,
         "baseUrl": "./", // This must be specified if "paths" is.
-        
-       "paths": {
-           "@app/*": ["src/app/*"],
-           "@assets/*": ["src/assets/*"],
-           "@config/*": ["src/app/_config/*"],
-           "@environment/*": ["src/environments/*"],
-           "@shared/*": ["src/app/_shared/*"],
-           "@helpers/*": ["src/app/_core/helpers/*"]
-       },
+        "paths": {
+            "@root/*": [
+                "src/*"
+            ],
+            "@assets/*": [
+                "assets/*"
+            ],
+            "@config/*": [
+                "src/_config/*"
+            ],
+            "@environment/*": [
+                "src/environments/*"
+            ]
+        },
     },
+    "include": [
+        "src/**/*.ts"
+    ],
     "angularCompilerOptions": {
         "fullTemplateTypeCheck": true,
         "strictInjectionParameters": true
