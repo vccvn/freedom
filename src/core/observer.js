@@ -1,33 +1,9 @@
 
 'use strict';
 
-/**
- * lấy kiểu giá trị của biến
- * @param {*} obj
- * @return {string}
- */
-function getType(obj) {
-    var t = 'null';
-    var type = typeof obj;
-    if (type == 'object') {
-        if (obj === null) {
-            t = 'null';
-        } else if (obj.constructor == FormData) {
-            t = 'formdata';
-        } else if (obj.constructor == Array) {
-            t = 'array';
-        } else if (obj.constructor == Object) {
-            t = 'object';
-        } else if (obj.constructor == Number) {
-            t = 'number';
-        } else {
-            t = 'object';
-        }
-    } else {
-        t = type;
-    }
-    return t;
-};
+import { isFunction } from "lodash";
+import { Str, getArguments, inArray } from "./utils";
+
 // These helpers produce better VM code in JS engines due to their
 // explicitness and function inlining.
 function isUndef(v) {
@@ -103,109 +79,8 @@ var hasOwnProperty = Object.prototype.hasOwnProperty;
 function hasOwn(obj, key) {
     return hasOwnProperty.call(obj, key)
 }
-/**
- * Simple bind polyfill for environments that do not support it,
- * e.g., PhantomJS 1.x. Technically, we don't need this anymore
- * since native bind is now performant enough in most browsers.
- * But removing it would mean breaking code that was able to run in
- * PhantomJS 1.x, so this must be kept for backward compatibility.
- */
-
-/* istanbul ignore next */
-function polyfillBind(fn, ctx) {
-    function boundFn(a) {
-        var l = arguments.length;
-        return l
-            ? l > 1
-                ? fn.apply(ctx, arguments)
-                : fn.call(ctx, a)
-            : fn.call(ctx)
-    }
-
-    boundFn._length = fn.length;
-    return boundFn
-}
 
 
-/**
- * Mix properties into target object.
- */
-function extend(to, _from) {
-    for (var key in _from) {
-        to[key] = _from[key];
-    }
-    return to
-}
-
-/* eslint-disable no-unused-vars */
-
-/**
- * Perform no operation.
- * Stubbing args to make Flow happy without leaving useless transpiled code
- * with ...rest (https://flow.org/blog/2017/05/07/Strict-Function-Call-Arity/).
- */
-function noop(a, b, c) { }
-
-/**
- * Always return false.
- */
-var no = function (a, b, c) { return false; };
-
-/* eslint-enable no-unused-vars */
-
-/**
- * Return the same value.
- */
-var identity = function (_) { return _; };
-
-/**
- * Generate a string containing static keys from compiler modules.
- */
-function genStaticKeys(modules) {
-    return modules.reduce(function (keys, m) {
-        return keys.concat(m.staticKeys || [])
-    }, []).join(',')
-}
-
-/**
- * Check if two values are loosely equal - that is,
- * if they are plain objects, do they have the same shape?
- */
-function looseEqual(a, b) {
-    if (a === b) { return true }
-    var isObjectA = isObject(a);
-    var isObjectB = isObject(b);
-    if (isObjectA && isObjectB) {
-        try {
-            var isArrayA = Array.isArray(a);
-            var isArrayB = Array.isArray(b);
-            if (isArrayA && isArrayB) {
-                return a.length === b.length && a.every(function (e, i) {
-                    return looseEqual(e, b[i])
-                })
-            } else if (a instanceof Date && b instanceof Date) {
-                return a.getTime() === b.getTime()
-            } else if (!isArrayA && !isArrayB) {
-                var keysA = Object.keys(a);
-                var keysB = Object.keys(b);
-                return keysA.length === keysB.length && keysA.every(function (key) {
-                    return looseEqual(a[key], b[key])
-                })
-            } else {
-                /* istanbul ignore next */
-                return false
-            }
-        } catch (e) {
-            /* istanbul ignore next */
-            return false
-        }
-    } else if (!isObjectA && !isObjectB) {
-        return String(a) === String(b)
-    } else {
-        return false
-    }
-}
-/*  */
 
 
 
@@ -233,6 +108,115 @@ function def(obj, key, val, enumerable) {
         writable: true,
         configurable: true
     });
+}
+
+function defConst(obj, key, value, options) {
+    var opt = {
+        enumerable: false,
+        configurable: false
+    };
+    if (isObject(options)) {
+        if (options.enumerable) {
+            opt.enumerable = true;
+        }
+        if (typeof options.get == "function") {
+            opt.get = options.get;
+            // if(options.writable){
+            //     opt.writable = true;
+            // }
+        }
+        else {
+            opt.value = Object.hasOwnProperty(options, 'value') ? options.value : value;
+        }
+    } else {
+        opt.value = value;
+    }
+    Object.defineProperty(obj, key, opt);
+}
+
+function defProp(obj, key, value, options) {
+    var opt = {
+        enumerable: true,
+        configurable: true
+    };
+    if (isObject(options)) {
+        if (options.enumerable !== undefined) {
+            opt.enumerable = options.enumerable ? true : false;
+        }
+        if (typeof options.get == "function") {
+            opt.get = options.get;
+            if (typeof options.set == "function") {
+                opt.set = options.set;
+            }
+        }
+        else {
+            opt.value = Object.hasOwnProperty(options, 'value') ? options.value : value;
+            if (options.writable) {
+                opt.writable = true;
+            }
+        }
+    } else {
+        opt.value = value;
+    }
+    Object.defineProperty(obj, key, opt);
+}
+
+function getPrimitiveValue(value, change) {
+    return function Primitive(newValue) {
+        var type = getType(newValue);
+        value = newValue;
+        if(typeof change == "function"){
+            change(value);
+        }
+    };
+    
+}
+
+function getPrimitive(value, parent) {
+    var type = getType(value);
+    var primitive = null;
+    switch (type) {
+        case 'number':
+            primitive = new Number(value);
+            break;
+        case 'string':
+            primitive = new String(value);
+            break;
+        case 'boolean':
+            primitive = new Boolean(value);
+            break;
+
+        
+
+        default:
+            primitive = getPrimitiveValue(value);
+            break;
+    }
+    var events = {
+        value: [],
+        type: []
+    };
+    var parents = [];
+    
+    defConst(primitive, 'isPrimitive', true);
+    defConst(primitive, 'is'+Str.ucfirst(getType(value)), true);
+
+    
+    defConst(primitive, '__toData__', function (fn) {
+        if ((isObject(this) || isFunction(this)) && typeof this.__toData__ == "function") return this.__toData__();
+        return value;
+    });
+
+    defConst(primitive, 'toString', function (fn) {
+        return this.__toData__();
+    });
+    
+    return primitive;
+}
+
+function parseValue(value) {
+    if ((isObject(value) && (value.isArrayData || value.isObjectData || value.isPrimitiveData)) || (isFunction(value) && value.isPrimitiveData)) return value;
+    return isArray(value) ? (new ArrayData(value)) : (isObject(value) && value.constructor == Object ? (new ObjectData(value)) : getPrimitive(value));
 }
 
 
@@ -429,6 +413,7 @@ Observer.prototype.walk = function walk(obj) {
     for (var i = 0; i < keys.length; i++) {
         defineReactive$$1.call(this, obj, keys[i]);
     }
+    
 };
 
 /**
@@ -437,8 +422,49 @@ Observer.prototype.walk = function walk(obj) {
 Observer.prototype.observeArray = function observeArray(items) {
     for (var i = 0, l = items.length; i < l; i++) {
         observe(items[i], undefined, this);
+        // defineReactive$$1.call(this, items, i, items[i]);
     }
+
+    // defineReactive$i1(items, items.length);
+
 };
+
+function resetArrayAccessors(){
+
+}
+
+function defineReactive$i1(obj, key, val){
+    var val = undefined;
+    var isset = false;
+    Object.defineProperty(obj, key, {
+        enumerable: true,
+        configurable: true,
+        get: function reactiveGetter() {
+            var value = val;
+            return value
+        },
+        set: function reactiveSetter(newVal) {
+            var value = val;
+            /* eslint-disable no-self-compare */
+            var old = val;
+            if(!isset){
+                isset = true;
+
+                val = newVal;
+                childOb = !shallow && observe(newVal, undefined, this);
+                obj.__ob__.dispatch(key, val, old, obj);
+                defineReactive$i1(obj, key+1);
+            }
+            if (newVal === value || (newVal !== newVal && value !== value)) {
+                return
+            }
+            // #7981: for accessor properties without setter
+            val = newVal;
+            childOb = !shallow && observe(newVal, undefined, this);
+            obj.__ob__.dispatch(key, val, old, obj);
+        }
+    });
+}
 
 
 /**
@@ -449,10 +475,10 @@ Observer.prototype.observeArray = function observeArray(items) {
  */
 Observer.prototype.onTransfer = function (child, keys, listen) {
     var key = null;
-    if(isArray(this.value)){
+    if (isArray(this.value)) {
         for (let index = 0; index < this.value.length; index++) {
             const vl = this.value[index];
-            if(vl == child.value) {
+            if (vl == child.value) {
                 key = String(index);
                 break;
             }
@@ -462,7 +488,7 @@ Observer.prototype.onTransfer = function (child, keys, listen) {
         for (const k in this.value) {
             if (Object.hasOwnProperty.call(this.value, k)) {
                 const vl = this.value[k];
-                if(vl == child.value){
+                if (vl == child.value) {
                     key = k;
                     break;
                 }
@@ -475,7 +501,7 @@ Observer.prototype.onTransfer = function (child, keys, listen) {
     if (!this.parent) {
         this.addEventListener(keys.join("."), listen);
     }
-    else{
+    else {
         this.parent.onTransfer(this, keys, listen);
     }
     return this;
@@ -488,17 +514,17 @@ Observer.prototype.onTransfer = function (child, keys, listen) {
  */
 Observer.prototype.addEventListener = function (key, listen) {
     if (!this.parent) {
-        if(typeof key == "function"){
+        if (typeof key == "function") {
             listen = key;
             key = obsDefaultKey;
         }
-        
-        if(typeof this.listeners[key] == "undefined") this.listeners[key] = [];
+
+        if (typeof this.listeners[key] == "undefined") this.listeners[key] = [];
         this.listeners[key].push(listen);
         return this
     }
-    
-    if(typeof key == "function"){
+
+    if (typeof key == "function") {
         listen = key;
         key = obsDefaultKey;
         this.parent.onTransfer(this, [], listen);
@@ -515,7 +541,7 @@ Observer.prototype.addEventListener = function (key, listen) {
  * @param {string} key key muốn theo dõi thay đổi
  * @param {function(newValue, oldValue, fulKey)} listen hàm xử lý
  */
- Observer.prototype.subcribe = function subcribe(key, listen) {
+Observer.prototype.subcribe = function subcribe(key, listen) {
     return this.addEventListener.call(this, key, listen);
 };
 
@@ -524,7 +550,7 @@ Observer.prototype.addEventListener = function (key, listen) {
  * @param {string} key key muốn theo dõi thay đổi
  * @param {function(newValue, oldValue, fulKey)} listen hàm xử lý
  */
- Observer.prototype.on = function on(key, listen) {
+Observer.prototype.on = function on(key, listen) {
     return this.addEventListener.call(this, key, listen);
 };
 
@@ -534,10 +560,10 @@ Observer.prototype.addEventListener = function (key, listen) {
  */
 Observer.prototype.onDispatch = function onDispatch(changes, child) {
     var key = null;
-    if(isArray(this.value)){
+    if (isArray(this.value)) {
         for (let index = 0; index < this.value.length; index++) {
             const vl = this.value[index];
-            if(vl == child.value) {
+            if (vl == child.value) {
                 key = String(index);
                 break;
             }
@@ -547,7 +573,7 @@ Observer.prototype.onDispatch = function onDispatch(changes, child) {
         for (const k in this.value) {
             if (Object.hasOwnProperty.call(this.value, k)) {
                 const vl = this.value[k];
-                if(vl == child.value){
+                if (vl == child.value) {
                     key = k;
                     break;
                 }
@@ -555,7 +581,7 @@ Observer.prototype.onDispatch = function onDispatch(changes, child) {
         }
     }
     for (let i = 0; i < changes.length; i++) {
-        changes[i].key = key+"."+changes[i].key;
+        changes[i].key = key + "." + changes[i].key;
     }
     changes.push({
         key: key,
@@ -564,12 +590,12 @@ Observer.prototype.onDispatch = function onDispatch(changes, child) {
         target: child.value
     })
 
-    if(this.parent) return this.parent.onDispatch(changes, this);
+    if (this.parent) return this.parent.onDispatch(changes, this);
     for (let index = 0; index < changes.length; index++) {
         const change = changes[index];
         this.dispatch(change.key, change.value, change.old, change.target);
     }
-    
+
 };
 
 /**
@@ -578,34 +604,34 @@ Observer.prototype.onDispatch = function onDispatch(changes, child) {
  * @param {any} value hàm xử lý
  * @param {any} old hàm xử lý
  */
- Observer.prototype.dispatch = function dispatch(key, value, old, target) {
+Observer.prototype.dispatch = function dispatch(key, value, old, target) {
     var t = target ? target : this.value;
-    if(!this.parent){
-        if(!key) {
+    if (!this.parent) {
+        if (key === undefined) {
             key = obsDefaultKey;
             value = this.value;
             old = this.value;
             target = this.value;
         }
-        
-        if(typeof this.listeners[key] != "undefined"){
-            if(isArray(this.listeners[key])){
+
+        if (typeof this.listeners[key] != "undefined") {
+            if (isArray(this.listeners[key])) {
                 for (let index = 0; index < this.listeners[key].length; index++) {
                     const fn = this.listeners[key][index];
-                    if(typeof fn == "function"){
+                    if (typeof fn == "function") {
                         fn(value, old, key);
                     }
                 }
             }
         }
     }
-    else{
-        if(!key) {
-            this.onDispatch([], this);
+    else {
+        if (key === undefined) {
+            this.parent.onDispatch([], this);
             return this;
         }
-        
-        this.onDispatch([{
+
+        this.parent.onDispatch([{
             key: key,
             value: value,
             old: old,
@@ -623,7 +649,7 @@ Observer.prototype.onDispatch = function onDispatch(changes, child) {
  * @param {any} value hàm xử lý
  * @param {any} old hàm xử lý
  */
- Observer.prototype.emit = function emit(key, value, old) {
+Observer.prototype.emit = function emit(key, value, old) {
     return this.addEventListener.call(this, key, value, old);
 };
 
@@ -693,7 +719,7 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
         val = obj[key];
     }
 
-    var childOb = !shallow && observe(val);
+    var childOb = !shallow && observe(val, undefined, this);
     Object.defineProperty(obj, key, {
         enumerable: true,
         configurable: true,
@@ -729,6 +755,7 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
                 val = newVal;
             }
             childOb = !shallow && observe(newVal, undefined, this);
+            console.log(key, val);
             obj.__ob__.dispatch(key, val, old, obj);
         }
     });

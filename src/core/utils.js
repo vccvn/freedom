@@ -1,9 +1,5 @@
-'use strict';
-
-
-
 // var Helper;
-var global = this || window;
+var global = this || window || {document:{createElement:function(tag){return Object({})}}};
 function addToGlobal(name, value) {
     global[name] = value;
 }
@@ -13,7 +9,7 @@ function addToGlobal(name, value) {
 // mang
 var arr = [];
 
-var document = window.document;
+var document = global.document;
 
 var div = document.createElement("div");
 
@@ -61,6 +57,7 @@ var isCallable = function (variable) {
     return typeof variable === "function";
 };
 
+var FD = typeof FormData != "undefined" ? FormData : function FormData() { this.data = null; };
 /**
  * lấy kiểu giá trị của biến
  * @param {*} obj
@@ -72,7 +69,7 @@ var getType = function (obj) {
     if (type == 'object') {
         if (obj === null) {
             t = 'null';
-        } else if (obj.constructor == FormData) {
+        } else if (obj.constructor == FD) {
             t = 'formdata';
         } else if (obj.constructor == Array) {
             t = 'array';
@@ -1727,7 +1724,7 @@ class Queue {
             turn: 1,
             count: 1
         });
-        var methods = newObj({
+        var methods = {
             then: function (rs) {
                 // App.log(rs);
             },
@@ -1838,7 +1835,7 @@ class Queue {
             getData: function () {
                 return properties;
             }
-        });
+        };
         this.e = function (...args) {
             if (!args.length || typeof args[0] != "string") return null;
             var method = args[0];

@@ -17,7 +17,7 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         clean: true,
         // publicPath: '/',
-        // library: 'FD',
+        library: 'FD',
         libraryTarget: 'umd',
     },
     optimization: {

@@ -679,6 +679,7 @@ const U = createElementClass("u"), Ul = createElementClass("ul");
 const Video = createElementClass("video");
 const Wbr = createElementClass("wbr");
 
+
 const a = createHtmlElementFunction("a"), abbr = createHtmlElementFunction("abbr"), acronym = createHtmlElementFunction("acronym"), address = createHtmlElementFunction("address"), applet = createHtmlElementFunction("applet"), area = createHtmlElementFunction("area"), article = createHtmlElementFunction("article"), aside = createHtmlElementFunction("aside"), audio = createHtmlElementFunction("audio"),
     b = createHtmlElementFunction("b"), base = createHtmlElementFunction("base"), basefont = createHtmlElementFunction("basefont"), bb = createHtmlElementFunction("bb"), bdo = createHtmlElementFunction("bdo"), big = createHtmlElementFunction("big"), blockquote = createHtmlElementFunction("blockquote"), body = createHtmlElementFunction("body"), br = createHtmlElementFunction("br"), button = createHtmlElementFunction("button"),
     canvas = createHtmlElementFunction("canvas"), caption = createHtmlElementFunction("caption"), center = createHtmlElementFunction("center"), cite = createHtmlElementFunction("cite"), code = createHtmlElementFunction("code"), col = createHtmlElementFunction("col"), colgroup = createHtmlElementFunction("colgroup"), command = createHtmlElementFunction("command"),
@@ -777,6 +778,23 @@ Html.static({
     wbr: wbr,
 
 });
+
+const Loop = _class("Loop")({
+    target: null,
+    parent: null,
+    eachFb: null,
+    refs
+})
+
+
+Loop
+
+
+
+
+
+
+
 
 
 export default Html;

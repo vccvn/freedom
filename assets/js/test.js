@@ -1,4 +1,4 @@
-// var { _class, Dom, Html, isString, Component, app, Div, P, I, A } = FD;
+var { _class, Dom, Html, isString, Component, app, Div, P, I, A, observe } = FD;
 var AppComponent = _class("AppComponent").extends(Component)({
     constructor(props) {
         this.props = props;
