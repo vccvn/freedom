@@ -29,8 +29,6 @@
   },
   "export": "NODE_ENV='development' sapper export",
   "devDependencies": {
-    "@babel/parser": "^7.16.6",
-    "@types/lodash": "^4.14.175",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.4.0",
     "csv-loader": "^3.0.3",

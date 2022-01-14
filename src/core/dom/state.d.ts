@@ -1,0 +1,1 @@
+export declare function useState(value: any) : [any, (value: any) => any]

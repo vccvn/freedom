@@ -1204,6 +1204,15 @@ export const createClass = function (className, makeGlobal) {
                         }
 
                     }
+                    else if (s == 'onafterset' || s == 'setted' || s == 'afterset') {
+                        if (typeof value == "function") {
+                            if (typeof classData.accessors[a[1]] == "undefined") {
+                                classData.accessors[a[1]] = {};
+                            }
+                            classData.accessors[a[1]].afterSet = value;
+                        }
+
+                    }
                     else if (s == 'onget' || s == 'get') {
                         if (typeof value == "function") {
                             if (typeof classData.accessors[a[1]] == "undefined") {
@@ -1284,15 +1293,17 @@ export const createClass = function (className, makeGlobal) {
 
 
         function addAccessorKey(key) {
-            
-            if(ES5Class.prototype[key] !== undefined) return false;
+
+            if (ES5Class.prototype[key] !== undefined) return false;
             try {
-                var g, s;
+                var g, s, afs;
                 if (typeof classData.accessors[key] == "object") {
                     if (typeof classData.accessors[key].get == "function")
                         g = classData.accessors[key].get;
                     if (typeof classData.accessors[key].set == "function")
                         s = classData.accessors[key].set;
+                    if (typeof classData.accessors[key].afterSet == "function")
+                        afs = classData.accessors[key].afterSet;
                 }
 
                 Object.defineProperty(ES5Class.prototype, key, {
@@ -1329,7 +1340,12 @@ export const createClass = function (className, makeGlobal) {
                             if (a === false) stt = false;
                         }
 
-                        if (stt) data[key] = value;
+                        if (stt) {
+                            data[key] = value;
+                            if(afs) afs.call(this, value);
+                        }
+
+                        
                         return data[key];
                     }
                 });

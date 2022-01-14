@@ -17,6 +17,7 @@ const DATA_SYNC = 'DATA_SYNC' + Str.rand(Str.rand(MS));
 const DYNAMIC_SYNC = 'DYNAMIC_SYNC' + Str.rand(Str.rand(MS));
 const DYNAMIC_ATTRS = 'DYNAMIC_ATTRS' + Str.rand(Str.rand(MS));
 const DATA_CONTAINERS = 'DATA_CONTAINERS' + Str.rand(Str.rand(MS));
+const FOREIGN_DATA = 'FOREIGN_DATA' + Str.rand(Str.rand(MS));
 const BUILDER = 'BUILDER' + Str.rand(Str.rand(MS));
 const IS_STARTED = 'IS_STARTED' + Str.rand(Str.rand(MS));
 const LISTENNERS = 'LISTENNERS' + Str.rand(Str.rand(MS));
@@ -277,7 +278,7 @@ function addPendingData(_classCtx, data) {
  * @param {Dom|Dom[]} children Dom con
  * @param {Object<key:value>} attributes thuộc tính
  */
-var Dom = function Dom(selector, children, attributes){
+var Dom = function Dom(selector, children, attributes) {
 
     this.__instance__id__ = DEFAULT_VALUE;
 };
@@ -293,19 +294,17 @@ Dom = _class("Dom")({
     $children: null,
     $parent: null,
 
-    static$makeClass: function(name, props){
+    static$makeClass: function (name, props) {
         var wrapper = createClass(name, isGlobal).extends(this);
-        return isObject(props)?wrapper(props): wrapper;
+        return isObject(props) ? wrapper(props) : wrapper;
     },
-    static$maker: function(name, props){
+    static$maker: function (name, props) {
         try {
             var wrapper = createClass(name, isGlobal).extends(this);
-        return isObject(props)?wrapper(props): wrapper;
+            return isObject(props) ? wrapper(props) : wrapper;
         } catch (error) {
             console.warn(error);
         }
-        // var wrapper = createClass(name, isGlobal).extends(this);
-        // return isObject(props)?wrapper(props): wrapper;
     },
     /**
      * 
@@ -357,7 +356,7 @@ Dom = _class("Dom")({
 
         if (!classData.props.tagName && !classData.constants.tagName && !classData.accessors.tagName.value) {
             var s = Str.camelToSlug(this.__class__);
-            if (s != 'dom' && s!="component") {
+            if (s != 'dom' && s != "component") {
                 if (!classData.accessors.tagName)
                     classData.accessors.tagName = {
                         value: s
@@ -382,6 +381,7 @@ Dom = _class("Dom")({
             .__set__(LISTENNERS, {})
             .__set__(DOM_LISTENNERS, [])
             .__set__(DATA_CONTAINERS, [])
+            .__set__(FOREIGN_DATA, {})
             .__set__(PARENT_NODE, null)
             .__set__(SHOW, false)
             .__set__(MARK_COMMENT, null)
@@ -390,6 +390,7 @@ Dom = _class("Dom")({
             .__set__(DATA_TYPES, {})
             .__set__(SYNC_CHANGE, true)
             .__set__(DATA_SYNC, true)
+
 
 
         this.children = [];
@@ -416,7 +417,6 @@ Dom = _class("Dom")({
     __init__: function () {
         if (!this.el) {
             this.setup(this.getDefaultSelector());
-            
         }
 
         this.__before__init__();
@@ -429,57 +429,13 @@ Dom = _class("Dom")({
         if (this.autoRender) {
             __buildChildren__.call(this);
 
-        }else{
+        } else {
             __build__.call(this);
         }
 
-        // bắt sự kiện change và thay đổi cá thuộc tính dộng cho nó dồng bộ
-        this.on("change", function (event) {
-            if (event.target == self.el) {
-                if (this.__get__(DYNAMIC_SYNC)) {
-                    var attrs = self.attr();
-                    var __dynamicAttrs = this.__get__(DYNAMIC_ATTRS);
-                    for (var key in __dynamicAttrs) {
-                        if (Object.hasOwnProperty.call(dyna1micAttrs, key)) {
-                            var val = __dynamicAttrs[key];
-                            var camelKey = Str.slugToCamel(key),
-                                slugKey = Str.camelToSlug(key);
-                            var s = null;
-                            var v = null;
-                            if (Object.hasOwnProperty.call(attrs, key) && attrs[key] != val) {
-                                __dynamicAttrs[key] = attrs[key]
-                                s = key;
-                                v = attrs[key];
-                            }
-                            else if (Object.hasOwnProperty.call(attrs, slugKey) && attrs[slugKey] != val) {
-                                __dynamicAttrs[key] = attrs[slugKey];
-                                s = camelKey;
-                                v = attrs[slugKey];
-                            }
-                            else if (Object.hasOwnProperty.call(attrs, camelKey) && attrs[camelKey] != val) {
-                                __dynamicAttrs[key] = attrs[camelKey];
-                                s = slugKey;
-                                v = attrs[camelKey];
-                            }
 
-                            if (s) {
-                                self.trigger({
-                                    type: "change.attr." + s,
-                                    preventDefault: function () {
-                                        // stt = false;
-                                    },
-                                    target: self.el,
-                                    data: {
-                                        attr: s,
-                                        value: v
-                                    }
-                                });
-                            } // end if status == true
-                        } // end has prop
-                    } // wnd for
-                } // end if dynamic sync
-            } // end if target == el
-        }) // end call 
+
+
 
         if (typeof this.onAferInit == "function") {
             this.onAferInit();
@@ -513,7 +469,7 @@ Dom = _class("Dom")({
      * thay thế / thêm nội dung cho thẻ
      * @param {Element|Dom|string|Element[]|Dom[]|string[]} content nội dung
      */
-     final$render: function (content) {
+    final$render: function (content) {
         this.clear();
         if (typeof this.onBeforeRender == "function") {
             this.onBeforeRender();
@@ -524,9 +480,9 @@ Dom = _class("Dom")({
             this.onAfterRender();
         }
         this.emit("rendered");
-        
+
     },
-    clear: function(){
+    clear: function () {
         if (typeof this.onBeforeClear == "function") {
             this.onBeforeClear();
         }
@@ -552,7 +508,7 @@ Dom = _class("Dom")({
         }
         this.emit('children.rendering');
         var _pendingChildren = this.__get__(PENDING_CHILDREN);
-        
+
         if (_pendingChildren.length) {
             while (_pendingChildren.length) {
                 var a = _pendingChildren.shift();
@@ -586,16 +542,24 @@ Dom = _class("Dom")({
 
         var el = elem.el;
         if (el) {
-            if(!this.tagName && this.static.__class__ == "DOM"){
+            if (!this.tagName && this.static.__class__ == "DOM") {
                 this.tagName = elem.tag;
             }
-            
+
             if (!el.id && this.id) el.id = this.id;
             if (!el.className && this.className) el.className = this.className;
 
+
             this.el = el;
-            if (!isEmpty(elem.__dynamicAttrs)) {
-                addDynamicAttr.call(this, elem.__dynamicAttrs);
+
+            const FOREIGN = this.__get__(FOREIGN_DATA);
+
+            var self = this;
+
+
+
+            if (!isEmpty(elem.oneWayBinding)) {
+                addDynamicAttr.call(this, elem.oneWayBinding);
             }
             if (!isEmpty(elem.dataTypeAttrs)) {
                 for (const key in elem.dataTypeAttrs) {
@@ -1493,6 +1457,68 @@ Dom = _class("Dom")({
      * @param {*} child 
      * @returns {Query|Dom}
      */
+    const$before: function (child, childTarget) {
+        if (typeof child == "undefined" || isNull(child) || simpleTags.indexOf(this.tagName) !== -1 || !childTarget) return this;
+        let index = 0;
+        var target = null;
+        var self = this;
+        if (isFunction(child) && child.isDomClass) child = child('#inp-' + Str.rand());
+        var i = this.children.indexOf(childTarget);
+        if (i !== -1) {
+            index = i;
+            target = childTarget.isDom ? childTarget.el : childTarget;
+        }
+        else {
+            for (let j = 0; j < this.children.length; j++) {
+                const c = this.children[j];
+                if ((c.isDom && (c == childTarget || c.el == childTarget || c.el == childTarget.el)) || (childTarget.isDom && (childTarget.el == c || childTarget.el == c.el))) {
+                    index = j;
+                    target = childTarget.isDom ? childTarget.el : childTarget;
+                }
+            }
+        }
+
+        if (isObject(child)) {
+            if (target) {
+                if (child.isDom) {
+                    child.parent = self;
+                    this.children.splice(index, 0, child);
+                    this.el.insertBefore(child.el, target);
+                }
+                else if (child.isDomBag) {
+                    let c = child.withParent(this);
+                    __build__.call(c);
+                    this.children.splice(index, 0, c);
+                    this.el.insertBefore(c.el, target);
+                }
+                else if (child instanceof Element) {
+                    this.children.splice(index, 0, child);
+                    this.el.insertBefore(child, target);
+                }
+            }
+            if (child.isDom) {
+                child.parent = self;
+                this.children.unshift(child);
+                this.el.insertBefore(child.el, this.el.firstChild);
+            }
+            else if (child.isDomBag) {
+                let c = child.withParent(this);
+                __build__.call(c);
+                this.el.insertBefore(child.el, this.el.firstChild);
+                this.children.unshift(child);
+            }
+            else if (child instanceof Element) {
+                this.el.insertBefore(child, this.el.firstChild);
+                this.children.unshift(child);
+            }
+        }
+        return this;
+    },
+    /**
+     * Thêm phần tử con vào Đầu danh sách phần tử con cvua3 element
+     * @param {*} child 
+     * @returns {Query|Dom}
+     */
     const$prepend: function (child) {
         if (typeof child == "undefined" || isNull(child) || simpleTags.indexOf(this.tagName) !== -1) return this;
 
@@ -1692,19 +1718,9 @@ Dom = _class("Dom")({
         return this.append(content);
     },
 
-
-
-
-
-
-
     final$stopTransmission: function () {
         this.__set__(TRANSMISTION_STATUS, false);
     },
-
-
-
-
     /**
      * tuyền dữ liệu giữ các component cha -> con
      * @param {string} channel tên sự kiện
@@ -1713,14 +1729,6 @@ Dom = _class("Dom")({
     final$sendToChildren: function (channel, data) {
         return __sendToChildren__.call(this, channel, data);
     },
-
-
-
-
-
-
-
-
 
     /**
      * tuyền dữ liệu giữ các component con -> cha
@@ -1851,8 +1859,6 @@ Dom = _class("Dom")({
         return this.callSiblingMethod(method, args);
     },
 
-
-
     getElementArgsData: function (args, rules) {
         // var rules = {
 
@@ -1887,8 +1893,6 @@ Dom = _class("Dom")({
         if (this.parent && isObject(this.parent) && this.parent.isDom) return this.parent.getRootElement();
         return this;
     },
-
-
     // dịch chuyển element trong dom
     final$moveTo: function (parent, pos) {
         if (!isObject(parent)) return false;
@@ -2000,7 +2004,6 @@ Dom = _class("Dom")({
         }
 
     },
-
 
     /**
      * set id cho element khi set cho object
@@ -2160,6 +2163,7 @@ function bootData() {
     }
 
     const _data_containers = this.__get__(DATA_CONTAINERS);
+    console.log(_data_containers);
     if (!isEmpty(_data_containers)) {
         for (const key in _data_containers) {
             if (Object.prototype.hasOwnProperty.call(_data_containers, key)) {
@@ -2639,6 +2643,54 @@ function onReceiveFromSiblings(channel, data) {
 
 function ___assignDynamicProperties___() {
     var self = this;
+
+    function next(args) {
+
+        if (self.parent) {
+            let index = self.parent.children.indexOf(self);
+            var s = false;
+            for (let i = index + 1; i < self.parent.children.length; i++) {
+                const child = self.parent.children[i];
+                if (isObject(args)) {
+                    var a = true;
+                    for (const key in args) {
+                        if (Object.hasOwnProperty.call(args, key)) {
+                            const value = args[key];
+                            if (child[key] != value) a = false;
+                        }
+                    }
+                    if (a) return child;
+                }
+                else if (isFunction(args) && args(child)) return child;
+                else if (!args) return child;
+
+            }
+        }
+        return null;
+    }
+
+    function previous(args) {
+        if (self.parent) {
+            let index = self.parent.children.indexOf(self);
+            for (let i = index - 1; i > -1; i--) {
+                const child = self.parent.children[i];
+                if (isObject(args)) {
+                    var a = true;
+                    for (const key in args) {
+                        if (Object.hasOwnProperty.call(args, key)) {
+                            const value = args[key];
+                            if (child[key] != value) a = false;
+                        }
+                    }
+                    if (a) return child;
+                }
+                else if (isFunction(args) && args(child)) return child;
+                else if (!args) return child;
+            }
+        }
+        return null;
+    }
+
     function show(time, callback) {
 
         // function _show() {
@@ -2690,9 +2742,9 @@ function ___assignDynamicProperties___() {
             self.__set__(SHOW, true);
             _show();
         } else {
-            var next = next(function (el) { return el.isDom && el.__set__(SHOW) });
-            if (next) {
-                next.el.parentNode.insertBefore(self.el, next.el);
+            var _next = next(function (el) { return el.isDom && el.__get__(SHOW) });
+            if (_next) {
+                _next.el.parentNode.insertBefore(self.el, _next.el);
                 self.__set__(SHOW, true);
                 _show();
             } else if (self.parent) {
@@ -2754,52 +2806,6 @@ function ___assignDynamicProperties___() {
         return self;
     }
 
-    function next(args) {
-
-        if (self.parent) {
-            let index = self.parent.children.indexOf(self);
-            var s = false;
-            for (let i = index + 1; i < self.parent.children.length; i++) {
-                const child = self.parent.children[i];
-                if (isObject(args)) {
-                    var a = true;
-                    for (const key in args) {
-                        if (Object.hasOwnProperty.call(args, key)) {
-                            const value = args[key];
-                            if (child[key] != value) a = false;
-                        }
-                    }
-                    if (a) return child;
-                }
-                else if (isFunction(args) && args(child)) return child;
-                else if (!args) return child;
-
-            }
-        }
-        return null;
-    }
-
-    function previous(args) {
-        if (self.parent) {
-            let index = self.parent.children.indexOf(self);
-            for (let i = index - 1; i > -1; i--) {
-                const child = self.parent.children[i];
-                if (isObject(args)) {
-                    var a = true;
-                    for (const key in args) {
-                        if (Object.hasOwnProperty.call(args, key)) {
-                            const value = args[key];
-                            if (child[key] != value) a = false;
-                        }
-                    }
-                    if (a) return child;
-                }
-                else if (isFunction(args) && args(child)) return child;
-                else if (!args) return child;
-            }
-        }
-        return null;
-    }
     Object.defineProperties(show, {
         toString: {
             configurable: false,
@@ -2897,59 +2903,7 @@ function ___assignDynamicProperties___() {
 
 }
 
-function setDataTypeAttribute(key, value, sync) {
-    if (!((isObject(value) && (value.isObjectData || value.isArrayData) || value.isPrimitive) || (isFunction(value) && value.isPrimitive))) return sync ? this.addDynamicAttr(key, value) : this.setAttribute(key, value);
-    this.__set__(DATA_SYNC, false);
-    this.setAttribute(key, value.__toData__());
-    var vl = value;
-    var __dataTypes__ = this.__get__(DATA_TYPES);
-    if (__dataTypes__[key] === undefined) {
-        var self = this;
-        __dataTypes__[key] = value;
-        value.__addChangeEvent__(function (e) {
-            self.__set__(DATA_SYNC, false);
-            self.__set__(SYNC_CHANGE, false);
-            vl = e.value;
-            this.setAttribute(key, e.value.__toData__());
-            self.__set__(DATA_SYNC, true);
-            self.__set__(SYNC_CHANGE, true);
 
-        });
-        Object.defineProperty(this, key, {
-            configurable: true,
-            enumerable: true,
-            get: function () {
-                return vl;
-            },
-            set: function (value2) {
-                if (vl.__PARENT__) {
-                    var key = vl.__PARENT__.keyOf(vl);
-                    if (key !== undefined) {
-                        self.__set__(DATA_SYNC, false);
-                        self.__set__(SYNC_CHANGE, false);
-                        vl.__PARENT__[key] = value2;
-                        self.__set__(DATA_SYNC, true);
-                        self.__set__(SYNC_CHANGE, true);
-
-                    }
-                }
-            }
-        })
-        if (sync) {
-            this.on("change", function (e) {
-                if (e.target == self.el) {
-                    var vlchange = self.attr(key);
-                    if (vlchange != vl.__toData__() && self.__get__(SYNC_CHANGE)) {
-                        self.__set__(SYNC_CHANGE, false);
-                        self[key] = vlchange;
-                        self.__set__(SYNC_CHANGE, true);
-
-                    }
-                }
-            })
-        }
-    }
-}
 
 /**
  * Thêm thuộc tính động
@@ -2962,7 +2916,7 @@ function addDynamicAttr(attr, value) {
         var self = this;
         if ((isObject(value) && (value.isObjectData || value.isArrayData) || value.isPrimitive) || (isFunction(value) && value.isPrimitive)) return setDataTypeAttribute.call(this, attr, value);
         this.attr(attr, value);
-        var __dynamicAttrs = this.__get__(DYNAMIC_ATTRS);
+        var oneWayBinding = this.__get__(DYNAMIC_ATTRS);
         Object.defineProperty(this, attr, {
             configurable: true,
             set: function (val) {
@@ -2981,14 +2935,14 @@ function addDynamicAttr(attr, value) {
                 });
 
                 if (stt) {
-                    __dynamicAttrs[attr] = val;
+                    oneWayBinding[attr] = val;
                     this.attr(attr, val);
 
                 }
                 this.__set__(DYNAMIC_SYNC, true);
             },
             get: function () {
-                return __dynamicAttrs[attr] || null;
+                return oneWayBinding[attr] || null;
             }
         })
 
@@ -3014,7 +2968,6 @@ function create(tag, children, attributes) {
         id = '',
         className = '',
         attrs = {},
-        __dynamicAttrs = {},
         events = {},
         props = {},
         methods = {},
@@ -3025,44 +2978,70 @@ function create(tag, children, attributes) {
         isArrayContent = false,
         isTwoContent = 0,
         dataTypeAttrs = {},
-        bindingAttrs = {},
+        oneWayBinding = {},
+        twoWayBinding = {},
         data = {},
-        parent = null
+        parent = null,
+        self = this
         ;
 
     function addAttrValue(k, vl) {
 
         var s = String(k).toLowerCase();
-        if (s.substr(0, 1) == '$') {
-            if (s == '$parent' && ((isObject(vl) && vl.isDom) || vl instanceof Element)) {
+        var parts = s.split("$");
+        var f = k.substring(0, 1);
+        var n = k.substring(1);
+        var f2 = k.substring(0, 2);
+        var n2 = k.substring(2);
+        if (parts.length > 1) {
+            var key = k.substring(parts[0].length + 1);
+            if(parts[0].length){
+                if(parts[0] == "sync"){
+                    twoWayBinding[key] = val;
+                }else if(parts[0] == "bind"){
+                    oneWayBinding[key] = val;
+                }else{
+                    oneWayBinding[key] = val;
+                }
+                
+            }
+            else if(parts[1] == '$parent' && ((isObject(vl) && vl.isDom) || vl instanceof Element)) {
                 parent = val;
             }
             else {
-                __dynamicAttrs[k.substr(1)] = vl;
+                oneWayBinding[k.substr(1)] = vl;
             }
-            //fafdhfhdf
         }
-
-
         else if (k == 'parent' && ((isObject(vl) && vl.isDom) || vl instanceof Element)) {
             parent = val;
 
         }
-        else if (inArray(['data', 'services'], k)) {
+        else if (inArray(['data', 'services', 'methods'], k)) {
             if (isObject(vl)) {
                 var container = {};
                 container[k] = vl;
-                this.__set__(DATA_CONTAINERS, container);
+                self.__set__(FOREIGN_DATA, container);
+            }
+        }
+        else if (inArray(['attr', 'attrs', 'attribute', 'attributes', 'prop', 'props'], k)) {
+            if (isObject(vl)) {
+                Object.keys(vl).map(function (_k) {
+                    addAttrValue(_k, vl[_k]);
+                });
+
             }
         }
         else if (inArray(['tag', 'tagname'], s)) {
             // tagName = vl;
         }
-        else if (s.substr(0, 2) == 'on' && isDomEvent(s.substr(2))) {
+        else if (f2 == 'on' && isDomEvent(s.substr(2))) {
             events[s.substr(2)] = vl;
         }
-        else if (s.substr(0, 1) == '@' && isDomEvent(s.substr(1))) {
-            events[s.substr(1)] = vl;
+        else if (f2 == '$$') {
+            twoWayBinding[s.substr(2)] = vl;
+        }
+        else if (f == '@' && isDomEvent(n)) {
+            events[n] = vl;
         }
         else if (s == "on" && isObject(vl)) {
             for (const v in vl) {
@@ -3090,7 +3069,7 @@ function create(tag, children, attributes) {
             }
         }
         else if (isString(vl) && !isNumber(vl) && vl.substr(0, 2) == '{{' && vl.substr(vl, length - 2) == '}}') {
-            bindingAttrs[k] = vl.substr(2, vl, length - 4).trim();
+            twoWayBinding[k] = vl.substr(2, vl, length - 4).trim();
         }
         else if (isObject(vl) && (vl.isArrayData || vl.isObjectData)) {
             dataTypeAttrs[k] = vl;
@@ -3233,7 +3212,7 @@ function create(tag, children, attributes) {
                     // tagName = vl;
                 }
                 else if (f == '$' && (isString(vl) || isNumber(vl) || getType(vl) == "boolean")) {
-                    __dynamicAttrs[k.substr(1)] = vl;
+                    oneWayBinding[k.substr(1)] = vl;
                 }
                 else if (key == "style") {
 
@@ -3369,8 +3348,8 @@ function create(tag, children, attributes) {
     return {
         el: htmlObject,
         contents: childrenContents,
-        __dynamicAttrs: __dynamicAttrs,
-        bindingAttrs: bindingAttrs,
+        oneWayBinding: oneWayBinding,
+        twoWayBinding: twoWayBinding,
         dataTypeAttrs: dataTypeAttrs,
         events: events,
         methods: methods,
@@ -3391,7 +3370,7 @@ var createEl = function createEl(tag, ...args) {
         id = '',
         className = '',
         attrs = {},
-        __dynamicAttrs = {},
+        oneWayBinding = {},
         events = {},
         props = {},
         contents = [],
@@ -3412,7 +3391,7 @@ var createEl = function createEl(tag, ...args) {
                 var vl = object[k];
                 var s = String(k).toLowerCase();
                 if (s.substr(0, 1) == '$') {
-                    __dynamicAttrs[k.substr(1)] = vl;
+                    oneWayBinding[k.substr(1)] = vl;
                 }
                 else if (inArray(['tag', 'tagname'], s)) {
                     // tagName = vl;

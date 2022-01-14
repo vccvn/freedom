@@ -34,4 +34,17 @@ var AppComponent = _class("AppComponent").extends(Component)({
     },
 });
 var ac = AppComponent({name: "Doãn"});
-ac.appendTo(document.body)
+ac.appendTo(document.body);
+
+var div = Div('.test-div', {
+    data: {
+        source: 1,
+        uuid: FD.Str.rand()
+    },
+    methods:{
+        handle: function (event) {
+            console.log(event);
+        }
+    },
+    content: "Test"
+});

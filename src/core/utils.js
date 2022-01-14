@@ -1,5 +1,5 @@
 // var Helper;
-var global = this || window || {document:{createElement:function(tag){return Object({})}}};
+var global = this || window || { document: { createElement: function (tag) { return Object({}) } } };
 function addToGlobal(name, value) {
     global[name] = value;
 }
@@ -14,11 +14,6 @@ var document = global.document;
 var div = document.createElement("div");
 
 // var getProto = Object.getPrototypeOf;
-
-var slice = arr.slice;
-
-var createElement = document.createElement;
-
 
 // var $$;
 if (typeof Object.assign != 'function') {
@@ -91,7 +86,7 @@ var getType = function (obj) {
  */
 var isString = function isString(variable) {
     var type = getType(variable);
-    return type == "string" || (type == "number" && !isNaN(variable));
+    return type == "string" || (type == "number" && !isNaN(variable)) || (type == "object" && (variable.constructor == String || (variable.isPrimitive && variable.isString)));
 }
 /**
  * kiềm tra có phải null
@@ -120,7 +115,7 @@ var isObject = function isObject(variable) {
  */
 var isNumber = function isNumber(variable) {
     var type = getType(variable);
-    return (type === "number" || type === "string") && !isNaN(variable - parseFloat(variable));
+    return ((type === "number" || type === "string") && !isNaN(variable - parseFloat(variable))) || (type == "object" && (variable.constructor == Number || (variable.isPrimitive && variable.isNumber)));
 }
 /**
  * kiềm tra có phải loat
@@ -145,7 +140,8 @@ var isInteger = function isInteger(variable) {
  * @param {*} variable biến bất kỳ
  */
 var isBoolean = function isBoolean(variable) {
-    return getType(variable) == "boolean";
+    var type = getType(variable);
+    return type == "boolean" || (type == "object" && (variable.constructor == Boolean || (variable.isPrimitive && variable.isBoolean)));
 }
 
 /**
@@ -172,7 +168,7 @@ var isEmpty = function (obj) {
     // console.log(any.constructor)
     var type = getType(obj);
 
-    if (type == "object") {
+    if (type == "object" && (!obj.isPrimitive)) {
         for (var key in obj) {
             if (obj.hasOwnProperty(key)) {
                 return false;
@@ -180,7 +176,7 @@ var isEmpty = function (obj) {
         }
         return true;
     }
-    else if (type == "array" || type == 'string') {
+    else if (type == "array" || type == 'string' || (type == "object" && obj.isPrimitive && obj.isString)) {
         return obj.length == 0;
     }
     else return !obj;
@@ -817,18 +813,18 @@ var getEl = function (obj, key, defaultValue, delimiter) {
             }
         }
     }
-    else if(tpo == "object"){
+    else if (tpo == "object") {
         var c = obj;
-        var d = isString(delimiter)?delimiter:'.';
+        var d = isString(delimiter) ? delimiter : '.';
         var ks = String(key).split(d);
         for (let index = 0; index < ks.length; index++) {
             const e = ks[index];
-            if(objectHasKey(c, e)) {
+            if (objectHasKey(c, e)) {
                 c = c[e];
-            }else{
+            } else {
                 c = defaultValue;
             }
-            if(index < ks.length -1 && (!isObject(c) && !isArray(c))) return defaultValue;
+            if (index < ks.length - 1 && (!isObject(c) && !isArray(c))) return defaultValue;
         }
         return c;
 
@@ -1013,7 +1009,7 @@ var Str = {
             find.push(c);
             replace.push(k + c.toLowerCase());
         });
-        return this.replace(str[0].toLowerCase()+""+str.substr(1), find, replace);
+        return this.replace(str[0].toLowerCase() + "" + str.substr(1), find, replace);
     },
     upperToWord: function (str) {
         var st = 'abcdefghijklmnopqrstuvwxyz';
@@ -1375,7 +1371,7 @@ var getTimeStamp = function () {
  * @param {*} value giá trị
  * @returns {object}
  */
- const assignValue =  function(target, key, value) {
+const assignValue = function (target, key, value) {
     if (!isArray(target) && !isObject(target)) return target;
     if (isObject(key)) {
         let objData = key;
@@ -1387,10 +1383,10 @@ var getTimeStamp = function () {
         for (var k in objData) {
             if (objData.hasOwnProperty(k)) {
 
-                
-                    var v = objData[k];
-                    assignValue(target, k, v);
-                
+
+                var v = objData[k];
+                assignValue(target, k, v);
+
 
 
             }
@@ -1444,14 +1440,14 @@ var getTimeStamp = function () {
  * @param {*} value giá trị
  * @returns {object}
  */
- const assignOneValue = function(target, value) {
+const assignOneValue = function (target, value) {
     if (!isArray(target) && !isObject(target)) return target;
     if (isObject(target)) {
-        if(target.constructor == Object){
+        if (target.constructor == Object) {
             for (const key in target) {
                 if (Object.hasOwnProperty.call(target, key)) {
                     const vl = target[key];
-                    if(isObject(vl) && vl.constructor == Object){
+                    if (isObject(vl) && vl.constructor == Object) {
                         assignOneValue(vl, value);
                     }
                     target[key] = value;
@@ -1462,7 +1458,7 @@ var getTimeStamp = function () {
         let arrData = target;
         for (let i = 0; i < arrData.length; i++) {
             const vl = arrData[i];
-            if(isObject(vl) && vl.constructor == Object){
+            if (isObject(vl) && vl.constructor == Object) {
                 assignOneValue(vl, value);
             }
             arrData[i] = value;
@@ -1475,14 +1471,14 @@ var getTimeStamp = function () {
  * @param {object|array} target đối tượng cần gán thuộc tính
  * @returns {object}
  */
-const destroyObject = function(target) {
+const destroyObject = function (target) {
     if (!isArray(target) && !isObject(target)) return target;
     if (isObject(target)) {
-        if(target.constructor == Object){
+        if (target.constructor == Object) {
             for (const key in target) {
                 if (Object.hasOwnProperty.call(target, key)) {
                     const vl = target[key];
-                    if(isObject(vl) && vl.constructor == Object){
+                    if (isObject(vl) && vl.constructor == Object) {
                         destroyObject(vl);
                     }
                     target[key] = null;
@@ -1493,7 +1489,7 @@ const destroyObject = function(target) {
     } else if (isArray(target)) {
         for (let i = 0; i < target.length; i++) {
             const vl = target[i];
-            if(isObject(vl) && vl.constructor == Object){
+            if (isObject(vl) && vl.constructor == Object) {
                 destroyObject(vl);
             }
             target[i] = null;
@@ -1527,7 +1523,7 @@ var assignWithout = function (target, source) {
                     il.push(field);
                 }
             }
-        }else{
+        } else {
             il.push(list)
         }
     }
@@ -1550,7 +1546,7 @@ var assignWithout = function (target, source) {
  * @param {*} value giá trị
  * @returns {object}
  */
- const assignIfNotExists = (target, key, value) => {
+const assignIfNotExists = (target, key, value) => {
     if (!isArray(target) && !isObject(target)) return target;
     if (isObject(key)) {
         let objData = key;
@@ -1588,7 +1584,7 @@ var assignWithout = function (target, source) {
                 if (typeof target[ak] != "object") target[ak] = {};
                 assignIfNotExists(target[ak], value);
             }
-            else if(!objectHasKey(target, sk)){
+            else if (!objectHasKey(target, sk)) {
 
                 target[ak] = value;
             }
@@ -1601,7 +1597,7 @@ var assignWithout = function (target, source) {
                 assignIfNotExists(target[ak], value);
             }
         }
-        else if(!objectHasKey(target, sk)){
+        else if (!objectHasKey(target, sk)) {
             target[ak] = value;
         }
     }
@@ -1621,21 +1617,21 @@ const objectAssignKeyValue = (target, key, value, filter) => {
     const reject = (_any) => {
         stt = false;
     }
-    if(typeof filter == "function"){
+    if (typeof filter == "function") {
         let rs = filter(key, value, resolve, reject);
-        if(resolveStt){
+        if (resolveStt) {
             target[key] = resolveValue;
-        }else if(stt){
-            if(isBoolean(rs)){
-                if(isBoolean(value)) target[key] = rs;
-                else if(rs === true) target[key] = value;
-            }else if(typeof rs != "undefined") target[key] = value;
+        } else if (stt) {
+            if (isBoolean(rs)) {
+                if (isBoolean(value)) target[key] = rs;
+                else if (rs === true) target[key] = value;
+            } else if (typeof rs != "undefined") target[key] = value;
         }
-    }else if(isString(filter)){
-        if(getType(value) == filter){
+    } else if (isString(filter)) {
+        if (getType(value) == filter) {
             target[key] = value;
         }
-    }else{
+    } else {
         target[key] = value;
     }
     return value;
@@ -1654,7 +1650,7 @@ const objectAssign = (target, obj, filter) => {
 
                 var v = objData[k];
                 objectAssignKeyValue(target, k, v, filter);
-                
+
 
 
             }
@@ -1703,8 +1699,8 @@ class Queue {
     status = "";
     result;
 
-    e=null;
-    
+    e = null;
+
     constructor(work, delay, step) {
         if (typeof work == "undefined") return this;
         this.status = "pending";
@@ -1881,7 +1877,7 @@ class Queue {
         }
         return this;
     }
-    catch(fn){
+    catch(fn) {
         if (typeof fn == "function") {
             this.e("addCatch", fn);
         }
@@ -2022,43 +2018,43 @@ var radianToDegrees = function (radians) {
  * @param value gia tri
  * @param options option
  */
-function getInputCfg ( type, name, value, options ) {
+function getInputCfg(type, name, value, options) {
     var t = Str.lower(type);
     return inArray([
-        'text', 'number', 'select', 'range', 'radio', 'checkbox', 'switch', 
-        'textarea', 'texteditor', 'vector2', 'vector3', 'vector4', 'texture', 
-        'imagesurl', 'color' 
-    ], t)? assignValue({
+        'text', 'number', 'select', 'range', 'radio', 'checkbox', 'switch',
+        'textarea', 'texteditor', 'vector2', 'vector3', 'vector4', 'texture',
+        'imagesurl', 'color'
+    ], t) ? assignValue({
         type: t,
         name: name,
         value: value
-    }, options) : null ;
+    }, options) : null;
 }
 
 
 const EMPTY_VALUE = "<EMPTY>" + Str.rand(getTimeStamp()) + "</EMPTY>";
 
 
-var getFirstValueInList = function(list, key, checkFn){
+var getFirstValueInList = function (list, key, checkFn) {
     var val = EMPTY_VALUE;
-    if(isArray(list) && isString(key)){
-        if(isFunction(checkFn)){
+    if (isArray(list) && isString(key)) {
+        if (isFunction(checkFn)) {
             for (let index = 0; index < list.length; index++) {
                 const currentObject = list[index];
-                if(isObject(currentObject)){
-                    if(Object.hasOwnProperty.call(currentObject, key)){
-                        if(checkFn(currentObject[key])){
+                if (isObject(currentObject)) {
+                    if (Object.hasOwnProperty.call(currentObject, key)) {
+                        if (checkFn(currentObject[key])) {
                             return currentObject[key];
                         }
                     }
                 }
             }
-        }else{
+        } else {
             for (let index = 0; index < list.length; index++) {
                 const currentObject = list[index];
-                if(isObject(currentObject)){
-                    if(Object.hasOwnProperty.call(currentObject, key)){
-                        if(currentObject[key] !== "" && currentObject[key]!== null && currentObject[key] !== undefined) return currentObject[key];
+                if (isObject(currentObject)) {
+                    if (Object.hasOwnProperty.call(currentObject, key)) {
+                        if (currentObject[key] !== "" && currentObject[key] !== null && currentObject[key] !== undefined) return currentObject[key];
                     }
                 }
             }
@@ -2071,11 +2067,11 @@ export {
     _instanceof, _defineProperties, _createClass, _defineProperty, addToGlobal,
     getType, checkType, isArray, isBoolean, isObject, isString, isNumber, isInteger, isEmail, isNull, isFormData, isEmpty, isCallable, isFunction, isProperty, isMethod, hasValue, inArray,
 
-    cutWithout, copyWithout, copyArray, objectKeys, objectValues, merge, combine, arrayJoin, objectHasKey, objectHasProperty, destroyObject, assignOneValue, 
-    
+    cutWithout, copyWithout, copyArray, objectKeys, objectValues, merge, combine, arrayJoin, objectHasKey, objectHasProperty, destroyObject, assignOneValue,
+
     Num, Str, date, getEl, assignValue, assignWithout, assignIfNotExists, objectAssign, colorToHex, invertHexColor, minOf, maxOf, copyByList, isFloat,
-    
+
     Queue, queueTask, combineElenentsToArrList, combineElenentsJoinStringList, getArguments, JsonToBase64, b64toBlob, resizeImage, getTimeStamp,
-    
+
     degreeToRadians, radianToDegrees, newObj, emptyObject, getInputCfg, getFirstValueInList, EMPTY_VALUE
 };

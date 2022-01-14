@@ -1,7 +1,7 @@
 
 'use strict';
 
-import { Str, getArguments, inArray, _instanceof, getType, isFunction } from "./utils.js";
+import { Str, getArguments, inArray, _instanceof, getType, isFunction } from "../utils.js";
 
 // These helpers produce better VM code in JS engines due to their
 // explicitness and function inlining.
@@ -197,14 +197,9 @@ function getPrimitive(value, parent) {
 
 
     defConst(primitive, '__toData__', function (fn) {
-        if ((isObject(this) || isFunction(this)) && typeof this.__toData__ == "function") return this.__toData__();
         return value;
     });
-    defConst(primitive, 'addParent', function (parent) {
-        if ((isObject(this) || isFunction(this)) && typeof this.__toData__ == "function") return this.__toData__();
-        return value;
-    });
-
+    
     defConst(primitive, 'toString', function (fn) {
         return this.__toData__();
     });
@@ -450,6 +445,10 @@ var Observer = function Observer(value, parent) {
     this.parents = _instanceof(parent, Observer) ? [parent] : [];
     this.listeners = [];
     def(value, '__ob__', this);
+    defConst(primitive, '__toData__', function (fn) {
+        return value;
+    });
+    
     if (Array.isArray(value)) {
         if (hasProto) {
             protoAugment(value, arrayMethods);
@@ -461,6 +460,10 @@ var Observer = function Observer(value, parent) {
         this.walk(value);
     }
 };
+
+Observer.prototype.__toData__ = function toData() {
+    return this.value;
+}
 
 /**
  * Walk through all properties and convert them into
@@ -744,9 +747,18 @@ function copyAugment(target, src, keys) {
  * or the existing observer if the value already has one.
  */
 function observe(value, parent) {
+    var type = getType(value);
+    if ((type == "object" && value.isPrimitive) || (isFunction(value) && value.isPrimitive)) {
+        if (parent && value.parents.indexOf(parent) == -1) {
+            value.addParent(parent);
+        }
+        return;
+    }
+    
     if (!isObject(value)) {
         return
     }
+    
     var ob;
     if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
         ob = value.__ob__;
@@ -779,7 +791,20 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
         val = obj[key];
     }
 
+
     var childOb = !shallow && observe(val, this);
+    if ((type == "object" && value.isPrimitive) || (isFunction(value) && value.isPrimitive)) {
+        if (val.parents.indexOf(this) == -1) {
+            val.parents.addParent(this);
+        }
+    }
+    else if (!(type == 'object' || type == 'array')) {
+        val = parsePrimitive(val);
+        if (val.parents.indexOf(this) == -1) {
+            val.parents.addParent(this);
+        }
+    }
+
     Object.defineProperty(obj, key, {
         enumerable: true,
         configurable: true,
@@ -798,6 +823,19 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
             if (customSetter) {
                 customSetter();
             }
+            var type = getType(newVal);
+            if ((type == "object" && newVal.isPrimitive) || (isFunction(newVal) && newVal.isPrimitive)) {
+                if (newVal.parents.indexOf(this) == -1) {
+                    newVal.parents.addParent(this);
+                }
+            }
+            else if (!(type == 'object' || type == 'array')) {
+                newVal = parsePrimitive(newVal);
+                if (newVal.parents.indexOf(this) == -1) {
+                    newVal.parents.addParent(this);
+                }
+            }
+            
             // #7981: for accessor properties without setter
             if (getter && !setter) { return }
             if (setter) {
@@ -825,5 +863,22 @@ function dependArray(value) {
     }
 }
 
+export const useState = value => {
 
-export { observe, parsePrimitive, defConst, defProp }
+    var type = getType(value), state, change = val => {
+        if ((type == "object" && (value.isPrimitive || value.__ob__)) || (type == 'array' && value.__ob__) || (isFunction(value) && value.isPrimitive)) return state = val;
+        else if (type == 'object' || type == 'array') {
+            var ob = observe(val);
+            state = val;
+
+        } else {
+            state = val;
+        }
+        if (!state.isDomState) {
+            defConst(state, 'isDomState', true);
+        }
+
+    };
+    change(value);
+    return [state, change]
+}

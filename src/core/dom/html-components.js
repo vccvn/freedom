@@ -1,4 +1,4 @@
-import { assignValue, assignWithout, date, getArguments, getType, inArray, isArray, isBoolean, isEmpty, isFunction, isNull, isObject, isString, Str, _defineProperty, _instanceof } from '../utils.js';
+import { assignValue, assignWithout, date, getArguments, getType, inArray, isArray, isBoolean, isEmpty, isFunction, isNull, isObject, isString, objectKeys, Str, _defineProperty, _instanceof } from '../utils.js';
 // import Dom, { $, Query, query } from './dom.js';
 import createClass, { _class } from '../es5-class.js';
 import Dom, { getDomInf, inputTypes, inputTags, createEl, create } from './dom.js';
@@ -29,7 +29,7 @@ function createElementClass(tag, properties) {
     }
     var t = tag.toLowerCase();
     var classProps = {
-        
+
         const$tagName: tag,
         constructor: function () {
             var args = getArguments(arguments);
@@ -303,6 +303,11 @@ function createElementClass(tag, properties) {
     return createClass(Str.ucfirst(tag), false).extends(Dom).uses(prop)(classProps);
 }
 
+/**
+ * tạo hàm tạo tag
+ * @param {string} tag tên thẻ HTML
+ * @returns {function(...args):Element}
+ */
 function createHtmlElementFunction(tag) {
     var tagName = tag.toLowerCase();
     var fn = function (...args) {
@@ -723,8 +728,8 @@ var Html = function () {
     return $class
 }();
 
-Html.static = function(props){
-    if(isObject(props)){
+Html.static = function (props) {
+    if (isObject(props)) {
         for (const key in props) {
             if (Object.hasOwnProperty.call(props, key)) {
                 const vl = props[key];
@@ -737,6 +742,257 @@ Html.static = function(props){
         }
     }
 }
+
+const Loop = _class("Loop")({
+    static$isDomClass: true,
+    $el: null,
+    const$isDom: true,
+    $target: null,
+    $parent: null,
+    $eachFn: null,
+    $children: null,
+    $index: 0,
+    $key: 0,
+    $value: undefined,
+    $object: null,
+
+    $isFirst: false,
+    isLast: false,
+
+    __boot__: function () {
+        this.children = [];
+        this.el = document.createComment('Loop Elememt');
+        this.object = [];
+    },
+    __destroy__: function () {
+        this.removeChild();
+    },
+
+    /**
+     * ham khoi tao
+     * @param {*} arrObj data đầu vào
+     * @param {function(*)} eachFactory ham trả về đối tượng dom hoặc bất kỳ
+     */
+    constructor: function (arrObj, eachFactory) {
+        this.object = arrObj;
+        this.eachFn = eachFactory;
+    },
+
+    __init__: function () {
+
+    },
+
+    afterSet$parent: function (parent) {
+        this.render();
+    },
+
+    render: function () {
+        this.removeChild();
+        if (isFunction(this.eachFn)) {
+            if (isObject(this.object)) {
+                var keys = objectKeys(this.object);
+                var length = keys.length;
+                var i = 0;
+                for (const key in this.object) {
+                    if (Object.hasOwnProperty.call(this.object, key)) {
+                        const value = this.object[key];
+                        this.value = value;
+                        this.key = key;
+                        this.index = i;
+                        this.isFirst = i == 0;
+                        this.isLast = i == length - 1;
+                        if (this.eachFn.length == 1) {
+                            this.addChild(this.eachFn.apply(this, [value]));
+                        } else if (this.eachFn.length == 2) {
+                            this.addChild(this.eachFn.apply(this, [key, value]));
+                        }
+                        i++;
+                    }
+                }
+            }
+            else if (isArray(this.object)) {
+                for (let index = 0; index < this.object.length; index++) {
+                    const value = this.object[index];
+                    this.key = key;
+                    this.index = index;
+                    this.isFirst = index == 0;
+                    this.isLast = index == this.object.length - 1;
+                    if (this.eachFn.length == 1) {
+                        this.addChild(this.eachFn.apply(this, [value]));
+                    } else if (this.eachFn.length == 2) {
+                        this.addChild(this.eachFn.apply(this, [key, value]));
+                    }
+                }
+            }
+        }
+    },
+
+    addChild: function (child) {
+        if (child) {
+            this.children.push(child);
+            if (this.parent) {
+                this.parent.before(child, this);
+            }
+        }
+    },
+
+    /**
+     * xóa phần tử con
+     * @param {Element|Dom|Dom|Dom.Query} child 
+     * @param {boolean} removeDomEl Xóa dom el
+     */
+    final$removeChild: function (child, removeDomEl) {
+        if (typeof removeDomEl == "undefined" || !isBoolean(removeDomEl) || child === true) removeDomEl = true;
+
+        if (child) {
+            var self = this;
+            let index = this.children.indexOf(child);
+            if (index != -1) {
+                this.children.splice(index, 1);
+                if (child.isDom) {
+                    child.remove(true);
+                    child.__destroy__();
+                }
+
+            }
+            else if (child instanceof Element) {
+                for (let i = 0; i < this.children.length; i++) {
+                    const c = this.children[i];
+                    if (c.el == child) {
+                        this.children.splice(i, 1);
+                        child.remove(true);
+                        child.__destroy__();
+                    }
+                }
+            }
+
+        }
+        else {
+            if (!isArray(this.children)) return this;
+            while (this.children.length > 0) {
+                let child = this.children.shift();
+                child.remove(true);
+                child.__destroy__();
+            }
+        }
+        return this;
+
+    },
+
+    /**
+     * Xóa
+     */
+    final$remove: function () {
+        var children = getArguments(arguments);
+        if (!children.length || (children.length == 1 && children[0] == true)) {
+            this.removeChild();
+            if (this.parent) {
+                this.parent.removeChild(this);
+            }
+            else if (this.el.parentNode) {
+                this.el.parentNode.removeChild(this.el);
+            }
+            if (children[0] == true) {
+                this.removeChild();
+            }
+
+        }
+        else if (children.length) {
+            var self = this;
+            children.map(function (child) {
+                self.removeChild(child);
+            });
+        }
+        return this;
+    }
+});
+
+const ForInc = _class("ForInc").extends(Loop)({
+    const$isForLoop: true,
+    render: function () {
+        this.removeChild();
+        if (isFunction(this.eachFn)) {
+            if (isObject(this.object)) {
+                var keys = Object.keys(this.object);
+                var length = keys.length;
+                for (let index = 0; index < length; index++) {
+                    const key = keys[index];
+                    if (Object.hasOwnProperty.call(this.object, key)) {
+                        const value = this.object[key];
+                        this.value = value;
+                        this.key = key;
+                        this.index = i;
+                        this.isFirst = index == 0;
+                        this.isLast = index == length - 1;
+                        if (this.eachFn.length == 1) {
+                            this.addChild(this.eachFn.apply(this, [value]));
+                        } else if (this.eachFn.length == 2) {
+                            this.addChild(this.eachFn.apply(this, [key, value]));
+                        }
+                    }
+                }
+                
+            }
+            else if (isArray(this.object)) {
+                for (let index = 0; index < this.object.length; index++) {
+                    const value = this.object[index];
+                    this.key = index;
+                    this.index = index;
+                    this.isFirst = index == 0;
+                    this.isLast = index == this.object.length - 1;
+                    if (this.eachFn.length == 1) {
+                        this.addChild(this.eachFn.apply(this, [value]));
+                    } else if (this.eachFn.length == 2) {
+                        this.addChild(this.eachFn.apply(this, [index, value]));
+                    }
+                }
+            }
+        }
+    }
+})
+const ForDec = _class("ForDec").extends(Loop)({
+    const$isForLoop: true,
+    render: function () {
+        this.removeChild();
+        if (isFunction(this.eachFn)) {
+            if (isObject(this.object)) {
+                var keys = Object.keys(this.object);
+                var length = keys.length;
+                for (let index = length - 1; index > -1; index--) {
+                    const key = keys[index];
+                    if (Object.hasOwnProperty.call(this.object, key)) {
+                        const value = this.object[key];
+                        this.value = value;
+                        this.key = key;
+                        this.index = i;
+                        this.isFirst = index == 0;
+                        this.isLast = index == length - 1;
+                        if (this.eachFn.length == 1) {
+                            this.addChild(this.eachFn.apply(this, [value]));
+                        } else if (this.eachFn.length == 2) {
+                            this.addChild(this.eachFn.apply(this, [key, value]));
+                        }
+                    }
+                }
+            }
+            else if (isArray(this.object)) {
+                for (let index = this.object.length - 1; index > -1; index--) {
+                    const value = this.object[index];
+                    this.key = index;
+                    this.index = index;
+                    this.isFirst = index == 0;
+                    this.isLast = index == this.object.length - 1;
+                    if (this.eachFn.length == 1) {
+                        this.addChild(this.eachFn.apply(this, [value]));
+                    } else if (this.eachFn.length == 2) {
+                        this.addChild(this.eachFn.apply(this, [index, value]));
+                    }
+                }
+            }
+        }
+    }
+})
+
 Html.static({
     A: A, Abbr: Abbr, Acronym: Acronym, Address: Address, Applet: Applet, Area: Area, Article: Article, Aside: Aside, Audio: Audio,
     B: B, Base: Base, Basefont: Basefont, Bb: Bb, Bdo: Bdo, Big: Big, Blockquote: Blockquote, Body: Body, Br: Br, Button: Button,
@@ -756,6 +1012,7 @@ Html.static({
     Table: Table, Tbody: Tbody, Td: Td, Textarea: Textarea, Tfoot: Tfoot, Th: Th, Thead: Thead, Time: Time, Title: Title, Tr: Tr, Track: Track, Tt: Tt,
     U: U, Ul: Ul,
     Video: Video, Wbr: Wbr,
+    Loop:Loop, ForInc:ForInc, ForDec: ForDec,
     a: a, abbr: abbr, acronym: acronym, address: address, applet: applet, area: area, article: article, aside: aside, audio: audio,
     b: b, base: base, basefont: basefont, bb: bb, bdo: bdo, big: big, blockquote: blockquote, body: body, br: br, button: button,
     canvas: canvas, caption: caption, center: center, cite: cite, code: code, col: col, colgroup: colgroup, command: command,
@@ -778,23 +1035,6 @@ Html.static({
     wbr: wbr,
 
 });
-
-const Loop = _class("Loop")({
-    target: null,
-    parent: null,
-    eachFb: null,
-    refs
-})
-
-
-Loop
-
-
-
-
-
-
-
 
 
 export default Html;
@@ -821,6 +1061,7 @@ export {
     Table, Tbody, Td, Textarea, Tfoot, Th, Thead, Time, Title, Tr, Track, Tt,
     U, Ul,
     Video, Wbr,
+    Loop, ForInc, ForDec,
     a, abbr, acronym, address, applet, area, article, aside, audio,
     b, base, basefont, bb, bdo, big, blockquote, body, br, button,
     canvas, caption, center, cite, code, col, colgroup, command,
