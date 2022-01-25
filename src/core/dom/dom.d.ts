@@ -19,15 +19,15 @@ export interface DomElement {
     /**
      * thêm lang nghe su kien
      */
-    addEventListener(type: string, handler: (arg0: Event) => any, passed?: any) : this
-    hasEventListener(type: string, handler: (arg0: Event) => any): boolean
-    removeEventListener(type: string, handler?: (arg0: Event) => any):  this
+    addEventListener(type: string, handler: (event: Event) => any, passed?: any) : this
+    hasEventListener(type: string, handler: (event: Event) => any): boolean
+    removeEventListener(type: string, handler?: (event: Event) => any):  this
     dispatchEvent(event: any): this
-    addDomEvent(event: any, handler?: (arg0: Event) => any, passed?: any):  this
-    hasEvent(type: string, handler?: (arg0: Event) => any): boolean
-    off(events: any, handler?: (arg0: Event) => any): this
+    addDomEvent(event: any, handler?: (event: Event) => any, passed?: any):  this
+    hasEvent(type: string, handler?: (event: Event) => any): boolean
+    on(event: any, handler?: (event: Event) => any):  this
+    off(events: any, handler?: (event: Event) => any): this
     trigger(event: any, data: any):  this
-    on(event: any, handler?: (arg0: Event) => any):  this
     fn(method: any): (e: Event) => any
     is(selector: any, el: any):  boolean
     closest(selector: any, el: any):  any

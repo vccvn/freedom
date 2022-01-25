@@ -36,18 +36,29 @@ function createInstance(Parent, args, Class) {
     return _construct.apply(null, arguments);
 }
 
-const classContainers = [];
+const classContainers = {};
 
 const classInstanceData = {};
 
 function addClass($class) {
-    for (let i = 0; i < classContainers.length; i++) {
-        if (classContainers[i].$class == $class) {
-            return classContainers[i];
+    for (const key in classContainers) {
+        if (Object.hasOwnProperty.call(classContainers, key)) {
+            const classData = classContainers[key];
+            if(classData.$class == $class) return classData;
+            
         }
     }
-    classContainers.push({
-        $class: $class
+    let classIndexKey = Str.rand(Date.now());
+    
+    classContainers[classIndexKey] = {
+        $class: $class,
+        id : classIndexKey
+    };
+    Object.defineProperty($class.prototype, '__CLASS_ID__', {
+        configurable: false,
+        writable: false,
+        enumerable: false,
+        value: classIndexKey
     });
     Object.defineProperty($class.prototype, '__isES5ClassInstance__', {
         configurable: false,
@@ -69,15 +80,18 @@ function addClass($class) {
             removeClassInstance(this.__instance__id__, typeof this.destructor == "function" ? this.destructor() : false);
         }
     })
-    return classContainers[classContainers.length - 1];
+    return classContainers[classIndexKey];
 }
 function getClassIndex($class) {
-    for (let i = 0; i < classContainers.length; i++) {
-        if (classContainers[i].$class == $class) {
-            return i;
+    for (const key in classContainers) {
+        if (Object.hasOwnProperty.call(classContainers, key)) {
+            const classData = classContainers[key];
+            if(classData.$class == $class) return key;
+            
         }
     }
-    return -1;
+    return -1
+    
 
 }
 
@@ -89,8 +103,8 @@ function addClassData($class, key, value) {
     if (isObject(key)) {
         var index = getClassIndex($class);
         if (index == -1) {
-            addClass($class);
-            index = classContainers[classContainers.length - 1];
+            var cd = addClass($class);
+            index = cd.id;
         }
         assignValue(classContainers[index], key);
         return true;
@@ -99,10 +113,12 @@ function addClassData($class, key, value) {
 }
 
 function getClassData($class) {
-    for (let i = 0; i < classContainers.length; i++) {
-        const classData = classContainers[i];
-        if (classData.$class == $class) {
-            return classData;
+    if(isString($class)) return Object.hasOwnProperty.call(classContainers, $class) ? classContainers[key]: false;
+    for (const key in classContainers) {
+        if (Object.hasOwnProperty.call(classContainers, key)) {
+            const classData = classContainers[key];
+            if(classData.$class == $class) return classData;
+            
         }
     }
     return false;
@@ -367,10 +383,10 @@ export const createClass = function (className, makeGlobal) {
             value: $className
         });
 
-        addClass(ES5Class);
-
-        var classIndex = classContainers.length - 1;
-        var classData = classContainers[classIndex];
+        
+        var classData = addClass(ES5Class);
+        
+        var classIndex = classData.id;
         classData.parentMap = {};
         classData.parents = [];
         classData.extends = {

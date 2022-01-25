@@ -449,6 +449,7 @@ var Observer = function Observer(value, parent) {
     this.value = value;
     this.parents = _instanceof(parent, Observer) ? [parent] : [];
     this.listeners = [];
+    this.indexKeys = [];
     def(value, '__ob__', this);
     if (Array.isArray(value)) {
         if (hasProto) {
@@ -469,6 +470,7 @@ var Observer = function Observer(value, parent) {
  */
 Observer.prototype.walk = function walk(obj) {
     var keys = Object.keys(obj);
+    this.indexKeys = keys;
     for (var i = 0; i < keys.length; i++) {
         defineReactive$$1.call(this, obj, keys[i]);
     }
@@ -479,7 +481,9 @@ Observer.prototype.walk = function walk(obj) {
  * Observe a list of Array items.
  */
 Observer.prototype.observeArray = function observeArray(items) {
+    this.indexKeys = [];
     for (var i = 0, l = items.length; i < l; i++) {
+        this.indexKeys.push(i);
         observe(items[i], this);
     }
 };
@@ -669,7 +673,6 @@ Observer.prototype.dispatch = function dispatch(key, value, old, target) {
             old = this.value;
             target = this.value;
         }
-
         if (typeof this.listeners[key] != "undefined") {
             if (isArray(this.listeners[key])) {
                 for (let index = 0; index < this.listeners[key].length; index++) {
@@ -767,6 +770,7 @@ function observe(value, parent) {
 function defineReactive$$1(obj, key, val, customSetter, shallow) {
     // var dep = new Dep();
 
+    var self = this;
     var property = Object.getOwnPropertyDescriptor(obj, key);
     if (property && property.configurable === false) {
         return
@@ -805,25 +809,12 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
             } else {
                 val = newVal;
             }
-            childOb = !shallow && observe(newVal, this);
+            childOb = !shallow && observe(newVal, self);
             obj.__ob__.dispatch(key, val, old, obj);
         }
     });
 }
 
-/**
- * Collect dependencies on array elements when the array is touched, since
- * we cannot intercept array element access like property getters.
- */
-function dependArray(value) {
-    for (var e = (void 0), i = 0, l = value.length; i < l; i++) {
-        e = value[i];
-        e && e.__ob__ && e.__ob__.dep.depend();
-        if (Array.isArray(e)) {
-            dependArray(e);
-        }
-    }
-}
 
 
 export { observe, parsePrimitive, defConst, defProp }

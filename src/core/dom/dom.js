@@ -1,6 +1,9 @@
 import { assignValue, assignWithout, date, getType, inArray, isArray, isBoolean, isCallable, isEmpty, isFunction, isNull, isNumber, isObject, isString, objectHasProperty, objectHasKey, Str, _defineProperty, _instanceof, getArguments, getEl, getFirstValueInList } from '../utils.js';
 import createClass, { _class, createInstance, getClassData } from '../es5-class.js';
 import app from '../app.js';
+import { isState } from './state.js';
+import { setEl } from '../utils.js';
+import { observe } from '../observer.js';
 
 const global = window;
 const MS = date('ms');
@@ -245,7 +248,16 @@ function getDomDataValue(instanceID, key, value) {
 }
 function setDomDataValue(instanceID, key, value) {
     if (typeof DomClassData[instanceID] == "undefined") DomClassData[instanceID] = {};
-    if (isString(key)) DomClassData[instanceID][key] = value;
+    if (isString(key)) {
+        if (isObject(value)) {
+            if (!objectHasKey(DomClassData[instanceID], key) || !isObject(DomClassData[instanceID][key]))
+                DomClassData[instanceID][key] = value;
+            else
+                assignValue(DomClassData[instanceID][key], value)
+        } else
+            DomClassData[instanceID][key] = value;
+
+    }
     else if (isObject(key)) assignValue(DomClassData, instanceID, key);
 }
 
@@ -396,7 +408,8 @@ Dom = _class("Dom")({
         this.children = [];
 
         this.__set__(CAN_SET_CHILDREN, false);
-        bootData.apply(this, []);
+        let bag = getDataBag(this.static);
+        bootData.apply(this, [bag]);
         if (oneTimeData && isObject(oneTimeData) && !isEmpty(oneTimeData)) {
             for (const key in oneTimeData) {
                 if (Object.hasOwnProperty.call(oneTimeData, key)) {
@@ -440,6 +453,19 @@ Dom = _class("Dom")({
         if (typeof this.onAferInit == "function") {
             this.onAferInit();
         }
+
+
+        /**
+         * lắng nghe sự kiện thay đổi thuộc tính html
+         */
+        this.on("change", function (event) {
+            if (event.target == self.el) {
+                self.dispatchEvent({
+                    type: "attribute.changed",
+                    event: event
+                });
+            }
+        })
 
     },
 
@@ -553,14 +579,22 @@ Dom = _class("Dom")({
             this.el = el;
 
             const FOREIGN = this.__get__(FOREIGN_DATA);
+            bootData.call(this, FOREIGN);
 
             var self = this;
 
+            observe(self);
 
 
             if (!isEmpty(elem.oneWayBinding)) {
-                addDynamicAttr.call(this, elem.oneWayBinding);
+                addOneWayBindingAttr.call(this, elem.oneWayBinding);
             }
+
+            if (!isEmpty(elem.twoWayBinding)) {
+                addTwoWayBindingAttr.call(this, elem.twoWayBinding);
+            }
+
+
             if (!isEmpty(elem.dataTypeAttrs)) {
                 for (const key in elem.dataTypeAttrs) {
                     if (Object.hasOwnProperty.call(elem.dataTypeAttrs, key)) {
@@ -794,10 +828,8 @@ Dom = _class("Dom")({
 
 
     dispatchEvent: function (event) {
-
         var _listeners = this.__get__(LISTENNERS);
         if (_listeners === undefined || _listeners === null) return;
-
         if (isDomEvent(event.type)) return this.trigger.apply(this, getArguments(arguments));
         const listeners = _listeners;
         const listenerArray = listeners[event.type];
@@ -2140,8 +2172,8 @@ function __buildChildren__() {
     this.__set__(IS_BUILDED, true);
 }
 
-function bootData() {
-    let bag = getDataBag(this.static);
+function bootData(bag) {
+
     let data = {};
     if (isObject(bag)) {
         for (const key in bag) {
@@ -2163,7 +2195,6 @@ function bootData() {
     }
 
     const _data_containers = this.__get__(DATA_CONTAINERS);
-    console.log(_data_containers);
     if (!isEmpty(_data_containers)) {
         for (const key in _data_containers) {
             if (Object.prototype.hasOwnProperty.call(_data_containers, key)) {
@@ -2960,6 +2991,196 @@ function addDynamicAttr(attr, value) {
 
 
 /**
+ * Thêm thuộc tính động
+ * @param {string} attr tên thuộc tính
+ * @param {string|number} value 
+ * @returns this
+ */
+function addOneWayBindingAttr(attr, value, type) {
+    var self = this;
+    if (isString(attr)) {
+        if (type == 'state') {
+            this.attr(attr, value.__toData__());
+            value.subcribe(function (vl) {
+                if (isState(vl)) {
+                    self.attr(attr, vl.__toData__());
+
+                } else {
+                    self.attr(attr);
+                }
+            });
+        }
+        else if (type == 'prop') {
+            var vl = getEl(this, value);
+            this.attr(attr, vl);
+            if (value) {
+                var key = value.split(".").shift();
+
+                if (this.__ob__) {
+                    this.__ob__.subcribe(value, function (v) {
+                        if (isState(v)) {
+                            self.attr(attr, v.__toData__());
+                        } else {
+                            self.attr(attr, v);
+                        }
+                    })
+                }
+            }
+        } else {
+            self.attr(attr, value);
+            if (!objectHasKey(this, attr)) {
+                Object.defineProperty(this, attr, {
+                    configurable: true,
+                    enumerable: true,
+                    get: function () {
+                        return value;
+                    },
+                    set: function (val) {
+                        value = val;
+                        this.attr(attr, val);
+                    }
+                })
+            }
+        }
+
+    }
+    else if (isObject(attr)) {
+        for (var key in attr) {
+            if (Object.hasOwnProperty.call(attr, key)) {
+                addOneWayBindingAttr.call(this, key, attr[key].value, attr[key].type);
+            }
+        }
+    }
+    return this;
+}
+
+var PropChangeStatus = {};
+
+/**
+ * Thêm thuộc tính động
+ * @param {string} attr tên thuộc tính
+ * @param {string|number} value 
+ * @returns this
+ */
+function addTwoWayBindingAttr(attr, value, type) {
+    var self = this;
+    if (isString(attr)) {
+        let attrKey = this.__instance__id__ + "_" + attr;
+        PropChangeStatus[attrKey] = true;
+        if (type == 'state') {
+            var domValue = value.__toData__();
+            this.attr(attr, domValue);
+            value.subcribe(function (vl) {
+                if (PropChangeStatus[attrKey]) {
+                    if (isState(vl)) {
+                        self.attr(attr, vl.__toData__());
+
+                    } else {
+                        self.attr(attr);
+                    }
+                }
+            });
+            this.on("attribute.changed", function (event) {
+                var old = this.attr(attr);
+                if (old != domValue) {
+                    PropChangeStatus[attrKey] = false;
+                    if (!objectHasKey(this, attr)) {
+                        Object.defineProperty(this, attr, {
+                            configurable: true,
+                            enumerable: true,
+                            get: function () {
+                                return value;
+                            },
+                            set: function (val) {
+                                value = val;
+                                if (PropChangeStatus[attrKey]) {
+                                    this.attr(attr, val);
+                                }
+
+                            }
+                        })
+                    }
+                    this[attr] = old;
+                    PropChangeStatus[attrKey] = true;
+                }
+            })
+
+        }
+        else if (type == 'prop') {
+            var vl = getEl(this, value);
+            var vld = isState(vl) ? vl.__toData__() : vl;
+            this.attr(attr, vld);
+            if (value) {
+                if (this.__ob__) {
+                    this.__ob__.subcribe(value, function (v) {
+                
+                        vld = isState(v) ? v.__toData__() : v;
+                        if (PropChangeStatus[attrKey]) {
+                            self.attr(attr, vld);
+                        }
+                    })
+                }
+                this.on("attribute.changed", function (event) {
+                    var old = this.attr(attr);
+                    if (old != vld && PropChangeStatus[attrKey]) {
+                        vld = old;
+                        PropChangeStatus[attrKey] = false;
+                        setEl(self, value, old);
+                        PropChangeStatus[attrKey] = true;
+                    }
+                })
+            }
+        } else {
+            self.attr(attr, value);
+            if (!objectHasKey(this, attr)) {
+                Object.defineProperty(this, attr, {
+                    configurable: true,
+                    enumerable: true,
+                    get: function () {
+                        return value;
+                    },
+                    set: function (v) {
+                        value = isState(v) ? v.__toData__() : v;
+                        if (PropChangeStatus[attrKey]) {
+                            this.attr(attr, value);
+                        }
+
+                    }
+                })
+            }
+            else if (this.__ob__) {
+                this.__ob__.subcribe(value, function (v) {
+                    value = isState(v) ? v.__toData__() : v;
+                    if (PropChangeStatus[attrKey]) {
+                        self.attr(attr, value);
+                    }
+                })
+            }
+            this.on("attribute.changed", function (event) {
+                var old = self.attr(attr);
+                if (old != vld && PropChangeStatus[attrKey]) {
+                    vld = old;
+                    PropChangeStatus[attrKey] = false;
+                    self[attr] = vld
+                    PropChangeStatus[attrKey] = true;
+                }
+            })
+
+        }
+
+    }
+    else if (isObject(attr)) {
+        for (var key in attr) {
+            if (Object.hasOwnProperty.call(attr, key)) {
+                addTwoWayBindingAttr.call(this, key, attr[key].value, attr[key].type);
+            }
+        }
+    }
+    return this;
+}
+
+
+/**
  * Tạo đối tượng dom
  * @param {string|object} tag ten the hoặc tất cả các thông tin của thẻ
  */
@@ -2993,23 +3214,65 @@ function create(tag, children, attributes) {
         var n = k.substring(1);
         var f2 = k.substring(0, 2);
         var n2 = k.substring(2);
-        if (parts.length > 1) {
+        var vt = getType(vl);
+        var valType = isState(vl) ? 'state' : vt;
+        var $t = valType, $v = vl; 
+        if (isString(vl) && !isNumber(vl) && vl.substr(0, 2) == '{{' && vl.substr(vl.length - 2) == '}}') {
+            $t = 'prop';
+            $v = vl.substr(2, vl.length - 4).trim();
+        }
+
+        if (f2 == '$$') {
+            twoWayBinding[s.substr(2)] = {
+                type: $t,
+                value: $v
+            };;
+        }
+        else if (parts.length > 1) {
             var key = k.substring(parts[0].length + 1);
-            if(parts[0].length){
-                if(parts[0] == "sync"){
-                    twoWayBinding[key] = val;
-                }else if(parts[0] == "bind"){
-                    oneWayBinding[key] = val;
-                }else{
-                    oneWayBinding[key] = val;
+            if (parts[0].length) {
+                if (parts[0] == "sync") {
+                    twoWayBinding[key] = {
+                        type: $t,
+                        value: $v
+                    };
+                } else if (parts[0] == "bind") {
+                    oneWayBinding[key] = {
+                        type: $t,
+                        value: $v
+                    };
+                } else {
+                    if (valType == 'state') {
+                        twoWayBinding[key] = {
+                            type: $t,
+                            value: $v
+                        };
+                    } else {
+                        oneWayBinding[key] = {
+                            type: $t,
+                            value: $v
+                        };
+                    }
+
                 }
-                
+
             }
-            else if(parts[1] == '$parent' && ((isObject(vl) && vl.isDom) || vl instanceof Element)) {
+            else if (parts[1] == 'parent' && ((isObject(vl) && vl.isDom) || vl instanceof Element)) {
                 parent = val;
             }
             else {
-                oneWayBinding[k.substr(1)] = vl;
+                var key = k.substring(1);
+                if (valType == 'state') {
+                    twoWayBinding[key] = {
+                        type: $t,
+                        value: $v
+                    };
+                } else {
+                    oneWayBinding[key] = {
+                        type: $t,
+                        value: $v
+                    };
+                }
             }
         }
         else if (k == 'parent' && ((isObject(vl) && vl.isDom) || vl instanceof Element)) {
@@ -3037,9 +3300,6 @@ function create(tag, children, attributes) {
         else if (f2 == 'on' && isDomEvent(s.substr(2))) {
             events[s.substr(2)] = vl;
         }
-        else if (f2 == '$$') {
-            twoWayBinding[s.substr(2)] = vl;
-        }
         else if (f == '@' && isDomEvent(n)) {
             events[n] = vl;
         }
@@ -3063,17 +3323,23 @@ function create(tag, children, attributes) {
         }
         else if (typeof vl == "function") {
             if (vl.isPrimitive) {
-                dataTypeAttrs[k] = vl;
+                oneWayBinding[k] = {
+                    type: $t,
+                    value: $v
+                };;
             } else {
                 methods[k] = vl;
             }
         }
-        else if (isString(vl) && !isNumber(vl) && vl.substr(0, 2) == '{{' && vl.substr(vl, length - 2) == '}}') {
-            twoWayBinding[k] = vl.substr(2, vl, length - 4).trim();
+        else if ($t == 'prop') {
+            oneWayBinding[k] = {
+                type: $t,
+                value: $v
+            };
+
+
         }
-        else if (isObject(vl) && (vl.isArrayData || vl.isObjectData)) {
-            dataTypeAttrs[k] = vl;
-        }
+
         else {
             attrs[k] = vl;
         }
@@ -3118,26 +3384,21 @@ function create(tag, children, attributes) {
 
     for (let i = 1; i < arguments.length; i++) {
         const arg = arguments[i];
-        if (isObject(arg) && (arg.isQuery || arg.isDomQuery)) {
-            contents.push(arg);
-        }
-        else if (isObject(arg) && arg.isDom) {
-            contents.push(arg);
-        }
-        else if (isObject(arg) && arg.isDomBag) {
-            contents.push(arg);
-        }
-        else if (_instanceof(arg, Element)) {
-            contents.push(arg);
-        }
-        else if (_instanceof(arg, Dom)) {
-            contents.push(arg.el);
-        }
-        else if (isObject(arg)) {
-            for (var k in arg) {
-                if (arg.hasOwnProperty(k)) {
-                    addAttrValue(k, arg[k]);
+        let aType = getType(arg);
+        if (aType == "object") {
+            if (arg.isQuery || arg.isDomQuery || arg.isDom || arg.isDomBag || _instanceof(arg, Element)) {
+                contents.push(arg);
+            }
+            else if (_instanceof(arg, Dom)) {
+                contents.push(arg.el);
+            }
+            else if (isObject(arg)) {
+                for (var k in arg) {
+                    if (arg.hasOwnProperty(k)) {
+                        addAttrValue(k, arg[k]);
+                    }
                 }
+
             }
 
         }

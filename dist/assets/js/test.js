@@ -46,5 +46,10 @@ var div = Div('.test-div', {
             console.log(event);
         }
     },
+    attrs:{
+        $title: "{{uuid}}"
+    },
     content: "Test"
 });
+
+document.body.appendChild(div.el)

@@ -448,6 +448,7 @@ var Observer = function Observer(value, parent) {
     defConst(primitive, '__toData__', function (fn) {
         return value;
     });
+
     
     if (Array.isArray(value)) {
         if (hasProto) {
@@ -881,4 +882,9 @@ export const useState = value => {
     };
     change(value);
     return [state, change]
+}
+
+export const isState = (variable) => {
+    var type = getType(variable);
+    return (type == 'object' || type == 'array' || type == "function") && variable.isDomState;
 }

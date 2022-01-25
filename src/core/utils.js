@@ -791,7 +791,7 @@ function arrayJoin(target) {
  * @param delimiter 
  * @returns 
  */
-var getEl = function (obj, key, defaultValue, delimiter) {
+ var getEl = function (obj, key, defaultValue, delimiter) {
     if (typeof obj == 'undefined') {
         return null;
     }
@@ -827,6 +827,61 @@ var getEl = function (obj, key, defaultValue, delimiter) {
             if (index < ks.length - 1 && (!isObject(c) && !isArray(c))) return defaultValue;
         }
         return c;
+
+    }
+    return defaultValue;
+};
+/**
+ * 
+ * @param obj 
+ * @param key 
+ * @param delimiter 
+ * @returns 
+ */
+ var setEl = function (obj, key, value, delimiter) {
+    if (typeof obj == 'undefined') {
+        return null;
+    }
+    if (typeof key == 'undefined') {
+        return obj;
+    }
+    var tpo = getType(obj);
+    var tpk = getType(key);
+    if (tpo == 'array') {
+        var k = NaN;
+        if (tpk == 'number') {
+            k = key;
+        } else if (parseInt(key) != NaN) {
+            k = parseInt(key);
+        }
+        if (!isNaN(k)) {
+            if (typeof obj[k] != 'undefined') {
+                return obj[k];
+            }
+        }
+    }
+    else if (tpo == "object") {
+        var c = obj;
+        var d = isString(delimiter) ? delimiter : '.';
+        var ks = String(key).split(d);
+        for (let index = 0; index < ks.length; index++) {
+            const e = ks[index];
+            if(index == ks.length -1){
+                if(isObject(c) || isArray(c)){
+                    c[e] = value;
+
+                }
+                return obj;
+            }
+            
+            if (objectHasKey(c, e)) {
+                c = c[e];
+            } else {
+                c = defaultValue;
+            }
+            if (index < ks.length - 1 && (!isObject(c) && !isArray(c))) return obj;
+        }
+        return obj;
 
     }
     return defaultValue;
@@ -2069,7 +2124,7 @@ export {
 
     cutWithout, copyWithout, copyArray, objectKeys, objectValues, merge, combine, arrayJoin, objectHasKey, objectHasProperty, destroyObject, assignOneValue,
 
-    Num, Str, date, getEl, assignValue, assignWithout, assignIfNotExists, objectAssign, colorToHex, invertHexColor, minOf, maxOf, copyByList, isFloat,
+    Num, Str, date, getEl, setEl, assignValue, assignWithout, assignIfNotExists, objectAssign, colorToHex, invertHexColor, minOf, maxOf, copyByList, isFloat,
 
     Queue, queueTask, combineElenentsToArrList, combineElenentsJoinStringList, getArguments, JsonToBase64, b64toBlob, resizeImage, getTimeStamp,
 
