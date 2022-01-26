@@ -1,5 +1,6 @@
 import { ES5Class, Wrapper } from "../es5-class";
-
+type subscribeHandle = (value: any, ...args: any[]) => any
+type Subscribe = string | {[key:string]: subscribeHandle};
 export interface DomBag{
     domClass: DomFactory 
     args:any[]
@@ -28,6 +29,7 @@ export interface DomElement {
     on(event: any, handler?: (event: Event) => any):  this
     off(events: any, handler?: (event: Event) => any): this
     trigger(event: any, data: any):  this
+    subscribe(key: Subscribe, handler?: subscribeHandle):  this
     fn(method: any): (e: Event) => any
     is(selector: any, el: any):  boolean
     closest(selector: any, el: any):  any

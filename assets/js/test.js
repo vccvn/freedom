@@ -53,3 +53,21 @@ var div = Div('.test-div', {
 });
 
 document.body.appendChild(div.el)
+var Demo = Component.maker('Demo', {
+    $selector: "demo.dkm",
+    $stack: 1,
+    over: 10,
+    data: null,
+    set$stack: function(val){
+        console.log('set Stack', val);
+    },
+    constructor: function(data){
+        this.data = data;
+    },
+
+    builder: function(){
+        return [
+            Div()
+        ]
+    }
+})

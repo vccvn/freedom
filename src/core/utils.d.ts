@@ -363,3 +363,18 @@ declare function radianToDegrees(radians: number): number
     options?: any};
 
 declare function createInstance(_classRef, args?: any[]): any
+
+/**
+ * gán giá trĩ cho thuộc tính của đối tượng
+ * @param obj đối tượng cần set thuộc tính
+ * @param key thuộc tính
+ * @param value giá trị
+ */
+declare function setEl(obj:any, key: string|number, value: any): any
+
+/**
+ * lấy method của đối tượng có thể gọi như function nhưng vẫn làm việc dựa trên đối tượng đó
+ * @param obj đối tượng
+ * @param key key thuộc tính
+ */
+declare function getObjectMethod(obj:any, key: string): (...args:any[]) => any

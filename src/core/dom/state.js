@@ -249,7 +249,7 @@ function getPrimitive(value, parent) {
      * Theo dõi thay đổi của giá trị
      * @param {function(newValue, oldValue, fulKey)} listen hàm xử lý
      */
-    defConst(primitive, 'subcribe', function subcribe(listen) {
+    defConst(primitive, 'subscribe', function subscribe(listen) {
         return this.addEventListener.call(this, listen);
     });
 
@@ -595,7 +595,7 @@ Observer.prototype.addEventListener = function (key, listen) {
  * @param {string} key key muốn theo dõi thay đổi
  * @param {function(newValue, oldValue, fulKey)} listen hàm xử lý
  */
-Observer.prototype.subcribe = function subcribe(key, listen) {
+Observer.prototype.subscribe = function subscribe(key, listen) {
     return this.addEventListener.call(this, key, listen);
 };
 

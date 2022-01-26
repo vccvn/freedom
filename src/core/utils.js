@@ -831,6 +831,61 @@ function arrayJoin(target) {
     }
     return defaultValue;
 };
+
+
+/**
+ * 
+ * @param obj 
+ * @param key 
+ * @param delimiter 
+ * @returns 
+ */
+ var getObjectMethod = function (obj, key, defaultValue, delimiter) {
+    if (typeof obj == 'undefined') {
+        return null;
+    }
+    if (typeof key == 'undefined') {
+        return obj;
+    }
+    var tpo = getType(obj);
+    var tpk = getType(key);
+    if (tpo == 'array') {
+        var k = NaN;
+        if (tpk == 'number') {
+            k = key;
+        } else if (parseInt(key) != NaN) {
+            k = parseInt(key);
+        }
+        if (!isNaN(k)) {
+            if (typeof obj[k] != 'undefined') {
+                return obj[k];
+            }
+        }
+    }
+    else if (tpo == "object") {
+        var c = obj;
+        var parent = null;
+        var d = isString(delimiter) ? delimiter : '.';
+        var ks = String(key).split(d);
+        for (let index = 0; index < ks.length; index++) {
+            const e = ks[index];
+            if (objectHasKey(c, e)) {
+                parent = c;
+                c = c[e];
+            } else {
+                c = defaultValue;
+            }
+            if (index < ks.length - 1 && (!isObject(c) && !isArray(c))) return defaultValue;
+        }
+        return !isFunction(c) ? emptyFunc : function(){
+            var args = getArguments(arguments);
+            return c.apply(parent, args);
+        }
+
+    }
+    return defaultValue;
+};
+
 /**
  * 
  * @param obj 
@@ -2124,7 +2179,7 @@ export {
 
     cutWithout, copyWithout, copyArray, objectKeys, objectValues, merge, combine, arrayJoin, objectHasKey, objectHasProperty, destroyObject, assignOneValue,
 
-    Num, Str, date, getEl, setEl, assignValue, assignWithout, assignIfNotExists, objectAssign, colorToHex, invertHexColor, minOf, maxOf, copyByList, isFloat,
+    Num, Str, date, getEl, setEl, getObjectMethod, assignValue, assignWithout, assignIfNotExists, objectAssign, colorToHex, invertHexColor, minOf, maxOf, copyByList, isFloat,
 
     Queue, queueTask, combineElenentsToArrList, combineElenentsJoinStringList, getArguments, JsonToBase64, b64toBlob, resizeImage, getTimeStamp,
 

@@ -1360,7 +1360,9 @@ export const createClass = function (className, makeGlobal) {
                             data[key] = value;
                             if(afs) afs.call(this, value);
                         }
-
+                        if(typeof this.__onChangeProp__ == "function"){
+                            this.__onChangeProp__(key, value);
+                        }
                         
                         return data[key];
                     }

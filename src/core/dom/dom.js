@@ -1,4 +1,4 @@
-import { assignValue, assignWithout, date, getType, inArray, isArray, isBoolean, isCallable, isEmpty, isFunction, isNull, isNumber, isObject, isString, objectHasProperty, objectHasKey, Str, _defineProperty, _instanceof, getArguments, getEl, getFirstValueInList } from '../utils.js';
+import { assignValue, assignWithout, date, getType, inArray, isArray, isBoolean, isCallable, isEmpty, isFunction, isNull, isNumber, isObject, isString, objectHasProperty, objectHasKey, Str, _defineProperty, _instanceof, getArguments, getEl, getFirstValueInList, getObjectMethod } from '../utils.js';
 import createClass, { _class, createInstance, getClassData } from '../es5-class.js';
 import app from '../app.js';
 import { isState } from './state.js';
@@ -30,6 +30,8 @@ const TRANSMISTION_LISTENNERS = 'TRANSMISTION_LISTENNERS' + Str.rand(Str.rand(MS
 const TRANSMISTION_STATUS = 'TRANSMISTION_STATUS' + Str.rand(Str.rand(MS));
 const IS_BUILDED = 'IS_BUILDED' + Str.rand(Str.rand(MS));
 const CAN_SET_CHILDREN = 'CAN_SET_CHILDREN' + Str.rand(Str.rand(MS));
+
+const DATA_SUBSCRIBERS = 'DATA_SUBSCRIBERS' + Str.rand(Str.rand(MS));
 
 
 
@@ -305,6 +307,7 @@ Dom = _class("Dom")({
 
     $children: null,
     $parent: null,
+    
 
     static$makeClass: function (name, props) {
         var wrapper = createClass(name, isGlobal).extends(this);
@@ -400,6 +403,7 @@ Dom = _class("Dom")({
             .__set__(CAN_SET_CHILDREN, true)
             .__set__(DYNAMIC_ATTRS, {})
             .__set__(DATA_TYPES, {})
+            .__set__(DATA_SUBSCRIBERS, {})
             .__set__(SYNC_CHANGE, true)
             .__set__(DATA_SYNC, true)
 
@@ -478,14 +482,52 @@ Dom = _class("Dom")({
         return getDomDataValue(this.__instance__id__, key, value);
     },
 
+    final$__onChangeProp__: function (key, value) {
+        var subContainer = this.__get__(DATA_SUBSCRIBERS);
+        if (!objectHasKey(subContainer, key) || !isArray(subContainer[key]) || !subContainer[key].length)
+            return false;
+
+        var self = this;
+        return subContainer[key].map(function (fn) {
+            fn.call(self, value);
+        })
+    },
+
+    /**
+     * Theo dỏi sự thay đổi của thuộc tính
+     * @param {*} key thuộc tính cần theo dõi sự thay đổi
+     * @param {function(any)} fn hàm xử lý khi có thay đổi
+     */
+    subscribe: function (key, fn) {
+        var t = getType(key);
+        if (t == 'string' || t == 'number') {
+            var k = String(key).split("").shift();
+            var f = isFunction(fn) ? fn : getObjectMethod(this, key);
+            if (!isFunction(f)) return false;
+            if (this.__ob__ && inArray(this.__ob__.indexKeys, k)) {
+                this.__ob__.subscribe(key, f);
+            } else {
+                var subContainer = this.__get__(DATA_SUBSCRIBERS);
+                if (!objectHasKey(subContainer, key) || !isArray(subContainer[key]) || !subContainer[key].length)
+                    subContainer[key] = [];
+                subContainer[key].push(f);
+            }
+            return true;
+        }
+        else if(t == 'object'){
+            var self = this;
+            Object.keys(key).map(function(k){
+                self.subscribe(k, fn);
+            })
+        }
+    },
+
     constructor: function Dom() {
         this.setElement.apply(this, arguments);
         __build__.call(this);
         this.__test__key__ = true;
     },
-
-
-
+    
     __call__: function (...args) {
         return createInstance(this, args);
     },
@@ -3001,7 +3043,7 @@ function addOneWayBindingAttr(attr, value, type) {
     if (isString(attr)) {
         if (type == 'state') {
             this.attr(attr, value.__toData__());
-            value.subcribe(function (vl) {
+            value.subscribe(function (vl) {
                 if (isState(vl)) {
                     self.attr(attr, vl.__toData__());
 
@@ -3015,9 +3057,12 @@ function addOneWayBindingAttr(attr, value, type) {
             this.attr(attr, vl);
             if (value) {
                 var key = value.split(".").shift();
+                if (!this.__ob__ || (!inArray(this.__ob__.indexKeys, key) && typeof this[kwy] != "undefined")) {
+                    //
 
-                if (this.__ob__) {
-                    this.__ob__.subcribe(value, function (v) {
+                }
+                else if (this.__ob__) {
+                    this.__ob__.subscribe(value, function (v) {
                         if (isState(v)) {
                             self.attr(attr, v.__toData__());
                         } else {
@@ -3070,7 +3115,7 @@ function addTwoWayBindingAttr(attr, value, type) {
         if (type == 'state') {
             var domValue = value.__toData__();
             this.attr(attr, domValue);
-            value.subcribe(function (vl) {
+            value.subscribe(function (vl) {
                 if (PropChangeStatus[attrKey]) {
                     if (isState(vl)) {
                         self.attr(attr, vl.__toData__());
@@ -3112,8 +3157,8 @@ function addTwoWayBindingAttr(attr, value, type) {
             this.attr(attr, vld);
             if (value) {
                 if (this.__ob__) {
-                    this.__ob__.subcribe(value, function (v) {
-                
+                    this.__ob__.subscribe(value, function (v) {
+
                         vld = isState(v) ? v.__toData__() : v;
                         if (PropChangeStatus[attrKey]) {
                             self.attr(attr, vld);
@@ -3149,7 +3194,7 @@ function addTwoWayBindingAttr(attr, value, type) {
                 })
             }
             else if (this.__ob__) {
-                this.__ob__.subcribe(value, function (v) {
+                this.__ob__.subscribe(value, function (v) {
                     value = isState(v) ? v.__toData__() : v;
                     if (PropChangeStatus[attrKey]) {
                         self.attr(attr, value);
@@ -3216,7 +3261,7 @@ function create(tag, children, attributes) {
         var n2 = k.substring(2);
         var vt = getType(vl);
         var valType = isState(vl) ? 'state' : vt;
-        var $t = valType, $v = vl; 
+        var $t = valType, $v = vl;
         if (isString(vl) && !isNumber(vl) && vl.substr(0, 2) == '{{' && vl.substr(vl.length - 2) == '}}') {
             $t = 'prop';
             $v = vl.substr(2, vl.length - 4).trim();
