@@ -138,21 +138,20 @@ app.instance = function (...args) {
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "RL": () => (/* binding */ DomBag),
 /* harmony export */   "ZP": () => (__WEBPACK_DEFAULT_EXPORT__),
-/* harmony export */   "ut": () => (/* binding */ createEl),
 /* harmony export */   "Ue": () => (/* binding */ create),
-/* harmony export */   "bM": () => (/* binding */ getDomInf),
+/* harmony export */   "ut": () => (/* binding */ createEl),
 /* harmony export */   "is": () => (/* binding */ Dom),
-/* harmony export */   "Je": () => (/* binding */ inputTypes),
-/* harmony export */   "oE": () => (/* binding */ inputTags),
+/* harmony export */   "ek": () => (/* binding */ domEvents),
+/* harmony export */   "bM": () => (/* binding */ getDomInf),
 /* harmony export */   "ck": () => (/* binding */ htmlTags),
-/* harmony export */   "ek": () => (/* binding */ domEvents)
+/* harmony export */   "oE": () => (/* binding */ inputTags),
+/* harmony export */   "Je": () => (/* binding */ inputTypes)
 /* harmony export */ });
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(499);
+/* harmony import */ var _app_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(544);
 /* harmony import */ var _es5_class_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(170);
-/* harmony import */ var _app_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(544);
-/* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(446);
-/* harmony import */ var _observer_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(734);
-
+/* harmony import */ var _observer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(734);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(499);
+/* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(446);
 
 
 
@@ -160,30 +159,32 @@ app.instance = function (...args) {
 
 
 const global = window;
-const MS = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .date */ .hT)('ms');
-const DEFAULT_VALUE = _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
+const MS = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .date */ .hT)('ms');
+const DEFAULT_VALUE = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
 
-const SHOW = 'SHOW' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const PENDING_CHILDREN = 'PENDING_CHILDREN' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const PENDING_CONTENTS = 'PENDING_CONTENTS' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const PARENT_NODE = 'PARENT_NODE' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const MARK_COMMENT = 'MARK_COMMENT' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const DATA_TYPES = 'DATA_TYPES' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const SYNC_CHANGE = 'SYNC_CHANGE' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const DATA_SYNC = 'DATA_SYNC' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const DYNAMIC_SYNC = 'DYNAMIC_SYNC' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const DYNAMIC_ATTRS = 'DYNAMIC_ATTRS' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const DATA_CONTAINERS = 'DATA_CONTAINERS' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const FOREIGN_DATA = 'FOREIGN_DATA' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const BUILDER = 'BUILDER' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const IS_STARTED = 'IS_STARTED' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const LISTENNERS = 'LISTENNERS' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const DOM_LISTENNERS = 'DOM_LISTENNERS' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
+const SHOW = 'SHOW' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const PENDING_CHILDREN = 'PENDING_CHILDREN' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const PENDING_CONTENTS = 'PENDING_CONTENTS' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const PARENT_NODE = 'PARENT_NODE' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const MARK_COMMENT = 'MARK_COMMENT' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const DATA_TYPES = 'DATA_TYPES' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const SYNC_CHANGE = 'SYNC_CHANGE' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const DATA_SYNC = 'DATA_SYNC' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const DYNAMIC_SYNC = 'DYNAMIC_SYNC' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const DYNAMIC_ATTRS = 'DYNAMIC_ATTRS' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const DATA_CONTAINERS = 'DATA_CONTAINERS' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const FOREIGN_DATA = 'FOREIGN_DATA' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const BUILDER = 'BUILDER' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const IS_STARTED = 'IS_STARTED' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const LISTENNERS = 'LISTENNERS' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const DOM_LISTENNERS = 'DOM_LISTENNERS' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
 
-const TRANSMISTION_LISTENNERS = 'TRANSMISTION_LISTENNERS' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const TRANSMISTION_STATUS = 'TRANSMISTION_STATUS' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const IS_BUILDED = 'IS_BUILDED' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
-const CAN_SET_CHILDREN = 'CAN_SET_CHILDREN' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand(MS));
+const TRANSMISTION_LISTENNERS = 'TRANSMISTION_LISTENNERS' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const TRANSMISTION_STATUS = 'TRANSMISTION_STATUS' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const IS_BUILDED = 'IS_BUILDED' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+const CAN_SET_CHILDREN = 'CAN_SET_CHILDREN' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
+
+const DATA_SUBSCRIBERS = 'DATA_SUBSCRIBERS' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand(MS));
 
 
 
@@ -263,7 +264,7 @@ function closest(selector, element) {
     if (!element) return null;
     if (selector == undefined) return element ? element.parentNode || null : null;
     var finder = [];
-    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(selector)) {
+    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(selector)) {
         if (selector.isDom) {
             finder.push(selector.el);
         }
@@ -280,7 +281,7 @@ function closest(selector, element) {
     else if (selector instanceof Element) {
         finder.push(selector);
     }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(selector)) {
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(selector)) {
         var els = document.querySelectorAll(selector);
         if (els.length) {
             for (var index = 0; index < els.length; index++) {
@@ -337,18 +338,18 @@ function getDataBag(_class) {
     classes.map(function (c) {
         dataContainers.map(function (container) {
             if (container._class == c) {
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(container.data)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(container.data)) {
                     for (const scope in container.data) {
                         if (Object.prototype.hasOwnProperty.call(container.data, scope)) {
                             const d = container.data[scope];
-                            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .objectHasKey */ .aX)(bag, scope)) bag[scope] = {};
+                            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .objectHasKey */ .aX)(bag, scope)) bag[scope] = {};
                             if (scope == 'data') {
-                                (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .assignValue */ .MP)(bag[scope], d);
+                                (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(bag[scope], d);
                             }
-                            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['args', 'arguments', 'params'], scope)) {
+                            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['args', 'arguments', 'params'], scope)) {
                                 bag[scope] = d;
                             }
-                            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(d)) {
+                            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(d)) {
                                 for (const key in d) {
                                     if (Object.prototype.hasOwnProperty.call(d, key)) {
                                         const v = d[key];
@@ -394,25 +395,25 @@ var DomPendingClassData = [];
  */
 function addDomClassData(instanceID, data) {
     if (typeof DomClassData[instanceID] == "undefined") DomClassData[instanceID] = {};
-    if (data && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(data)) (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .assignValue */ .MP)(DomClassData, instanceID, data);
+    if (data && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(data)) (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(DomClassData, instanceID, data);
 }
 
 function getDomDataValue(instanceID, key, value) {
-    return typeof DomClassData[instanceID] == "object" ? (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getEl */ .Gn)(DomClassData[instanceID], key, value) : value;
+    return typeof DomClassData[instanceID] == "object" ? (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getEl */ .Gn)(DomClassData[instanceID], key, value) : value;
 }
 function setDomDataValue(instanceID, key, value) {
     if (typeof DomClassData[instanceID] == "undefined") DomClassData[instanceID] = {};
-    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(key)) {
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(value)) {
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .objectHasKey */ .aX)(DomClassData[instanceID], key) || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(DomClassData[instanceID][key]))
+    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(key)) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(value)) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .objectHasKey */ .aX)(DomClassData[instanceID], key) || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(DomClassData[instanceID][key]))
                 DomClassData[instanceID][key] = value;
             else
-                (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .assignValue */ .MP)(DomClassData[instanceID][key], value)
+                (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(DomClassData[instanceID][key], value)
         } else
             DomClassData[instanceID][key] = value;
 
     }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(key)) (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .assignValue */ .MP)(DomClassData, instanceID, key);
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(key)) (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(DomClassData, instanceID, key);
 }
 
 function getDomClassPendingDAta(classCTX) {
@@ -459,15 +460,16 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
     $children: null,
     $parent: null,
+    
 
     static$makeClass: function (name, props) {
-        var wrapper = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ["default"] */ .ZP)(name, isGlobal).extends(this);
-        return (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(props) ? wrapper(props) : wrapper;
+        var wrapper = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ["default"] */ .ZP)(name).extends(this);
+        return (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(props) ? wrapper(props) : wrapper;
     },
     static$maker: function (name, props) {
         try {
-            var wrapper = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ["default"] */ .ZP)(name, isGlobal).extends(this);
-            return (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(props) ? wrapper(props) : wrapper;
+            var wrapper = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ["default"] */ .ZP)(name).extends(this);
+            return (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(props) ? wrapper(props) : wrapper;
         } catch (error) {
             console.warn(error);
         }
@@ -489,7 +491,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             if (Object.prototype.hasOwnProperty.call(props, key)) {
                 const vl = props[key];
                 let k = key.toLowerCase();
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['data', 'services', 'params', 'args'], k)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['data', 'services', 'params', 'args'], k)) {
                     hasData = true;
                     data[k] = vl;
                     delete props[key];
@@ -508,7 +510,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             for (let index = 0; index < dataContainers.length; index++) {
                 const container = dataContainers[index];
                 if (container._class == c) {
-                    (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .assignValue */ .MP)(container.data, data);
+                    (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(container.data, data);
                     return p;
                 }
 
@@ -521,7 +523,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
     __commit__: function (classData) {
 
         if (!classData.props.tagName && !classData.constants.tagName && !classData.accessors.tagName.value) {
-            var s = _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.camelToSlug */ .W3.camelToSlug(this.__class__);
+            var s = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.camelToSlug */ .W3.camelToSlug(this.__class__);
             if (s != 'dom' && s != "component") {
                 if (!classData.accessors.tagName)
                     classData.accessors.tagName = {
@@ -554,6 +556,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             .__set__(CAN_SET_CHILDREN, true)
             .__set__(DYNAMIC_ATTRS, {})
             .__set__(DATA_TYPES, {})
+            .__set__(DATA_SUBSCRIBERS, {})
             .__set__(SYNC_CHANGE, true)
             .__set__(DATA_SYNC, true)
 
@@ -564,7 +567,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         this.__set__(CAN_SET_CHILDREN, false);
         let bag = getDataBag(this.static);
         bootData.apply(this, [bag]);
-        if (oneTimeData && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(oneTimeData) && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(oneTimeData)) {
+        if (oneTimeData && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(oneTimeData) && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(oneTimeData)) {
             for (const key in oneTimeData) {
                 if (Object.hasOwnProperty.call(oneTimeData, key)) {
                     const value = oneTimeData[key];
@@ -632,14 +635,52 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         return getDomDataValue(this.__instance__id__, key, value);
     },
 
+    final$__onChangeProp__: function (key, value) {
+        var subContainer = this.__get__(DATA_SUBSCRIBERS);
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .objectHasKey */ .aX)(subContainer, key) || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(subContainer[key]) || !subContainer[key].length)
+            return false;
+
+        var self = this;
+        return subContainer[key].map(function (fn) {
+            fn.call(self, value);
+        })
+    },
+
+    /**
+     * Theo dỏi sự thay đổi của thuộc tính
+     * @param {*} key thuộc tính cần theo dõi sự thay đổi
+     * @param {function(any)} fn hàm xử lý khi có thay đổi
+     */
+    subscribe: function (key, fn) {
+        var t = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getType */ .oL)(key);
+        if (t == 'string' || t == 'number') {
+            var k = String(key).split("").shift();
+            var f = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(fn) ? fn : (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getObjectMethod */ .Kh)(this, key);
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(f)) return false;
+            if (this.__ob__ && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(this.__ob__.indexKeys, k)) {
+                this.__ob__.subscribe(key, f);
+            } else {
+                var subContainer = this.__get__(DATA_SUBSCRIBERS);
+                if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .objectHasKey */ .aX)(subContainer, key) || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(subContainer[key]) || !subContainer[key].length)
+                    subContainer[key] = [];
+                subContainer[key].push(f);
+            }
+            return true;
+        }
+        else if(t == 'object'){
+            var self = this;
+            Object.keys(key).map(function(k){
+                self.subscribe(k, fn);
+            })
+        }
+    },
+
     constructor: function Dom() {
         this.setElement.apply(this, arguments);
         __build__.call(this);
         this.__test__key__ = true;
     },
-
-
-
+    
     __call__: function (...args) {
         return (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* .createInstance */ .Fs)(this, args);
     },
@@ -714,7 +755,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      * @param {string|object}
      */
     const$setElement: function setElement(params) {
-        var args = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getArguments */ .Tu)(arguments);
+        var args = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getArguments */ .Tu)(arguments);
         if (args.length && typeof args[0] != "string") {
             args.unshift(this.getDefaultSelector());
         }
@@ -737,19 +778,19 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
             var self = this;
 
-            (0,_observer_js__WEBPACK_IMPORTED_MODULE_4__/* .observe */ .N7)(self);
+            (0,_observer_js__WEBPACK_IMPORTED_MODULE_2__/* .observe */ .N7)(self);
 
 
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(elem.oneWayBinding)) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(elem.oneWayBinding)) {
                 addOneWayBindingAttr.call(this, elem.oneWayBinding);
             }
 
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(elem.twoWayBinding)) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(elem.twoWayBinding)) {
                 addTwoWayBindingAttr.call(this, elem.twoWayBinding);
             }
 
 
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(elem.dataTypeAttrs)) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(elem.dataTypeAttrs)) {
                 for (const key in elem.dataTypeAttrs) {
                     if (Object.hasOwnProperty.call(elem.dataTypeAttrs, key)) {
                         const vl = elem.dataTypeAttrs[key];
@@ -765,19 +806,19 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
                 }
             }
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(elem.events)) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(elem.events)) {
                 this.on(elem.events);
             }
             if (elem.parent) {
                 this.parent = elem.parent;
             }
 
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(elem.methods)) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(elem.methods)) {
                 for (var method in elem.methods) {
                     if (Object.hasOwnProperty.call(elem.methods, method)) {
                         var fn = elem.methods[method];
                         // console.log(method, fn)
-                        (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._defineProperty */ .w2)(this, method, fn);
+                        (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._defineProperty */ .w2)(this, method, fn);
                     }
                 }
             }
@@ -792,13 +833,13 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      * @param {*} args thông tin element
      */
     final$setup: function setup(args) {
-        return this.setElement.apply(this, (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getArguments */ .Tu)(arguments));
+        return this.setElement.apply(this, (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getArguments */ .Tu)(arguments));
     },
 
     const$getDefaultSelector: function () {
         if (this.selector) return this.selector;
         return "div#" + (
-            this.id ? this.id : _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand()
+            this.id ? this.id : _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand()
         ) + "." + (
                 this.className ? this.className.split(" ").map(function (v) {
                     return v.trim();
@@ -958,7 +999,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         var _listeners = this.__get__(LISTENNERS);
         if (_listeners === undefined || _listeners === null) return;
         type = String(type).toLowerCase();
-        if (isDomEvent(type)) return this.off.apply((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getArguments */ .Tu)(arguments));
+        if (isDomEvent(type)) return this.off.apply((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getArguments */ .Tu)(arguments));
         const listeners = _listeners;
         const listenerArray = listeners[type];
 
@@ -984,7 +1025,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
     dispatchEvent: function (event) {
         var _listeners = this.__get__(LISTENNERS);
         if (_listeners === undefined || _listeners === null) return;
-        if (isDomEvent(event.type)) return this.trigger.apply(this, (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getArguments */ .Tu)(arguments));
+        if (isDomEvent(event.type)) return this.trigger.apply(this, (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getArguments */ .Tu)(arguments));
         const listeners = _listeners;
         const listenerArray = listeners[event.type];
 
@@ -1074,8 +1115,8 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      * @returns {Query|Dom}
      */
     trigger: function trigger(event, data) {
-        var ev = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(event) ? event : (event ? event.type : null);
-        var e = !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(event) ? { type: ev } : event;
+        var ev = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(event) ? event : (event ? event.type : null);
+        var e = !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(event) ? { type: ev } : event;
         var el = this.el;
         if (!e.target) {
             e.target = el;
@@ -1107,8 +1148,8 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
     on: function on(event, handler) {
         var self = this;
         const __transmissionEventListeners = this.__get__(TRANSMISTION_LISTENNERS);
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(event)) {
-            var args = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getArguments */ .Tu)(arguments);
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(event)) {
+            var args = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getArguments */ .Tu)(arguments);
             if (isDomEvent(event)) {
                 return self.addDomEvent.apply(this, args);
             }
@@ -1137,12 +1178,12 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             }
 
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(event)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(event)) {
             event.map(function (e) {
                 self.on(e, handler);
             })
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(event)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(event)) {
             for (var key in event) {
                 if (Object.hasOwnProperty.call(event, key)) {
                     this.on(key, event[key]);
@@ -1158,8 +1199,8 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      */
     const$fn: function fn(method) {
         var self = this;
-        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(method) || typeof self[method] != "function") return function (e) { console.log(e) };
-        var args = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getArguments */ .Tu)(arguments);
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(method) || typeof self[method] != "function") return function (e) { console.log(e) };
+        var args = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getArguments */ .Tu)(arguments);
         var fn = self[method];
         return function (e) {
             e.component = this;
@@ -1176,8 +1217,8 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      */
     const$getTreeMethod: function getTreeMethod(method) {
         var self = this;
-        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(method)) return function (e) { console.log(e) };
-        var args = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getArguments */ .Tu)(arguments);
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(method)) return function (e) { console.log(e) };
+        var args = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getArguments */ .Tu)(arguments);
         if (typeof self[method] != "function") {
             if (this.parent && typeof this.parent.getTreeMethod == "function") {
                 return this.parent.getTreeMethod.apply(this.parent, args);
@@ -1200,16 +1241,16 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
     is: function is(selector, el) {
         var e = null;
         if (el) {
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(el)) {
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(el)) {
                 if (el.isDom) {
                     e = el.el;
                 }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(el, Element)) {
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(el, Element)) {
                     e = el;
                 }
                 else return false;
             }
-            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(el)) {
+            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(el)) {
                 var elm = $document.querySelectorAll(el);
                 if (elm.length) {
                     e = elm;
@@ -1226,10 +1267,10 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         }
 
 
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(selector)) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(selector)) {
             if (selector.length > 1 && selector.substring(0, 1) == ":") {
                 var s = selector.substring(1);
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(e, Element)) return (typeof e[s] != 'undefined' && e[s]) ? true : false;
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(e, Element)) return (typeof e[s] != 'undefined' && e[s]) ? true : false;
                 for (let i = 0; i < e.length; i++) {
                     const ell = e[i];
                     if (typeof ell[s] != 'undefined' && ell[s]) return true;
@@ -1239,7 +1280,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             var elem = $document.querySelectorAll(selector);
             for (let i = 0; i < elem.length; i++) {
                 const ele = elem[i];
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(e, Element)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(e, Element)) {
                     if (e == ele) return true;
                 }
                 else if (e.length) {
@@ -1252,7 +1293,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
         }
         if (selector instanceof Element) {
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(e, Element)) {
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(e, Element)) {
                 if (e == selector) return true;
             }
             else if (e.length) {
@@ -1262,8 +1303,8 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
                 }
             }
         }
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(selector) && selector.isDom) {
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(e, Element)) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(selector) && selector.isDom) {
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(e, Element)) {
                 if (e == selector.el) return true;
             }
             else if (e.length) {
@@ -1308,10 +1349,10 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
     removeProp: function (prop) {
         if (typeof prop != "undefined") {
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(prop)) prop = [prop];
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(prop)) {
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(prop)) prop = [prop];
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(prop)) {
                 prop.map(function (p) {
-                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(p)) {
+                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(p)) {
                         delete this.el[p];
                     }
                 })
@@ -1418,7 +1459,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         else if ((typeof value == "undefined" || value === null) && typeof attr != "object") {
             return this.getAttribute(attr);
         }
-        else if (typeof attr != "undefined" && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getType */ .oL)(attr) == "object") {
+        else if (typeof attr != "undefined" && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getType */ .oL)(attr) == "object") {
 
             for (var key in attr) {
                 if (attr.hasOwnProperty(key)) {
@@ -1445,13 +1486,13 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
                         dataRaw[a] = attr.value;
                         var b = a.split("-");
                         var c = b.shift();
-                        var d = b.map(function (v) { return _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.ucfirst */ .W3.ucfirst(v) });
+                        var d = b.map(function (v) { return _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.ucfirst */ .W3.ucfirst(v) });
                         var k = c + (d.length ? d.join("") : "");
                         data[k] = attr.value;
                     }
                 }
             }
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._defineProperty */ .w2)(this, '__data', {
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._defineProperty */ .w2)(this, '__data', {
                 raw: dataRaw,
                 parse: data
             });
@@ -1462,7 +1503,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         if (typeof key == "string") {
             return (typeof this.__data.raw[key] != "undefined") ? this.__data.raw[key] : null;
         }
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(key)) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(key)) {
             var arrData = {};
             for (var i = 0; i < key.length; i++) {
                 var kk = key[i];
@@ -1481,16 +1522,16 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
     addClass: function (className) {
         var classlist = [];
         var mapFunc = function (val) {
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(val)) {
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(val)) {
                 classlist.push(val);
-            } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(val)) {
+            } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(val)) {
                 val.map(mapFunc);
             }
         };
         if (arguments.length) {
             for (var i = 0; i < arguments.length; i++) {
                 var arg = arguments[i];
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(arg)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(arg)) {
                     mapFunc(arg.split(" ").map(function (v) {
                         return v.trim();
                     }).filter(function (v) { return v.length > 0 }));
@@ -1511,9 +1552,9 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
     removeClass: function (classname) {
         var classlist = [];
         var mapFunc = function (val) {
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(val)) {
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(val)) {
                 classlist.push(val);
-            } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(val)) {
+            } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(val)) {
                 val.map(mapFunc);
             }
         };
@@ -1522,7 +1563,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         if (arguments.length) {
             for (var i = 0; i < arguments.length; i++) {
                 var arg = arguments[i];
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(arg)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(arg)) {
                     mapFunc(arg.split(" ").map(function (v) {
                         return v.trim();
                     }).filter(function (v) { return v.length > 0 }));
@@ -1554,17 +1595,17 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         else if (!prop) {
             return this.el.style;
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(prop) && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(value)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(prop) && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(value)) {
             var style = this.el.style;
-            var p = _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.camelToSlug */ .W3.camelToSlug(prop, '-');
+            var p = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.camelToSlug */ .W3.camelToSlug(prop, '-');
             var s = p[0].toLowerCase() + prop.substr(1);
             if (Object.hasOwnProperty.call(style, p)) return style[p];
             if (Object.hasOwnProperty.call(style, s)) return style[s];
             return "";
         }
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(prop)) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(prop)) {
             setCssProp(this.el, prop, value);
-        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(prop)) {
+        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(prop)) {
             for (var key in prop) {
                 if (prop.hasOwnProperty(key)) {
                     var v = prop[key];
@@ -1587,15 +1628,15 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      * @returns {Dom}
      */
     const$append: function (child) {
-        if (typeof child == "undefined" || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isNull */ .Ft)(child) || simpleTags.indexOf(this.tagName) !== -1) return this;
+        if (typeof child == "undefined" || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNull */ .Ft)(child) || simpleTags.indexOf(this.tagName) !== -1) return this;
         var self = this;
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isFunction */ .mf)(child) && child.isDomClass) child = child('#inp-' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand());
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(child)) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(child) && child.isDomClass) child = child('#inp-' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand());
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(child)) {
             for (var index = 0; index < child.length; index++) {
                 this.append(child[index]);
 
             }
-        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(child)) {
+        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(child)) {
             if (child.isDom) {
                 child.parent = this;
                 this.el.appendChild(child.el);
@@ -1644,11 +1685,11 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      * @returns {Query|Dom}
      */
     const$before: function (child, childTarget) {
-        if (typeof child == "undefined" || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isNull */ .Ft)(child) || simpleTags.indexOf(this.tagName) !== -1 || !childTarget) return this;
+        if (typeof child == "undefined" || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNull */ .Ft)(child) || simpleTags.indexOf(this.tagName) !== -1 || !childTarget) return this;
         let index = 0;
         var target = null;
         var self = this;
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isFunction */ .mf)(child) && child.isDomClass) child = child('#inp-' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand());
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(child) && child.isDomClass) child = child('#inp-' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand());
         var i = this.children.indexOf(childTarget);
         if (i !== -1) {
             index = i;
@@ -1664,7 +1705,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             }
         }
 
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(child)) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(child)) {
             if (target) {
                 if (child.isDom) {
                     child.parent = self;
@@ -1706,12 +1747,12 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      * @returns {Query|Dom}
      */
     const$prepend: function (child) {
-        if (typeof child == "undefined" || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isNull */ .Ft)(child) || simpleTags.indexOf(this.tagName) !== -1) return this;
+        if (typeof child == "undefined" || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNull */ .Ft)(child) || simpleTags.indexOf(this.tagName) !== -1) return this;
 
         var self = this;
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isFunction */ .mf)(child) && child.isDomClass) child = child('#inp-' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand());
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(child) && child.isDomClass) child = child('#inp-' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand());
 
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(child)) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(child)) {
             if (child.isDom) {
                 child.parent = self;
                 this.children.unshift(child);
@@ -1764,9 +1805,9 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             this.__set__(PARENT_NODE, parent);
 
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(parent)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(parent)) {
             var domEl = $document.querySelector(parent);
-            if (domEl && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(domEl, Element)) {
+            if (domEl && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(domEl, Element)) {
                 domEl.appendChild(this.el);
                 this.__set__(PARENT_NODE, domEl);
             }
@@ -1780,9 +1821,9 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         } else if (parent instanceof Element) {
             parent.insertBefore(this.el, parent.firstChild);
             this.__set__(PARENT_NODE, parent);
-        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(parent)) {
+        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(parent)) {
             var domEl = $document.querySelector(parent);
-            if (domEl && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(domEl, Element)) {
+            if (domEl && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(domEl, Element)) {
                 domEl.insertBefore(this.el, domEl.firstChild);
                 this.__set__(PARENT_NODE, domEl);
             }
@@ -1799,7 +1840,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      * @returns {boolean}
      */
     hasDomChild: function (child) {
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(child, Element)) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(child, Element)) {
             if (this.el.children.length) {
                 for (var index = 0; index < this.el.children.length; index++) {
                     var chl = this.el.children[index];
@@ -1824,7 +1865,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      */
     final$removeChild: function (child, removeDomEl) {
         if (typeof removeDomEl == "undefined") removeDomEl = true;
-        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isBoolean */ .jn)(removeDomEl)) removeDomEl = true;
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isBoolean */ .jn)(removeDomEl)) removeDomEl = true;
 
         if (child) {
             var self = this;
@@ -1852,7 +1893,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
             }
 
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(this.children)) return this;
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(this.children)) return this;
 
             for (var index = 0; index < this.children.length; index++) {
                 const c = this.children[index];
@@ -1865,7 +1906,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             }
         }
         else {
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(this.children)) return this;
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(this.children)) return this;
 
             while (this.children.length) {
                 this.removeChild(this.children[0]);
@@ -1879,7 +1920,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      * Xóa
      */
     final$remove: function () {
-        var children = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getArguments */ .Tu)(arguments);
+        var children = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getArguments */ .Tu)(arguments);
         if (children.length) {
             var self = this;
             children.map(function (child) {
@@ -2014,10 +2055,10 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      */
     final$callSiblingMethod: function (method, args) {
         if (this.parent && this.parent.children && this.parent.children.length > 1) {
-            var a = typeof args == "undefined" ? [] : ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(args) ? args : [args]);
+            var a = typeof args == "undefined" ? [] : ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(args) ? args : [args]);
             for (var i = 0; i < this.parent.children.length; i++) {
                 var child = this.parent.children[i];
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(child) && child != this && typeof child[method] == "function") {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(child) && child != this && typeof child[method] == "function") {
                     var fn = child[method];
                     var r = fn.apply(child, a);
                     if (r !== undefined) return r;
@@ -2056,7 +2097,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         // duyệt qua mảng tham so
         for (var index = 0; index < args.length; index++) {
             var vl = args[index];
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(vl)) {
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(vl)) {
                 if (index == 0) {
                     var a = getDomInf(vl);
                     if (a.isElement) {
@@ -2076,13 +2117,13 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      * @returns {Dom}
      */
     final$getRootElement: function () {
-        if (this.parent && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(this.parent) && this.parent.isDom) return this.parent.getRootElement();
+        if (this.parent && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(this.parent) && this.parent.isDom) return this.parent.getRootElement();
         return this;
     },
     // dịch chuyển element trong dom
     final$moveTo: function (parent, pos) {
-        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(parent)) return false;
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(parent, Element)) {
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(parent)) return false;
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(parent, Element)) {
             parent.appendChild(this.el);
             return this;
         }
@@ -2100,7 +2141,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      * @returns {Dom}
      */
     final$moveChild: function moveChild(child, receiveDomEl, pos) {
-        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(receiveDomEl)) return false;
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(receiveDomEl)) return false;
 
         for (var index = 0; index < this.children.length; index++) {
             var ch = this.children[index];
@@ -2111,7 +2152,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
                     ch.moveTo(receiveDomEl, pos);
 
                 }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(ch, Element)) {
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(ch, Element)) {
                     if (receiveDomEl.isDom) {
                         receiveDomEl.moveIn(ch);
                     }
@@ -2127,9 +2168,9 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
      * @param {boolean} pos 
      */
     final$moveIn: function moveIn(child, pos, oldparent) {
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(child)) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(child)) {
             var t;
-            if (((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isBoolean */ .jn)(pos) && pos === true) || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['top', 'start', 'prepend'], pos)) t = true;
+            if (((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isBoolean */ .jn)(pos) && pos === true) || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['top', 'start', 'prepend'], pos)) t = true;
             else t = false;
             var self = this;
             if (t) {
@@ -2209,7 +2250,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
     },
     get$children: function getChildren(value) {
         var returnValue = value;
-        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(value)) {
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(value)) {
             returnValue = [];
             this.__set__(CAN_SET_CHILDREN, true);
             this.children = returnValue;
@@ -2245,11 +2286,11 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
     static$toString: function () {
         var self = this;
-        return self('#' + _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.rand */ .W3.rand());
+        return self('#' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand());
     },
     static$withParent: function (parent) {
         var self = this;
-        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(parent) || !parent.isDom) {
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(parent) || !parent.isDom) {
             console.error("Parent must be instance of Dom");
             return false;
         }
@@ -2274,7 +2315,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
 
 function __build_data_ref__(data) {
-    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(data)) {
+    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(data)) {
         for (const key in data) {
             if (Object.prototype.hasOwnProperty.call(data, key)) {
                 const vl = data[key];
@@ -2329,7 +2370,7 @@ function __buildChildren__() {
 function bootData(bag) {
 
     let data = {};
-    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(bag)) {
+    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(bag)) {
         for (const key in bag) {
             if (Object.prototype.hasOwnProperty.call(bag, key)) {
                 const scopeData = bag[key];
@@ -2337,29 +2378,29 @@ function bootData(bag) {
                     for (const k in scopeData) {
                         if (Object.prototype.hasOwnProperty.call(scopeData, k)) {
                             const sc = scopeData[k];
-                            this[k] = (0,_app_js__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .ZP)(sc);
+                            this[k] = (0,_app_js__WEBPACK_IMPORTED_MODULE_0__/* ["default"] */ .ZP)(sc);
                         }
                     }
                 }
                 else if (key == 'data') {
-                    (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .assignValue */ .MP)(data, scopeData);
+                    (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(data, scopeData);
                 }
             }
         }
     }
 
     const _data_containers = this.__get__(DATA_CONTAINERS);
-    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(_data_containers)) {
+    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(_data_containers)) {
         for (const key in _data_containers) {
             if (Object.prototype.hasOwnProperty.call(_data_containers, key)) {
                 const sc = _data_containers[key];
                 if (key == 'servives') {
-                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(sc)) {
+                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(sc)) {
                         for (const k in sc) {
                             if (Object.prototype.hasOwnProperty.call(sc, k)) {
                                 const s = sc[k];
-                                if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(s)) {
-                                    this[k] = (0,_app_js__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .ZP)(s);
+                                if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(s)) {
+                                    this[k] = (0,_app_js__WEBPACK_IMPORTED_MODULE_0__/* ["default"] */ .ZP)(s);
                                 } else {
                                     this[k] = s;
                                 }
@@ -2368,7 +2409,7 @@ function bootData(bag) {
                     }
                 }
                 else if (key == 'data') {
-                    (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .assignValue */ .MP)(data, sc);
+                    (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(data, sc);
                 }
             }
         }
@@ -2471,8 +2512,8 @@ function receiveFromParent(channel, data, sentId) {
     }
     if (next) {
         if (!a) {
-            var c = _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.replace */ .W3.replace(
-                _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.ucword */ .W3.ucword(
+            var c = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.replace */ .W3.replace(
+                _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.ucword */ .W3.ucword(
                     channel.split("-").join(" ")
                 ),
                 " ",
@@ -2568,8 +2609,8 @@ function receiveFromChildren(channel, data) {
     }
     if (next) {
         if (!a) {
-            var c = _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.replace */ .W3.replace(
-                _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.ucword */ .W3.ucword(
+            var c = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.replace */ .W3.replace(
+                _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.ucword */ .W3.ucword(
                     channel.split("-").join(" ")
                 ),
                 " ",
@@ -2656,7 +2697,7 @@ function receiveFromChildren(channel, data) {
 function onChildrenCallMethod(method, args) {
     if (typeof this[method] == "function") {
         var fn = this[method];
-        return fn.apply(this, (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(args) ? args : [args]);
+        return fn.apply(this, (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(args) ? args : [args]);
     }
     return this.callParentMethod(method, args);
 }
@@ -2674,7 +2715,7 @@ function onCallMethodFromParent(method, args, className) {
     function f() {
         if (typeof self[method] == "function") {
             var fn = self[method];
-            var res = fn.apply(self, (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(args) ? args : [args]);
+            var res = fn.apply(self, (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(args) ? args : [args]);
             if (typeof res != "undefined") stopCallChildrenTask[curremtCallChildrenMethodID] = true;
             return res;
         }
@@ -2778,8 +2819,8 @@ function onReceiveFromSiblings(channel, data) {
         }
     }
     if (!a) {
-        var c = _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.replace */ .W3.replace(
-            _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.ucword */ .W3.ucword(
+        var c = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.replace */ .W3.replace(
+            _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.ucword */ .W3.ucword(
                 channel.split("-").join(" ")
             ),
             " ",
@@ -2836,7 +2877,7 @@ function ___assignDynamicProperties___() {
             var s = false;
             for (let i = index + 1; i < self.parent.children.length; i++) {
                 const child = self.parent.children[i];
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(args)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(args)) {
                     var a = true;
                     for (const key in args) {
                         if (Object.hasOwnProperty.call(args, key)) {
@@ -2846,7 +2887,7 @@ function ___assignDynamicProperties___() {
                     }
                     if (a) return child;
                 }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isFunction */ .mf)(args) && args(child)) return child;
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(args) && args(child)) return child;
                 else if (!args) return child;
 
             }
@@ -2859,7 +2900,7 @@ function ___assignDynamicProperties___() {
             let index = self.parent.children.indexOf(self);
             for (let i = index - 1; i > -1; i--) {
                 const child = self.parent.children[i];
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(args)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(args)) {
                     var a = true;
                     for (const key in args) {
                         if (Object.hasOwnProperty.call(args, key)) {
@@ -2869,7 +2910,7 @@ function ___assignDynamicProperties___() {
                     }
                     if (a) return child;
                 }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isFunction */ .mf)(args) && args(child)) return child;
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(args) && args(child)) return child;
                 else if (!args) return child;
             }
         }
@@ -2880,8 +2921,8 @@ function ___assignDynamicProperties___() {
 
         // function _show() {
         if (self.__get__(SHOW)) return self;
-        var t = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isNumber */ .hj)(time) ? parseInt(time) : 0;
-        var cb = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isCallable */ .GV)(time) ? time : ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isCallable */ .GV)(callback) ? callback : emptyFunc);
+        var t = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNumber */ .hj)(time) ? parseInt(time) : 0;
+        var cb = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isCallable */ .GV)(time) ? time : ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isCallable */ .GV)(callback) ? callback : emptyFunc);
 
         function _show() {
             var e = self.el;
@@ -2950,8 +2991,8 @@ function ___assignDynamicProperties___() {
      */
     function hide(time = 0, callback) {
         var e = self.el;
-        var t = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isNumber */ .hj)(time) ? parseInt(time) : 0;
-        var cb = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isCallable */ .GV)(time) ? time : ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isCallable */ .GV)(callback) ? callback : emptyFunc);
+        var t = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNumber */ .hj)(time) ? parseInt(time) : 0;
+        var cb = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isCallable */ .GV)(time) ? time : ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isCallable */ .GV)(callback) ? callback : emptyFunc);
         if (!self.el.parentNode) return self;
         if (!self.__get__(PARENT_NODE)) self.__set__(PARENT_NODE, self.el.parentNode);
         if (!self.__get__(MARK_COMMENT)) {
@@ -3041,7 +3082,7 @@ function ___assignDynamicProperties___() {
             configurable: false,
             enumerable: false,
             set: function (status) {
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isBoolean */ .jn)(status)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isBoolean */ .jn)(status)) {
                     if (status) show();
                     else hide();
                 }
@@ -3054,7 +3095,7 @@ function ___assignDynamicProperties___() {
             configurable: false,
             enumerable: false,
             set: function (status) {
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isBoolean */ .jn)(status)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isBoolean */ .jn)(status)) {
                     if (status) hide();
                     else show();
                 }
@@ -3097,9 +3138,9 @@ function ___assignDynamicProperties___() {
  * @returns this
  */
 function addDynamicAttr(attr, value) {
-    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(attr)) {
+    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(attr)) {
         var self = this;
-        if (((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(value) && (value.isObjectData || value.isArrayData) || value.isPrimitive) || ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isFunction */ .mf)(value) && value.isPrimitive)) return setDataTypeAttribute.call(this, attr, value);
+        if (((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(value) && (value.isObjectData || value.isArrayData) || value.isPrimitive) || ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(value) && value.isPrimitive)) return setDataTypeAttribute.call(this, attr, value);
         this.attr(attr, value);
         var oneWayBinding = this.__get__(DYNAMIC_ATTRS);
         Object.defineProperty(this, attr, {
@@ -3132,7 +3173,7 @@ function addDynamicAttr(attr, value) {
         })
 
     }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(attr)) {
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(attr)) {
         for (var key in attr) {
             if (Object.hasOwnProperty.call(attr, key)) {
                 addDynamicAttr.call(this, key, attr[key]);
@@ -3152,11 +3193,11 @@ function addDynamicAttr(attr, value) {
  */
 function addOneWayBindingAttr(attr, value, type) {
     var self = this;
-    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(attr)) {
+    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(attr)) {
         if (type == 'state') {
             this.attr(attr, value.__toData__());
-            value.subcribe(function (vl) {
-                if ((0,_state_js__WEBPACK_IMPORTED_MODULE_3__/* .isState */ .L)(vl)) {
+            value.subscribe(function (vl) {
+                if ((0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(vl)) {
                     self.attr(attr, vl.__toData__());
 
                 } else {
@@ -3165,14 +3206,17 @@ function addOneWayBindingAttr(attr, value, type) {
             });
         }
         else if (type == 'prop') {
-            var vl = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getEl */ .Gn)(this, value);
+            var vl = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getEl */ .Gn)(this, value);
             this.attr(attr, vl);
             if (value) {
                 var key = value.split(".").shift();
+                if (!this.__ob__ || (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(this.__ob__.indexKeys, key) && typeof this[kwy] != "undefined")) {
+                    //
 
-                if (this.__ob__) {
-                    this.__ob__.subcribe(value, function (v) {
-                        if ((0,_state_js__WEBPACK_IMPORTED_MODULE_3__/* .isState */ .L)(v)) {
+                }
+                else if (this.__ob__) {
+                    this.__ob__.subscribe(value, function (v) {
+                        if ((0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(v)) {
                             self.attr(attr, v.__toData__());
                         } else {
                             self.attr(attr, v);
@@ -3182,7 +3226,7 @@ function addOneWayBindingAttr(attr, value, type) {
             }
         } else {
             self.attr(attr, value);
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .objectHasKey */ .aX)(this, attr)) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .objectHasKey */ .aX)(this, attr)) {
                 Object.defineProperty(this, attr, {
                     configurable: true,
                     enumerable: true,
@@ -3198,7 +3242,7 @@ function addOneWayBindingAttr(attr, value, type) {
         }
 
     }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(attr)) {
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(attr)) {
         for (var key in attr) {
             if (Object.hasOwnProperty.call(attr, key)) {
                 addOneWayBindingAttr.call(this, key, attr[key].value, attr[key].type);
@@ -3218,15 +3262,15 @@ var PropChangeStatus = {};
  */
 function addTwoWayBindingAttr(attr, value, type) {
     var self = this;
-    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(attr)) {
+    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(attr)) {
         let attrKey = this.__instance__id__ + "_" + attr;
         PropChangeStatus[attrKey] = true;
         if (type == 'state') {
             var domValue = value.__toData__();
             this.attr(attr, domValue);
-            value.subcribe(function (vl) {
+            value.subscribe(function (vl) {
                 if (PropChangeStatus[attrKey]) {
-                    if ((0,_state_js__WEBPACK_IMPORTED_MODULE_3__/* .isState */ .L)(vl)) {
+                    if ((0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(vl)) {
                         self.attr(attr, vl.__toData__());
 
                     } else {
@@ -3238,7 +3282,7 @@ function addTwoWayBindingAttr(attr, value, type) {
                 var old = this.attr(attr);
                 if (old != domValue) {
                     PropChangeStatus[attrKey] = false;
-                    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .objectHasKey */ .aX)(this, attr)) {
+                    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .objectHasKey */ .aX)(this, attr)) {
                         Object.defineProperty(this, attr, {
                             configurable: true,
                             enumerable: true,
@@ -3261,14 +3305,14 @@ function addTwoWayBindingAttr(attr, value, type) {
 
         }
         else if (type == 'prop') {
-            var vl = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getEl */ .Gn)(this, value);
-            var vld = (0,_state_js__WEBPACK_IMPORTED_MODULE_3__/* .isState */ .L)(vl) ? vl.__toData__() : vl;
+            var vl = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getEl */ .Gn)(this, value);
+            var vld = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(vl) ? vl.__toData__() : vl;
             this.attr(attr, vld);
             if (value) {
                 if (this.__ob__) {
-                    this.__ob__.subcribe(value, function (v) {
-                
-                        vld = (0,_state_js__WEBPACK_IMPORTED_MODULE_3__/* .isState */ .L)(v) ? v.__toData__() : v;
+                    this.__ob__.subscribe(value, function (v) {
+
+                        vld = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(v) ? v.__toData__() : v;
                         if (PropChangeStatus[attrKey]) {
                             self.attr(attr, vld);
                         }
@@ -3279,14 +3323,14 @@ function addTwoWayBindingAttr(attr, value, type) {
                     if (old != vld && PropChangeStatus[attrKey]) {
                         vld = old;
                         PropChangeStatus[attrKey] = false;
-                        (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .setEl */ .NR)(self, value, old);
+                        (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .setEl */ .NR)(self, value, old);
                         PropChangeStatus[attrKey] = true;
                     }
                 })
             }
         } else {
             self.attr(attr, value);
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .objectHasKey */ .aX)(this, attr)) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .objectHasKey */ .aX)(this, attr)) {
                 Object.defineProperty(this, attr, {
                     configurable: true,
                     enumerable: true,
@@ -3294,7 +3338,7 @@ function addTwoWayBindingAttr(attr, value, type) {
                         return value;
                     },
                     set: function (v) {
-                        value = (0,_state_js__WEBPACK_IMPORTED_MODULE_3__/* .isState */ .L)(v) ? v.__toData__() : v;
+                        value = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(v) ? v.__toData__() : v;
                         if (PropChangeStatus[attrKey]) {
                             this.attr(attr, value);
                         }
@@ -3303,8 +3347,8 @@ function addTwoWayBindingAttr(attr, value, type) {
                 })
             }
             else if (this.__ob__) {
-                this.__ob__.subcribe(value, function (v) {
-                    value = (0,_state_js__WEBPACK_IMPORTED_MODULE_3__/* .isState */ .L)(v) ? v.__toData__() : v;
+                this.__ob__.subscribe(value, function (v) {
+                    value = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(v) ? v.__toData__() : v;
                     if (PropChangeStatus[attrKey]) {
                         self.attr(attr, value);
                     }
@@ -3323,7 +3367,7 @@ function addTwoWayBindingAttr(attr, value, type) {
         }
 
     }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(attr)) {
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(attr)) {
         for (var key in attr) {
             if (Object.hasOwnProperty.call(attr, key)) {
                 addTwoWayBindingAttr.call(this, key, attr[key].value, attr[key].type);
@@ -3368,10 +3412,10 @@ function create(tag, children, attributes) {
         var n = k.substring(1);
         var f2 = k.substring(0, 2);
         var n2 = k.substring(2);
-        var vt = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getType */ .oL)(vl);
-        var valType = (0,_state_js__WEBPACK_IMPORTED_MODULE_3__/* .isState */ .L)(vl) ? 'state' : vt;
-        var $t = valType, $v = vl; 
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(vl) && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isNumber */ .hj)(vl) && vl.substr(0, 2) == '{{' && vl.substr(vl.length - 2) == '}}') {
+        var vt = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getType */ .oL)(vl);
+        var valType = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(vl) ? 'state' : vt;
+        var $t = valType, $v = vl;
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(vl) && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNumber */ .hj)(vl) && vl.substr(0, 2) == '{{' && vl.substr(vl.length - 2) == '}}') {
             $t = 'prop';
             $v = vl.substr(2, vl.length - 4).trim();
         }
@@ -3411,7 +3455,7 @@ function create(tag, children, attributes) {
                 }
 
             }
-            else if (parts[1] == 'parent' && (((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(vl) && vl.isDom) || vl instanceof Element)) {
+            else if (parts[1] == 'parent' && (((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(vl) && vl.isDom) || vl instanceof Element)) {
                 parent = val;
             }
             else {
@@ -3429,26 +3473,26 @@ function create(tag, children, attributes) {
                 }
             }
         }
-        else if (k == 'parent' && (((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(vl) && vl.isDom) || vl instanceof Element)) {
+        else if (k == 'parent' && (((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(vl) && vl.isDom) || vl instanceof Element)) {
             parent = val;
 
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['data', 'services', 'methods'], k)) {
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(vl)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['data', 'services', 'methods'], k)) {
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(vl)) {
                 var container = {};
                 container[k] = vl;
                 self.__set__(FOREIGN_DATA, container);
             }
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['attr', 'attrs', 'attribute', 'attributes', 'prop', 'props'], k)) {
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(vl)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['attr', 'attrs', 'attribute', 'attributes', 'prop', 'props'], k)) {
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(vl)) {
                 Object.keys(vl).map(function (_k) {
                     addAttrValue(_k, vl[_k]);
                 });
 
             }
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
             // tagName = vl;
         }
         else if (f2 == 'on' && isDomEvent(s.substr(2))) {
@@ -3457,7 +3501,7 @@ function create(tag, children, attributes) {
         else if (f == '@' && isDomEvent(n)) {
             events[n] = vl;
         }
-        else if (s == "on" && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(vl)) {
+        else if (s == "on" && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(vl)) {
             for (const v in vl) {
                 if (Object.hasOwnProperty.call(vl, v)) {
                     const ev = vl[v];
@@ -3466,8 +3510,8 @@ function create(tag, children, attributes) {
             }
 
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(["content", "children"], s)) {
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(vl)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(["content", "children"], s)) {
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(vl)) {
                 for (var j = 0; j < vl.length; j++) {
                     contents.push(vl[j]);
                 }
@@ -3498,26 +3542,26 @@ function create(tag, children, attributes) {
             attrs[k] = vl;
         }
     }
-    if (((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(tag) && (tag.isQuery || tag.isDomQuery))) {
+    if (((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag) && (tag.isQuery || tag.isDomQuery))) {
         contents.push(tag);
     }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(tag) && tag.isDom) {
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag) && tag.isDom) {
         contents.push(tag);
     }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(tag) && tag.isDomBag) {
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag) && tag.isDomBag) {
         contents.push(tag);
     }
 
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(tag)) {
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag)) {
         for (var k in tag) {
             if (tag.hasOwnProperty(k)) {
                 var vl = tag[k];
                 var s = String(k).toLowerCase();
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
                     tagName = vl;
                 }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(["content", "children"], s)) {
-                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(vl)) {
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(["content", "children"], s)) {
+                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(vl)) {
                         for (var j = 0; j < vl.length; j++) {
                             var cnt = vl[j];
                             contents.push(cnt);
@@ -3533,20 +3577,20 @@ function create(tag, children, attributes) {
         }
     }
 
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(tag)) tagName = tag;
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(tag)) tagName = tag;
 
 
     for (let i = 1; i < arguments.length; i++) {
         const arg = arguments[i];
-        let aType = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getType */ .oL)(arg);
+        let aType = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getType */ .oL)(arg);
         if (aType == "object") {
-            if (arg.isQuery || arg.isDomQuery || arg.isDom || arg.isDomBag || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(arg, Element)) {
+            if (arg.isQuery || arg.isDomQuery || arg.isDom || arg.isDomBag || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(arg, Element)) {
                 contents.push(arg);
             }
-            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(arg, Dom)) {
+            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(arg, Dom)) {
                 contents.push(arg.el);
             }
-            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(arg)) {
+            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(arg)) {
                 for (var k in arg) {
                     if (arg.hasOwnProperty(k)) {
                         addAttrValue(k, arg[k]);
@@ -3556,15 +3600,15 @@ function create(tag, children, attributes) {
             }
 
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(arg)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(arg)) {
             isTwoContent = 0;
             contents.push(arg);
-        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(arg)) {
+        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(arg)) {
             isArrayContent = true;
             for (var j = 0; j < arg.length; j++) {
                 contents.push(arg[j]);
             }
-        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isFunction */ .mf)(arg) && arg.isDomClass) {
+        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(arg) && arg.isDomClass) {
             contents.push(arg);
         }
     }
@@ -3581,15 +3625,15 @@ function create(tag, children, attributes) {
             if (inf.className) {
                 className = inf.className;
             }
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(inf.attrs)) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(inf.attrs)) {
                 for (var k in inf.attrs) {
                     if (Object.hasOwnProperty.call(inf.attrs, k)) {
                         addAttrValue(k, inf.attrs[k]);
                     }
                 }
             }
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(inf.props)) {
-                (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .assignValue */ .MP)(props, inf.props);
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(inf.props)) {
+                (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(props, inf.props);
             }
             if (inf.content) {
                 if (!isSimple) {
@@ -3611,7 +3655,7 @@ function create(tag, children, attributes) {
 
     isSimple = simpleTags.indexOf(tagName.toLowerCase()) >= 0;
     var htmlObject = $document.createElement(tagName);
-    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(attrs)) {
+    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(attrs)) {
 
         var csk, v;
         var css = {};
@@ -3623,10 +3667,10 @@ function create(tag, children, attributes) {
                 var f = k.substring(0, 1);
                 var f2 = k.substring(0, 2);
                 var isEvent = domEvents.indexOf(key) >= 0;
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
                     // tagName = vl;
                 }
-                else if (f == '$' && ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(vl) || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isNumber */ .hj)(vl) || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getType */ .oL)(vl) == "boolean")) {
+                else if (f == '$' && ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(vl) || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNumber */ .hj)(vl) || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getType */ .oL)(vl) == "boolean")) {
                     oneWayBinding[k.substr(1)] = vl;
                 }
                 else if (key == "style") {
@@ -3651,8 +3695,8 @@ function create(tag, children, attributes) {
                         htmlObject.setAttribute(key, val);
                     }
                 }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(val)) {
-                    if (val.isDom || val.isDomBag || val.isDomQuery || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(val, Element)) {
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(val)) {
+                    if (val.isDom || val.isDomBag || val.isDomQuery || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(val, Element)) {
                         if (key == 'parent' || key == '@parent' || key == '$parent') {
                             parent = val;
                         }
@@ -3665,7 +3709,7 @@ function create(tag, children, attributes) {
                         this[key] = val;
                     }
                     else {
-                        var attrObj = _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.convertTextObject */ .W3.convertTextObject({}, val, prop, '-');
+                        var attrObj = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.convertTextObject */ .W3.convertTextObject({}, val, prop, '-');
                         for (var ak in attrObj) {
                             if (attrObj.hasOwnProperty(ak)) {
                                 var v = attrObj[ak];
@@ -3682,7 +3726,7 @@ function create(tag, children, attributes) {
                 else if (typeof vl == "function") {
                     methods[k] = vl;
                 }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isBoolean */ .jn)(val)) {
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isBoolean */ .jn)(val)) {
                     if (val === false) {
                         htmlObject.removeAttribute(key);
 
@@ -3691,14 +3735,14 @@ function create(tag, children, attributes) {
                     }
                 }
                 else if (key != "content" || isSimple) {
-                    var slug = _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.camelToSlug */ .W3.camelToSlug(prop, '-');
+                    var slug = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.camelToSlug */ .W3.camelToSlug(prop, '-');
                     htmlObject.setAttribute(slug, val);
                 }
             }
         }
     }
 
-    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(props)) {
+    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(props)) {
         for (const key in props) {
             if (Object.hasOwnProperty.call(props, key)) {
                 const value = props[key];
@@ -3808,13 +3852,13 @@ var createEl = function createEl(tag, ...args) {
                 if (s.substr(0, 1) == '$') {
                     oneWayBinding[k.substr(1)] = vl;
                 }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
                     // tagName = vl;
                     if (changeTagName) {
                         tagName = vl;
                     }
                 }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['init', 'boot'], s)) {
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['init', 'boot'], s)) {
                     if (s == 'boot') boot = vl;
                     else init = vl;
                 }
@@ -3824,8 +3868,8 @@ var createEl = function createEl(tag, ...args) {
                 else if (s.substr(0, 1) == '@' && isDomEvent(s.substr(1))) {
                     events[s.substr(1)] = vl;
                 }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(["content", "content", "children"], s)) {
-                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(vl)) {
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(["content", "content", "children"], s)) {
+                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(vl)) {
                         for (var j = 0; j < vl.length; j++) {
                             var cnt = vl[j];
                             contents.push(cnt);
@@ -3841,34 +3885,34 @@ var createEl = function createEl(tag, ...args) {
         }
     }
 
-    if (((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(tag) && (tag.isQuery || tag.isDomQuery))) {
+    if (((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag) && (tag.isQuery || tag.isDomQuery))) {
         contents.push(tag);
     }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(tag) && tag.isDom) {
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag) && tag.isDom) {
         contents.push(tag.el);
     }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(tag)) {
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag)) {
         parseAttrs(tag, true);
     }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(tag)) tagName = tag;
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(tag)) tagName = tag;
     var max = arguments.length > 3 ? 3 : arguments.length;
     for (var i = 1; i < max; i++) {
         var arg = arguments[i];
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(arg) && arg.isDom) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(arg) && arg.isDom) {
             contents.push(arg.el);
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(arg, Element)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(arg, Element)) {
             contents.push(arg);
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(arg, Dom)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(arg, Dom)) {
             contents.push(arg.el);
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(arg)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(arg)) {
             parseAttrs(arg);
         }
-        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(arg)) {
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(arg)) {
             contents.push(arg);
-        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(arg)) {
+        } else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(arg)) {
             for (var j = 0; j < arg.length; j++) {
                 var cnt = arg[j];
                 contents.push(cnt);
@@ -3892,11 +3936,11 @@ var createEl = function createEl(tag, ...args) {
             if (inf.className) {
                 className = inf.className;
             }
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(inf.attrs)) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(inf.attrs)) {
                 parseAttrs(inf.attrs);
             }
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(inf.props)) {
-                (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .assignValue */ .MP)(props, inf.props);
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(inf.props)) {
+                (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(props, inf.props);
             }
             if (inf.content) {
                 if (!isSimple) {
@@ -3918,7 +3962,7 @@ var createEl = function createEl(tag, ...args) {
      */
     var htmlObject = document.createElement(tagName);
     if (typeof boot == "function") boot.call(htmlObject, attrs, events);
-    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(attrs)) {
+    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(attrs)) {
         var csk, v;
         var css = {};
         for (var prop in attrs) {
@@ -3929,7 +3973,7 @@ var createEl = function createEl(tag, ...args) {
                 var f = k.substring(0, 1);
                 var f2 = k.substring(0, 2);
                 var isEvent = isDomEvent(key)
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['tag', 'tagname'], key)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['tag', 'tagname'], key)) {
                     // tagName = vl;
                 }
                 else if (key == "style") {
@@ -3955,7 +3999,7 @@ var createEl = function createEl(tag, ...args) {
                     if (val.isQuery || val.isDomQuery || val.isDom) {
 
                     } else {
-                        let attrObj = _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.convertTextObject */ .W3.convertTextObject({}, val, prop, '-');
+                        let attrObj = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.convertTextObject */ .W3.convertTextObject({}, val, prop, '-');
                         for (var ak in attrObj) {
                             if (attrObj.hasOwnProperty(ak)) {
                                 var v = attrObj[ak];
@@ -3968,7 +4012,7 @@ var createEl = function createEl(tag, ...args) {
                     htmlObject.className = val;
                 }
                 else if (key != "content" || isSimple) {
-                    var slug = _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.camelToSlug */ .W3.camelToSlug(prop, '-');
+                    var slug = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.camelToSlug */ .W3.camelToSlug(prop, '-');
                     htmlObject.setAttribute(slug, val);
                 }
             }
@@ -3985,13 +4029,13 @@ var createEl = function createEl(tag, ...args) {
             } else {
                 for (var i = 0; i < contents.length; i++) {
                     var el = contents[i];
-                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(el) && el.isDom) {
+                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(el) && el.isDom) {
                         htmlObject.appendChild(el.el);
                     }
                     else if (el instanceof Element) {
                         htmlObject.appendChild(el);
                     }
-                    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(el) || (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(el)) {
+                    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(el) || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(el)) {
                         var a = parse(el);
                         if (a) htmlObject.appendChild(a);
                     }
@@ -4034,7 +4078,7 @@ var createEl = function createEl(tag, ...args) {
     };
 
 
-    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isEmpty */ .xb)(events)) {
+    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(events)) {
         for (var key in events) {
             if (Object.hasOwnProperty.call(events, key)) {
                 var fn = events[key];
@@ -4059,7 +4103,7 @@ var createEl = function createEl(tag, ...args) {
 function parse(str) {
     var div = document.createElement('div');
     if ((str instanceof Element)) return str;
-    else if (typeof str == "object" && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isNull */ .Ft)(str)) {
+    else if (typeof str == "object" && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNull */ .Ft)(str)) {
         if (isQuery(str)) {
             if (str.length > 0) {
                 return str[0];
@@ -4078,7 +4122,7 @@ function parse(str) {
             return createEl(str);
         }
     }
-    div.innerHTML = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(str) && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isNumber */ .hj)(str) ? String(str).trim() : str;
+    div.innerHTML = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(str) && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNumber */ .hj)(str) ? String(str).trim() : str;
 
     // Change this to div.childNodes to support multiple top-level nodes
     return div.firstChild;
@@ -4268,7 +4312,7 @@ function getDomInf(s) {
             var attr = p[i].split("=");
             if (attr.length == 2) {
                 status = true;
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['"', "'"], attr[1][0]) && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .inArray */ .d3)(['"', "'"], attr[1][attr[1].length - 1])) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['"', "'"], attr[1][0]) && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['"', "'"], attr[1][attr[1].length - 1])) {
                     obj2.attrs[attr[0]] = attr[1].substr(1, attr[1].length - 2);
                 }
                 else {
@@ -4317,7 +4361,7 @@ function eventHandler(e) {
 * @return {boolean}
 */
 function addEvent(element, event, callback, data) {
-    if (!element || !event || (!(element instanceof Element) && !isGlobalOrRoot(element)) || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(event) || !callback || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isCallable */ .GV)(callback)) return false;
+    if (!element || !event || (!(element instanceof Element) && !isGlobalOrRoot(element)) || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(event) || !callback || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isCallable */ .GV)(callback)) return false;
     event = event.toLowerCase();
     data = data || null;
 
@@ -4367,7 +4411,7 @@ function addEvent(element, event, callback, data) {
 */
 function removeEvent(element, event, callback, data) {
     // trưởng hợp không gửi element nào thì xóa tất cả
-    if (!element || (!(element instanceof Element) && !isGlobalOrRoot(element)) || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(event)) {
+    if (!element || (!(element instanceof Element) && !isGlobalOrRoot(element)) || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(event)) {
         for (var i = 0; i < events.length; i++) {
             var eventData = events[i];
             if (eventData.tasks.length) {
@@ -4402,7 +4446,7 @@ function removeEvent(element, event, callback, data) {
                     var evCallback = eventData.tasks[j];
                     if (data) {
                         if (data == evCallback.data) {
-                            if (callback && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isFunction */ .mf)(callback)) {
+                            if (callback && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(callback)) {
                                 if (evCallback.callback === callback) {
                                     removeEventListener(eventData.element, eventData.event, evCallback.callback);
                                     events[i].tasks.splice(j, 1);
@@ -4410,7 +4454,7 @@ function removeEvent(element, event, callback, data) {
                                 }
                             }
                         }
-                    } else if (callback && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isFunction */ .mf)(callback)) {
+                    } else if (callback && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(callback)) {
                         if (evCallback.callback === callback) {
                             removeEventListener(eventData.element, eventData.event, evCallback.callback);
                             events[i].tasks.splice(j, 1);
@@ -4457,7 +4501,7 @@ function getEvents(element, event, data) {
 */
 function hasEvent(element, event, callback, data) {
     // trưởng hợp không gửi element nào thì xóa tất cả
-    if (!element || (!(element instanceof Element) && !isGlobalOrRoot(element)) || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(event)) {
+    if (!element || (!(element instanceof Element) && !isGlobalOrRoot(element)) || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(event)) {
         return false;
     }
     event = event ? event.toLowerCase() : null;
@@ -4471,7 +4515,7 @@ function hasEvent(element, event, callback, data) {
                     var evCallback = eventData.tasks[j];
                     if (data) {
                         if (data == evCallback.data) {
-                            if (callback && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isFunction */ .mf)(callback)) {
+                            if (callback && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(callback)) {
                                 if (evCallback.callback === callback) {
                                     removeEventListener(eventData.element, eventData.event, evCallback.callback);
                                     events[i].tasks.splice(j, 1);
@@ -4479,7 +4523,7 @@ function hasEvent(element, event, callback, data) {
                                 }
                             }
                         }
-                    } else if (callback && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isFunction */ .mf)(callback)) {
+                    } else if (callback && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(callback)) {
                         if (evCallback.callback === callback) {
                             removeEventListener(eventData.element, eventData.event, evCallback.callback);
                             events[i].tasks.splice(j, 1);
@@ -4541,8 +4585,8 @@ function getEventData(element, event, data) {
  */
 function isDomEvent(eventName) {
     var stt = false;
-    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(eventName)) eventName.map(function (e) { if (allEvents.indexOf(String(e).toLowerCase()) != -1) stt = true; });
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(eventName) && allEvents.indexOf(eventName.toLowerCase()) != -1) stt = true;
+    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(eventName)) eventName.map(function (e) { if (allEvents.indexOf(String(e).toLowerCase()) != -1) stt = true; });
+    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(eventName) && allEvents.indexOf(eventName.toLowerCase()) != -1) stt = true;
     return stt;
 };
 
@@ -4567,9 +4611,9 @@ function isDomBasicEvent(eventName) {
  * @param {string} value 
  */
 function setCssProp(element, prop, value) {
-    if (element instanceof HTMLElement && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(prop)) {
+    if (element instanceof HTMLElement && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(prop)) {
         try {
-            var c = _utils_js__WEBPACK_IMPORTED_MODULE_0__/* .Str.slugToCamel */ .W3.slugToCamel(prop);
+            var c = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.slugToCamel */ .W3.slugToCamel(prop);
             var s = "element.style." + c + " = value;";
             eval(s);
         } catch (error) {
@@ -4578,7 +4622,7 @@ function setCssProp(element, prop, value) {
     }
 }
 function getCssProp(element, prop) {
-    if (element instanceof Element && (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isString */ .HD)(prop)) {
+    if (element instanceof Element && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(prop)) {
         return typeof element['style'][prop] != "undefined" ? String(element['style'][prop]) : "";
     }
     return "";
@@ -4586,7 +4630,7 @@ function getCssProp(element, prop) {
 
 function getTree(elem, list) {
     if (typeof elem == "undefined") return [];
-    if (typeof list == "undefined" || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(list)) {
+    if (typeof list == "undefined" || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(list)) {
         list = [];
     }
     if (elem instanceof Element) {
@@ -4604,7 +4648,7 @@ function getTree(elem, list) {
 }
 function getParentNodes(elem, list, elementStop) {
     if (typeof elem == "undefined") return [];
-    if (typeof list == "undefined" || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isArray */ .kJ)(list)) {
+    if (typeof list == "undefined" || !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(list)) {
         list = [];
     }
     if (elem instanceof Element) {
@@ -4616,7 +4660,7 @@ function getParentNodes(elem, list, elementStop) {
 }
 
 function isQuery(obj) {
-    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .isObject */ .Kn)(obj)) return false;
+    if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(obj)) return false;
     if (obj.isQuery || obj.isDomQuery) return true;
     return false;
 }
@@ -4907,7 +4951,7 @@ function getPrimitive(value, parent) {
      * Theo dõi thay đổi của giá trị
      * @param {function(newValue, oldValue, fulKey)} listen hàm xử lý
      */
-    defConst(primitive, 'subcribe', function subcribe(listen) {
+    defConst(primitive, 'subscribe', function subscribe(listen) {
         return this.addEventListener.call(this, listen);
     });
 
@@ -5253,7 +5297,7 @@ Observer.prototype.addEventListener = function (key, listen) {
  * @param {string} key key muốn theo dõi thay đổi
  * @param {function(newValue, oldValue, fulKey)} listen hàm xử lý
  */
-Observer.prototype.subcribe = function subcribe(key, listen) {
+Observer.prototype.subscribe = function subscribe(key, listen) {
     return this.addEventListener.call(this, key, listen);
 };
 
@@ -5555,9 +5599,9 @@ const isState = (variable) => {
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "qH": () => (/* binding */ createClass),
 /* harmony export */   "ZP": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   "nN": () => (/* binding */ _class),
 /* harmony export */   "Fs": () => (/* binding */ createInstance),
-/* harmony export */   "VG": () => (/* binding */ getClassData),
-/* harmony export */   "nN": () => (/* binding */ _class)
+/* harmony export */   "VG": () => (/* binding */ getClassData)
 /* harmony export */ });
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(499);
 
@@ -6196,6 +6240,7 @@ const createClass = function (className, makeGlobal) {
                         if (Object.hasOwnProperty.call(superStatic, key)) {
                             const fn = superStatic[key];
                             classData.static[key] = fn;
+                            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._defineProperty */ .w2)(ES5Class, key, fn);
                         }
                     }
 
@@ -6801,6 +6846,7 @@ const createClass = function (className, makeGlobal) {
                     }
                     else if (s == 'static') {
                         classData.static[a[1]] = value;
+                        (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._defineProperty */ .w2)(ES5Class, a[1], value);
                     }
                     else if (!isConst(a[1])) {
                         classData.constants[a[1]] = value;
@@ -6922,7 +6968,9 @@ const createClass = function (className, makeGlobal) {
                             data[key] = value;
                             if(afs) afs.call(this, value);
                         }
-
+                        if(typeof this.__onChangeProp__ == "function"){
+                            this.__onChangeProp__(key, value);
+                        }
                         
                         return data[key];
                     }
@@ -7427,7 +7475,7 @@ function getPrimitive(value, parent) {
      * Theo dõi thay đổi của giá trị
      * @param {function(newValue, oldValue, fulKey)} listen hàm xử lý
      */
-    defConst(primitive, 'subcribe', function subcribe(listen) {
+    defConst(primitive, 'subscribe', function subscribe(listen) {
         return this.addEventListener.call(this, listen);
     });
 
@@ -7768,7 +7816,7 @@ Observer.prototype.addEventListener = function (key, listen) {
  * @param {string} key key muốn theo dõi thay đổi
  * @param {function(newValue, oldValue, fulKey)} listen hàm xử lý
  */
-Observer.prototype.subcribe = function subcribe(key, listen) {
+Observer.prototype.subscribe = function subscribe(key, listen) {
     return this.addEventListener.call(this, key, listen);
 };
 
@@ -8038,6 +8086,7 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
 /* harmony export */   "hT": () => (/* binding */ date),
 /* harmony export */   "Gn": () => (/* binding */ getEl),
 /* harmony export */   "NR": () => (/* binding */ setEl),
+/* harmony export */   "Kh": () => (/* binding */ getObjectMethod),
 /* harmony export */   "MP": () => (/* binding */ assignValue),
 /* harmony export */   "bg": () => (/* binding */ assignWithout),
 /* harmony export */   "_W": () => (/* binding */ assignIfNotExists),
@@ -8898,6 +8947,61 @@ function arrayJoin(target) {
     }
     return defaultValue;
 };
+
+
+/**
+ * 
+ * @param obj 
+ * @param key 
+ * @param delimiter 
+ * @returns 
+ */
+ var getObjectMethod = function (obj, key, defaultValue, delimiter) {
+    if (typeof obj == 'undefined') {
+        return null;
+    }
+    if (typeof key == 'undefined') {
+        return obj;
+    }
+    var tpo = getType(obj);
+    var tpk = getType(key);
+    if (tpo == 'array') {
+        var k = NaN;
+        if (tpk == 'number') {
+            k = key;
+        } else if (parseInt(key) != NaN) {
+            k = parseInt(key);
+        }
+        if (!isNaN(k)) {
+            if (typeof obj[k] != 'undefined') {
+                return obj[k];
+            }
+        }
+    }
+    else if (tpo == "object") {
+        var c = obj;
+        var parent = null;
+        var d = isString(delimiter) ? delimiter : '.';
+        var ks = String(key).split(d);
+        for (let index = 0; index < ks.length; index++) {
+            const e = ks[index];
+            if (objectHasKey(c, e)) {
+                parent = c;
+                c = c[e];
+            } else {
+                c = defaultValue;
+            }
+            if (index < ks.length - 1 && (!isObject(c) && !isArray(c))) return defaultValue;
+        }
+        return !isFunction(c) ? emptyFunc : function(){
+            var args = getArguments(arguments);
+            return c.apply(parent, args);
+        }
+
+    }
+    return defaultValue;
+};
+
 /**
  * 
  * @param obj 
@@ -10474,6 +10578,7 @@ __webpack_require__.d(__webpack_exports__, {
   "getEl": () => (/* reexport */ utils/* getEl */.Gn),
   "getFirstValueInList": () => (/* reexport */ utils/* getFirstValueInList */.X5),
   "getInputCfg": () => (/* reexport */ utils/* getInputCfg */.Sk),
+  "getObjectMethod": () => (/* reexport */ utils/* getObjectMethod */.Kh),
   "getTimeStamp": () => (/* reexport */ utils/* getTimeStamp */.dg),
   "getType": () => (/* reexport */ utils/* getType */.oL),
   "h1": () => (/* reexport */ h1),

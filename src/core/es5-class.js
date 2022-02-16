@@ -1,4 +1,20 @@
-import { assignValue, date, inArray, isArray, isEmpty, isFunction, isNumber, isObject, isString, Num, Str, getArguments, _defineProperty, _instanceof, destroyObject } from "./utils.js";
+import {
+  _defineProperty,
+  _instanceof,
+  assignValue,
+  date,
+  destroyObject,
+  getArguments,
+  inArray,
+  isArray,
+  isEmpty,
+  isFunction,
+  isNumber,
+  isObject,
+  isString,
+  Num,
+  Str,
+} from './utils.js';
 
 const NORETURN_VALUE = date('time') + '-' + Str.rand(Str.rand(date('ms') + "-" + Num.rand(0, 999999)));
 const getArgs = getArguments;
@@ -634,6 +650,7 @@ export const createClass = function (className, makeGlobal) {
                         if (Object.hasOwnProperty.call(superStatic, key)) {
                             const fn = superStatic[key];
                             classData.static[key] = fn;
+                            _defineProperty(ES5Class, key, fn);
                         }
                     }
 
@@ -1239,6 +1256,7 @@ export const createClass = function (className, makeGlobal) {
                     }
                     else if (s == 'static') {
                         classData.static[a[1]] = value;
+                        _defineProperty(ES5Class, a[1], value);
                     }
                     else if (!isConst(a[1])) {
                         classData.constants[a[1]] = value;
@@ -1596,4 +1614,4 @@ export const createClass = function (className, makeGlobal) {
 };
 const _class = createClass;
 export default createClass;
-export { createInstance, getClassData, _class }
+export { _class, createInstance, getClassData };

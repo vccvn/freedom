@@ -1,9 +1,34 @@
-import { assignValue, assignWithout, date, getType, inArray, isArray, isBoolean, isCallable, isEmpty, isFunction, isNull, isNumber, isObject, isString, objectHasProperty, objectHasKey, Str, _defineProperty, _instanceof, getArguments, getEl, getFirstValueInList, getObjectMethod } from '../utils.js';
-import createClass, { _class, createInstance, getClassData } from '../es5-class.js';
 import app from '../app.js';
-import { isState } from './state.js';
-import { setEl } from '../utils.js';
+import createClass, {
+  _class,
+  createInstance,
+  getClassData,
+} from '../es5-class.js';
 import { observe } from '../observer.js';
+import {
+  _defineProperty,
+  _instanceof,
+  assignValue,
+  date,
+  getArguments,
+  getEl,
+  getObjectMethod,
+  getType,
+  inArray,
+  isArray,
+  isBoolean,
+  isCallable,
+  isEmpty,
+  isFunction,
+  isNull,
+  isNumber,
+  isObject,
+  isString,
+  objectHasKey,
+  setEl,
+  Str,
+} from '../utils.js';
+import { isState } from './state.js';
 
 const global = window;
 const MS = date('ms');
@@ -310,12 +335,12 @@ Dom = _class("Dom")({
     
 
     static$makeClass: function (name, props) {
-        var wrapper = createClass(name, isGlobal).extends(this);
+        var wrapper = createClass(name).extends(this);
         return isObject(props) ? wrapper(props) : wrapper;
     },
     static$maker: function (name, props) {
         try {
-            var wrapper = createClass(name, isGlobal).extends(this);
+            var wrapper = createClass(name).extends(this);
             return isObject(props) ? wrapper(props) : wrapper;
         } catch (error) {
             console.warn(error);
@@ -4535,5 +4560,12 @@ function emptyFunc() { }
 export default Dom;
 
 export {
-    createEl, create, getDomInf, Dom, inputTypes, inputTags, htmlTags, domEvents
-}
+  create,
+  createEl,
+  Dom,
+  domEvents,
+  getDomInf,
+  htmlTags,
+  inputTags,
+  inputTypes,
+};

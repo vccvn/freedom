@@ -1,4 +1,4 @@
-var { _class, Dom, Html, isString, Component, app, Div, P, I, A, observe } = FD;
+var { _class, Dom, Html, isString, Component, app, Div, P, I, A, Span, H1, H2, H3, H4, observe } = FD;
 var AppComponent = _class("AppComponent").extends(Component)({
     constructor(props) {
         this.props = props;
@@ -53,3 +53,34 @@ var div = Div('.test-div', {
 });
 
 document.body.appendChild(div.el)
+var Demo = Component.maker('Demo', {
+    $selector: "demo.dkm",
+    $stack: 1,
+    over: 10,
+    data: null,
+    set$stack: function(val){
+        console.log('set Stack', val);
+    },
+    constructor: function(data){
+        this.data = data;
+    },
+
+    builder: function(){
+        var self = this;
+        return [
+            Div(".header", H3(".sub-title", "Tiêu đề")),
+            Div(".container", Div(".main", P("Doãn Đẹp Trai"), P(".link", A(".link-item", {
+                href: "#Doan",
+                content: "Click Me",
+                onclick: function(e){
+                    e.preventDefault();
+                    self.over++;
+                }
+            }))))
+        ]
+    }
+});
+
+var demo = Demo("demo");
+
+document.body.appendChild(demo.el)
