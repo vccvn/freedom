@@ -1,7 +1,12 @@
 
 'use strict';
 
-import { Str, getArguments, inArray, _instanceof, getType, isFunction } from "./utils.js";
+import {
+  _instanceof,
+  getType,
+  isFunction,
+  Str,
+} from './utils.js';
 
 // These helpers produce better VM code in JS engines due to their
 // explicitness and function inlining.
@@ -448,7 +453,7 @@ var obsDefaultKey = '___OBSERVER_DEFAULT_KEY___';
 var Observer = function Observer(value, parent) {
     this.value = value;
     this.parents = _instanceof(parent, Observer) ? [parent] : [];
-    this.listeners = [];
+    this.listeners = {};
     this.indexKeys = [];
     def(value, '__ob__', this);
     if (Array.isArray(value)) {
@@ -809,12 +814,11 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
             } else {
                 val = newVal;
             }
+            console.log(setter);
             childOb = !shallow && observe(newVal, self);
             obj.__ob__.dispatch(key, val, old, obj);
         }
     });
 }
 
-
-
-export { observe, parsePrimitive, defConst, defProp }
+export { defConst, defProp, observe, parsePrimitive };

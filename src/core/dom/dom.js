@@ -218,7 +218,7 @@ function getDataBag(_class) {
                             if (scope == 'data') {
                                 assignValue(bag[scope], d);
                             }
-                            else if (inArray(['args', 'arguments', 'params'], scope)) {
+                            else if (inArray(['args', 'arguments', 'params', 'attrs', 'oneWayBinding', 'twoWayBinding', 'classes', 'classBinding'], scope)) {
                                 bag[scope] = d;
                             }
                             else if (isObject(d)) {
@@ -318,9 +318,9 @@ function addPendingData(_classCtx, data) {
  * @param {Object<key:value>} attributes thuộc tính
  */
 var Dom = function Dom(selector, children, attributes) {
-
     this.__instance__id__ = DEFAULT_VALUE;
 };
+
 Dom = _class("Dom")({
     static$isDomClass: true,
     $el: null,
@@ -332,7 +332,7 @@ Dom = _class("Dom")({
 
     $children: null,
     $parent: null,
-    
+
 
     static$makeClass: function (name, props) {
         var wrapper = createClass(name).extends(this);
@@ -357,12 +357,56 @@ Dom = _class("Dom")({
     __prepare__: function (props, scope, resolve, reject, classCTX) {
         let c = this;
         let hasData = false;
-        let data = {};
+        let data = {
+            attrs: {},
+            oneWayBinding: {},
+            twoWayBinding: {},
+            classes: [],
+            classBinding: {},
+            styles: {}
+        };
         let p = {};
+        function addData(key, value, bindType) {
+            var vt = getType(value);
+            var valType = isState(value) ? 'state' : vt;
+            var $t = valType, $v = value;
+            if (isString(value) && !isNumber(value) && value.substr(0, 2) == '{{' && value.substr(value.length - 2) == '}}') {
+                $t = 'prop';
+                $v = value.substr(2, value.length - 4).trim();
+            }
+
+            if (bindType == "sync") {
+                data.twoWayBinding[key] = {
+                    type: $t,
+                    value: $v
+                };
+            } else if (bindType == "bind") {
+                data.oneWayBinding[key] = {
+                    type: $t,
+                    value: $v
+                };
+            } else {
+                if (valType == 'state') {
+                    data.twoWayBinding[key] = {
+                        type: $t,
+                        value: $v
+                    };
+                } else {
+                    data.oneWayBinding[key] = {
+                        type: $t,
+                        value: $v
+                    };
+                }
+
+            }
+
+        }
         for (const key in props) {
             if (Object.prototype.hasOwnProperty.call(props, key)) {
                 const vl = props[key];
                 let k = key.toLowerCase();
+                let fs = key.split("$");
+                let f = fs[0].toLowerCase();
                 if (inArray(['data', 'services', 'params', 'args'], k)) {
                     hasData = true;
                     data[k] = vl;
@@ -371,6 +415,52 @@ Dom = _class("Dom")({
                 else if (k == 'dynamiccreate') {
                     p.allowDynamicCreate = vl;
                     hasData = true;
+                    delete props[key];
+                }
+                else if (k.substring(0, 2) == '$$') {
+                    addData(key.substring(2), vl, 'sync');
+                    delete props[key];
+                }
+                else if (fs.length == 2) {
+
+                    if (f == "attr") {
+                        data.attrs[key.substring(5)] = vl;
+                        delete props[key];
+                    }
+                    else if (f == 'class') {
+                        data.classBinding[fs[1]] = vl;
+                        delete props[key];
+                    }
+                    else if (inArray(['sync', 'bind'], f)) {
+                        addData(fs[1], vl, f);
+                        delete props[key];
+                    }
+                    else{
+                        p[key] = vl;
+                    }
+                    
+                }
+                else if (inArray(['attr', 'attrs', 'attribute', 'attributes']) && isObject(vl)) {
+                    Object.keys(vl).map(function (_key) {
+                        let _k = key.toLowerCase();
+                        let _fs = key.split("$");
+                        let _f = _fs[0].toLowerCase();
+                        let _vl = vl[_key];
+                        if (_k.substring(0, 2) == '$$') {
+                            addData(_key.substring(2), _vl, 'sync');
+                        }
+                        else if (_fs.length == 2) {
+                            if (_f == 'class') {
+                                data.classBinding[_fs[1]] = _vl;
+
+                            }
+                            else if (inArray(['sync', 'bind', ''], _f)) {
+                                addData(_fs[1], _vl, _f);
+
+                            }
+                        }
+
+                    });
                     delete props[key];
                 }
                 else {
@@ -539,9 +629,9 @@ Dom = _class("Dom")({
             }
             return true;
         }
-        else if(t == 'object'){
+        else if (t == 'object') {
             var self = this;
-            Object.keys(key).map(function(k){
+            Object.keys(key).map(function (k) {
                 self.subscribe(k, fn);
             })
         }
@@ -550,9 +640,9 @@ Dom = _class("Dom")({
     constructor: function Dom() {
         this.setElement.apply(this, arguments);
         __build__.call(this);
-        this.__test__key__ = true;
+        this.isDom = true;
     },
-    
+
     __call__: function (...args) {
         return createInstance(this, args);
     },
@@ -652,13 +742,18 @@ Dom = _class("Dom")({
 
             observe(self);
 
-
-            if (!isEmpty(elem.oneWayBinding)) {
-                addOneWayBindingAttr.call(this, elem.oneWayBinding);
+            let bag = getDataBag(this.static);
+            let oneWayBinding = {};
+            assignValue(oneWayBinding, elem.oneWayBinding)
+            assignValue(oneWayBinding, bag.oneWayBinding)
+            if (!isEmpty(oneWayBinding)) {
+                addOneWayBindingAttr.call(this, oneWayBinding);
             }
-
-            if (!isEmpty(elem.twoWayBinding)) {
-                addTwoWayBindingAttr.call(this, elem.twoWayBinding);
+            let twoWayBinding = {};
+            assignValue(twoWayBinding, elem.twoWayBinding)
+            assignValue(twoWayBinding, bag.twoWayBinding)
+            if (!isEmpty(twoWayBinding)) {
+                addTwoWayBindingAttr.call(this, twoWayBinding);
             }
 
 
@@ -1318,10 +1413,11 @@ Dom = _class("Dom")({
         return this;
     },
     getAttribute: function (attr) {
-        return this.el ? this.el.getAttribute(attr) : null;
+        return this.el ? this.el.getAttribute(Str.camelToSlug(attr)) : null;
     },
     setAttribute: function (attr, value) {
-        this.el.setAttribute(attr, value);
+        Str.camelToSlug(attr)
+        this.el.setAttribute(Str.camelToSlug(attr), value);
         return this;
     },
     attr: function attr(attr, value) {
@@ -2196,9 +2292,12 @@ function __build_data_ref__(data) {
         }
     }
 }
+
 function __build_data_ref_item__(key, value) {
     var self = this;
     var v = value;
+    self[key] = value;
+    return;
     Object.defineProperty(this, key, {
         enumerable: true,
         configurable: true,
@@ -2218,6 +2317,7 @@ function __build_data_ref_item__(key, value) {
 function __rebuild__() {
     __buildChildren__.call(this);
 }
+
 function __buildChildren__() {
     if (typeof this.builder == "function") {
         if (typeof this.onBeforeBuild == "function") {

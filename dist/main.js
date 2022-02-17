@@ -346,7 +346,7 @@ function getDataBag(_class) {
                             if (scope == 'data') {
                                 (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(bag[scope], d);
                             }
-                            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['args', 'arguments', 'params'], scope)) {
+                            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['args', 'arguments', 'params', 'attrs', 'oneWayBinding', 'twoWayBinding', 'classes', 'classBinding'], scope)) {
                                 bag[scope] = d;
                             }
                             else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(d)) {
@@ -446,9 +446,9 @@ function addPendingData(_classCtx, data) {
  * @param {Object<key:value>} attributes thuộc tính
  */
 var Dom = function Dom(selector, children, attributes) {
-
     this.__instance__id__ = DEFAULT_VALUE;
 };
+
 Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
     static$isDomClass: true,
     $el: null,
@@ -460,7 +460,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
     $children: null,
     $parent: null,
-    
+
 
     static$makeClass: function (name, props) {
         var wrapper = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ["default"] */ .ZP)(name).extends(this);
@@ -485,12 +485,56 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
     __prepare__: function (props, scope, resolve, reject, classCTX) {
         let c = this;
         let hasData = false;
-        let data = {};
+        let data = {
+            attrs: {},
+            oneWayBinding: {},
+            twoWayBinding: {},
+            classes: [],
+            classBinding: {},
+            styles: {}
+        };
         let p = {};
+        function addData(key, value, bindType) {
+            var vt = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getType */ .oL)(value);
+            var valType = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(value) ? 'state' : vt;
+            var $t = valType, $v = value;
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(value) && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNumber */ .hj)(value) && value.substr(0, 2) == '{{' && value.substr(value.length - 2) == '}}') {
+                $t = 'prop';
+                $v = value.substr(2, value.length - 4).trim();
+            }
+
+            if (bindType == "sync") {
+                data.twoWayBinding[key] = {
+                    type: $t,
+                    value: $v
+                };
+            } else if (bindType == "bind") {
+                data.oneWayBinding[key] = {
+                    type: $t,
+                    value: $v
+                };
+            } else {
+                if (valType == 'state') {
+                    data.twoWayBinding[key] = {
+                        type: $t,
+                        value: $v
+                    };
+                } else {
+                    data.oneWayBinding[key] = {
+                        type: $t,
+                        value: $v
+                    };
+                }
+
+            }
+
+        }
         for (const key in props) {
             if (Object.prototype.hasOwnProperty.call(props, key)) {
                 const vl = props[key];
                 let k = key.toLowerCase();
+                let fs = key.split("$");
+                let f = fs[0].toLowerCase();
                 if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['data', 'services', 'params', 'args'], k)) {
                     hasData = true;
                     data[k] = vl;
@@ -499,6 +543,52 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
                 else if (k == 'dynamiccreate') {
                     p.allowDynamicCreate = vl;
                     hasData = true;
+                    delete props[key];
+                }
+                else if (k.substring(0, 2) == '$$') {
+                    addData(key.substring(2), vl, 'sync');
+                    delete props[key];
+                }
+                else if (fs.length == 2) {
+
+                    if (f == "attr") {
+                        data.attrs[key.substring(5)] = vl;
+                        delete props[key];
+                    }
+                    else if (f == 'class') {
+                        data.classBinding[fs[1]] = vl;
+                        delete props[key];
+                    }
+                    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['sync', 'bind'], f)) {
+                        addData(fs[1], vl, f);
+                        delete props[key];
+                    }
+                    else{
+                        p[key] = vl;
+                    }
+                    
+                }
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['attr', 'attrs', 'attribute', 'attributes']) && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(vl)) {
+                    Object.keys(vl).map(function (_key) {
+                        let _k = key.toLowerCase();
+                        let _fs = key.split("$");
+                        let _f = _fs[0].toLowerCase();
+                        let _vl = vl[_key];
+                        if (_k.substring(0, 2) == '$$') {
+                            addData(_key.substring(2), _vl, 'sync');
+                        }
+                        else if (_fs.length == 2) {
+                            if (_f == 'class') {
+                                data.classBinding[_fs[1]] = _vl;
+
+                            }
+                            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['sync', 'bind', ''], _f)) {
+                                addData(_fs[1], _vl, _f);
+
+                            }
+                        }
+
+                    });
                     delete props[key];
                 }
                 else {
@@ -616,6 +706,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
          * lắng nghe sự kiện thay đổi thuộc tính html
          */
         this.on("change", function (event) {
+            console.log(event);
             if (event.target == self.el) {
                 self.dispatchEvent({
                     type: "attribute.changed",
@@ -667,9 +758,9 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             }
             return true;
         }
-        else if(t == 'object'){
+        else if (t == 'object') {
             var self = this;
-            Object.keys(key).map(function(k){
+            Object.keys(key).map(function (k) {
                 self.subscribe(k, fn);
             })
         }
@@ -678,9 +769,9 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
     constructor: function Dom() {
         this.setElement.apply(this, arguments);
         __build__.call(this);
-        this.__test__key__ = true;
+        this.isDom = true;
     },
-    
+
     __call__: function (...args) {
         return (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* .createInstance */ .Fs)(this, args);
     },
@@ -780,13 +871,18 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
             (0,_observer_js__WEBPACK_IMPORTED_MODULE_2__/* .observe */ .N7)(self);
 
-
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(elem.oneWayBinding)) {
-                addOneWayBindingAttr.call(this, elem.oneWayBinding);
+            let bag = getDataBag(this.static);
+            let oneWayBinding = {};
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(oneWayBinding, elem.oneWayBinding)
+            ;(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(oneWayBinding, bag.oneWayBinding)
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(oneWayBinding)) {
+                addOneWayBindingAttr.call(this, oneWayBinding);
             }
-
-            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(elem.twoWayBinding)) {
-                addTwoWayBindingAttr.call(this, elem.twoWayBinding);
+            let twoWayBinding = {};
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(twoWayBinding, elem.twoWayBinding)
+            ;(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(twoWayBinding, bag.twoWayBinding)
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(twoWayBinding)) {
+                addTwoWayBindingAttr.call(this, twoWayBinding);
             }
 
 
@@ -1446,10 +1542,11 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         return this;
     },
     getAttribute: function (attr) {
-        return this.el ? this.el.getAttribute(attr) : null;
+        return this.el ? this.el.getAttribute(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.camelToSlug */ .W3.camelToSlug(attr)) : null;
     },
     setAttribute: function (attr, value) {
-        this.el.setAttribute(attr, value);
+        _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.camelToSlug */ .W3.camelToSlug(attr)
+        this.el.setAttribute(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.camelToSlug */ .W3.camelToSlug(attr), value);
         return this;
     },
     attr: function attr(attr, value) {
@@ -2324,9 +2421,12 @@ function __build_data_ref__(data) {
         }
     }
 }
+
 function __build_data_ref_item__(key, value) {
     var self = this;
     var v = value;
+    self[key] = value;
+    return;
     Object.defineProperty(this, key, {
         enumerable: true,
         configurable: true,
@@ -2346,6 +2446,7 @@ function __build_data_ref_item__(key, value) {
 function __rebuild__() {
     __buildChildren__.call(this);
 }
+
 function __buildChildren__() {
     if (typeof this.builder == "function") {
         if (typeof this.onBeforeBuild == "function") {
@@ -3216,6 +3317,7 @@ function addOneWayBindingAttr(attr, value, type) {
                 }
                 else if (this.__ob__) {
                     this.__ob__.subscribe(value, function (v) {
+                        console.log(value, v);
                         if ((0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(v)) {
                             self.attr(attr, v.__toData__());
                         } else {
@@ -3319,6 +3421,7 @@ function addTwoWayBindingAttr(attr, value, type) {
                     })
                 }
                 this.on("attribute.changed", function (event) {
+                    console.log(old);
                     var old = this.attr(attr);
                     if (old != vld && PropChangeStatus[attrKey]) {
                         vld = old;
@@ -7213,10 +7316,10 @@ const _class = createClass;
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "N7": () => (/* binding */ observe),
-/* harmony export */   "Rb": () => (/* binding */ parsePrimitive),
 /* harmony export */   "o": () => (/* binding */ defConst),
-/* harmony export */   "TT": () => (/* binding */ defProp)
+/* harmony export */   "TT": () => (/* binding */ defProp),
+/* harmony export */   "N7": () => (/* binding */ observe),
+/* harmony export */   "Rb": () => (/* binding */ parsePrimitive)
 /* harmony export */ });
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(499);
 
@@ -7669,7 +7772,7 @@ var obsDefaultKey = '___OBSERVER_DEFAULT_KEY___';
 var Observer = function Observer(value, parent) {
     this.value = value;
     this.parents = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* ._instanceof */ .lH)(parent, Observer) ? [parent] : [];
-    this.listeners = [];
+    this.listeners = {};
     this.indexKeys = [];
     def(value, '__ob__', this);
     if (Array.isArray(value)) {
@@ -8030,13 +8133,12 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
             } else {
                 val = newVal;
             }
+            console.log(setter);
             childOb = !shallow && observe(newVal, self);
             obj.__ob__.dispatch(key, val, old, obj);
         }
     });
 }
-
-
 
 
 

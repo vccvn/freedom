@@ -57,12 +57,17 @@ var Demo = Component.maker('Demo', {
     $selector: "demo.dkm",
     $stack: 1,
     over: 10,
-    data: null,
+    bind$id: "{{demoID}}",
+    sync$classData: '{{demoClass}}',
+    data: {
+        demoID: 'Doan',
+        demoClass: 'test'
+    },
     set$stack: function(val){
         console.log('set Stack', val);
     },
     constructor: function(data){
-        this.data = data;
+        this.data1 = data;
     },
 
     builder: function(){
