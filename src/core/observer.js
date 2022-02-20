@@ -814,7 +814,6 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
             } else {
                 val = newVal;
             }
-            console.log(setter);
             childOb = !shallow && observe(newVal, self);
             obj.__ob__.dispatch(key, val, old, obj);
         }

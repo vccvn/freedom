@@ -72,7 +72,8 @@ interface HTMLFactory extends DomFactory {
 }
 
 declare function createElementClass(tag:string) : HTMLFactory
-declare function createHtmlElementFunction(tag:string) :  (...args) => Element
+// declare function createHtmlElementFunction(tag:string) :  (...args) => Element
+declare function createHtmlElementFunction(tag:string) : (...args) => Element
 
 export interface A extends DomFactory{}
 export interface Abbr extends DomFactory{}

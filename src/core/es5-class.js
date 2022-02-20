@@ -1083,12 +1083,6 @@ export const createClass = function (className, makeGlobal) {
                 configurable: false,
                 writable: false
             });
-            Object.defineProperty(this, '__test__key__', {
-                enumerable: false,
-                configurable: false,
-                set: function (value) { return value },
-                get: function () { return true; }
-            });
 
             updateProperties.call(this, true);
 

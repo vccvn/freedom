@@ -1,32 +1,32 @@
 import app from '../app.js';
 import createClass, {
-  _class,
-  createInstance,
-  getClassData,
+    _class,
+    createInstance,
+    getClassData,
 } from '../es5-class.js';
 import { observe } from '../observer.js';
 import {
-  _defineProperty,
-  _instanceof,
-  assignValue,
-  date,
-  getArguments,
-  getEl,
-  getObjectMethod,
-  getType,
-  inArray,
-  isArray,
-  isBoolean,
-  isCallable,
-  isEmpty,
-  isFunction,
-  isNull,
-  isNumber,
-  isObject,
-  isString,
-  objectHasKey,
-  setEl,
-  Str,
+    _defineProperty,
+    _instanceof,
+    assignValue,
+    date,
+    getArguments,
+    getEl,
+    getObjectMethod,
+    getType,
+    inArray,
+    isArray,
+    isBoolean,
+    isCallable,
+    isEmpty,
+    isFunction,
+    isNull,
+    isNumber,
+    isObject,
+    isString,
+    objectHasKey,
+    setEl,
+    Str,
 } from '../utils.js';
 import { isState } from './state.js';
 
@@ -58,7 +58,7 @@ const CAN_SET_CHILDREN = 'CAN_SET_CHILDREN' + Str.rand(Str.rand(MS));
 
 const DATA_SUBSCRIBERS = 'DATA_SUBSCRIBERS' + Str.rand(Str.rand(MS));
 
-
+const DOM_BASE_OBJECT = 'DOM_BASE_OBJECT' + Str.rand(Str.rand(MS));
 
 var $document = window.document,
     div = $document.createElement("div"),
@@ -311,6 +311,12 @@ function setDomClassPendingData(classCTX, key, value) {
 function addPendingData(_classCtx, data) {
 
 }
+
+function BindingText(key) {
+    this.key = String(key).trim();
+    this.isBindingText = true;
+}
+
 /**
  * Class Dom
  * @param {string} selector css selewctor of element
@@ -320,6 +326,16 @@ function addPendingData(_classCtx, data) {
 var Dom = function Dom(selector, children, attributes) {
     this.__instance__id__ = DEFAULT_VALUE;
 };
+
+
+
+function __set__(key, value) {
+    setDomDataValue(this.__instance__id__, key, value);
+    return this;
+}
+function __get__(key, value) {
+    return getDomDataValue(this.__instance__id__, key, value);
+}
 
 Dom = _class("Dom")({
     static$isDomClass: true,
@@ -332,6 +348,7 @@ Dom = _class("Dom")({
 
     $children: null,
     $parent: null,
+
 
 
     static$makeClass: function (name, props) {
@@ -435,10 +452,10 @@ Dom = _class("Dom")({
                         addData(fs[1], vl, f);
                         delete props[key];
                     }
-                    else{
+                    else {
                         p[key] = vl;
                     }
-                    
+
                 }
                 else if (inArray(['attr', 'attrs', 'attribute', 'attributes']) && isObject(vl)) {
                     Object.keys(vl).map(function (_key) {
@@ -499,45 +516,53 @@ Dom = _class("Dom")({
     },
     __boot__: function () {
         addDomClassData(this.__instance__id__, {});
-        this.__set__(TRANSMISTION_LISTENNERS, {
+        __set__.call(this, TRANSMISTION_LISTENNERS, {
             fromChildren: {},
             fromParent: {},
             fromSiblings: {},
             events: {}
         })
-            .__set__(TRANSMISTION_STATUS, true)
-            .__set__(PENDING_CHILDREN, [])
-            .__set__(PENDING_CONTENTS, [])
-            .__set__(LISTENNERS, {})
-            .__set__(DOM_LISTENNERS, [])
-            .__set__(DATA_CONTAINERS, [])
-            .__set__(FOREIGN_DATA, {})
-            .__set__(PARENT_NODE, null)
-            .__set__(SHOW, false)
-            .__set__(MARK_COMMENT, null)
-            .__set__(CAN_SET_CHILDREN, true)
-            .__set__(DYNAMIC_ATTRS, {})
-            .__set__(DATA_TYPES, {})
-            .__set__(DATA_SUBSCRIBERS, {})
-            .__set__(SYNC_CHANGE, true)
-            .__set__(DATA_SYNC, true)
+        __set__.call(this, TRANSMISTION_STATUS, true)
+        __set__.call(this, PENDING_CHILDREN, [])
+        __set__.call(this, PENDING_CONTENTS, [])
+        __set__.call(this, LISTENNERS, {})
+        __set__.call(this, DOM_LISTENNERS, [])
+        __set__.call(this, DATA_CONTAINERS, [])
+        __set__.call(this, FOREIGN_DATA, {})
+        __set__.call(this, PARENT_NODE, null)
+        __set__.call(this, SHOW, false)
+        __set__.call(this, MARK_COMMENT, null)
+        __set__.call(this, CAN_SET_CHILDREN, true)
+        __set__.call(this, DYNAMIC_ATTRS, {})
+        __set__.call(this, DATA_TYPES, {})
+        __set__.call(this, DATA_SUBSCRIBERS, {})
+        __set__.call(this, SYNC_CHANGE, true)
+        __set__.call(this, DATA_SYNC, true)
 
 
 
         this.children = [];
 
-        this.__set__(CAN_SET_CHILDREN, false);
-        let bag = getDataBag(this.static);
-        bootData.apply(this, [bag]);
+        __set__.call(this, CAN_SET_CHILDREN, false);
         if (oneTimeData && isObject(oneTimeData) && !isEmpty(oneTimeData)) {
             for (const key in oneTimeData) {
                 if (Object.hasOwnProperty.call(oneTimeData, key)) {
                     const value = oneTimeData[key];
-                    this[key] = value;
+                    if (key == '__dom__base__object__') {
+                        if (value) {
+                            __set__.call(this, DOM_BASE_OBJECT, value);
+                        }
+                    } else {
+                        this[key] = value;
+                    }
+
+
                 }
             }
             oneTimeData = {};
         }
+        let bag = getDataBag(this.static);
+        bootData.apply(this, [bag]);
         ___assignDynamicProperties___.call(this);
 
     },
@@ -589,16 +614,9 @@ Dom = _class("Dom")({
     },
 
 
-    __set__: function (key, value) {
-        setDomDataValue(this.__instance__id__, key, value);
-        return this;
-    },
-    __get__: function (key, value) {
-        return getDomDataValue(this.__instance__id__, key, value);
-    },
 
     final$__onChangeProp__: function (key, value) {
-        var subContainer = this.__get__(DATA_SUBSCRIBERS);
+        var subContainer = __get__.call(this, DATA_SUBSCRIBERS);
         if (!objectHasKey(subContainer, key) || !isArray(subContainer[key]) || !subContainer[key].length)
             return false;
 
@@ -622,7 +640,7 @@ Dom = _class("Dom")({
             if (this.__ob__ && inArray(this.__ob__.indexKeys, k)) {
                 this.__ob__.subscribe(key, f);
             } else {
-                var subContainer = this.__get__(DATA_SUBSCRIBERS);
+                var subContainer = __get__.call(this, DATA_SUBSCRIBERS);
                 if (!objectHasKey(subContainer, key) || !isArray(subContainer[key]) || !subContainer[key].length)
                     subContainer[key] = [];
                 subContainer[key].push(f);
@@ -690,7 +708,7 @@ Dom = _class("Dom")({
             this.onBeforeRenderChildren();
         }
         this.emit('children.rendering');
-        var _pendingChildren = this.__get__(PENDING_CHILDREN);
+        var _pendingChildren = __get__.call(this, PENDING_CHILDREN);
 
         if (_pendingChildren.length) {
             while (_pendingChildren.length) {
@@ -698,7 +716,7 @@ Dom = _class("Dom")({
                 this.append(a);
             }
         }
-        var _pendingContents = this.__get__(PENDING_CONTENTS);
+        var _pendingContents = __get__.call(this, PENDING_CONTENTS);
         if (_pendingContents.length) {
             while (_pendingContents.length) {
                 var a = _pendingContents.shift();
@@ -710,7 +728,7 @@ Dom = _class("Dom")({
             this.onAfterRenderChildren();
         }
         this.emit('children.rendered');
-        this.__set__(IS_BUILDED, true);
+        __set__.call(this, IS_BUILDED, true);
     },
     /**
      * thiết lập
@@ -735,7 +753,7 @@ Dom = _class("Dom")({
 
             this.el = el;
 
-            const FOREIGN = this.__get__(FOREIGN_DATA);
+            const FOREIGN = __get__.call(this, FOREIGN_DATA);
             bootData.call(this, FOREIGN);
 
             var self = this;
@@ -767,7 +785,7 @@ Dom = _class("Dom")({
             }
             if (elem.contents && elem.contents.length) {
                 // this._pendingContents = elem.contents;
-                var _pendingChildren = this.__get__(PENDING_CHILDREN);
+                var _pendingChildren = __get__.call(this, PENDING_CHILDREN);
                 for (var index = 0; index < elem.contents.length; index++) {
                     _pendingChildren.push(elem.contents[index]);
 
@@ -792,7 +810,7 @@ Dom = _class("Dom")({
 
         }
 
-        this.__set__(IS_STARTED, true);
+        __set__.call(this, IS_STARTED, true);
         return this;
     },
     /**
@@ -848,7 +866,18 @@ Dom = _class("Dom")({
 
             }
 
-            if (this.parent && this.parent.isDom) {
+            var domBaseObject = __get__.call(this, DOM_BASE_OBJECT);
+            if (domBaseObject && typeof domBaseObject[handler] == "function") {
+                fnt = function (e) {
+                    // e.preventDefault();
+                    e.component = self;
+                    var args = [e];
+                    params.map(function (p) { args.push(p); });
+                    return domBaseObject[handler].apply(self, args);
+
+                };
+            }
+            else if (this.parent && this.parent.isDom) {
 
                 if (!instanceID) {
                     params.unshift(handler);
@@ -928,7 +957,7 @@ Dom = _class("Dom")({
         var element = this.el;
         var listener = passed === DEFAULT_VALUE ? handler : this.parseEventHandler(handler);
 
-        var _listeners = this.__get__(LISTENNERS);
+        var _listeners = __get__.call(this, LISTENNERS);
         if (_listeners === undefined || _listeners === null) _listeners = {};
 
         type = String(type).toLowerCase();
@@ -954,7 +983,7 @@ Dom = _class("Dom")({
     },
 
     hasEventListener: function (type, listener) {
-        var _listeners = this.__get__(LISTENNERS);
+        var _listeners = __get__.call(this, LISTENNERS);
         if (_listeners === undefined || _listeners === null) return false;
 
         type = String(type).toLowerCase();
@@ -963,7 +992,7 @@ Dom = _class("Dom")({
     },
 
     removeEventListener: function (type, listener) {
-        var _listeners = this.__get__(LISTENNERS);
+        var _listeners = __get__.call(this, LISTENNERS);
         if (_listeners === undefined || _listeners === null) return;
         type = String(type).toLowerCase();
         if (isDomEvent(type)) return this.off.apply(getArguments(arguments));
@@ -990,7 +1019,7 @@ Dom = _class("Dom")({
 
 
     dispatchEvent: function (event) {
-        var _listeners = this.__get__(LISTENNERS);
+        var _listeners = __get__.call(this, LISTENNERS);
         if (_listeners === undefined || _listeners === null) return;
         if (isDomEvent(event.type)) return this.trigger.apply(this, getArguments(arguments));
         const listeners = _listeners;
@@ -1033,7 +1062,7 @@ Dom = _class("Dom")({
 
 
         if (!isDomEvent(event)) return this.addEventListener(event, listener, DEFAULT_VALUE);
-        const _domlisteners = this.__get__(DOM_LISTENNERS);
+        const _domlisteners = __get__.call(this, DOM_LISTENNERS);
         event.split(" ").filter(function (evt) { return (allEvents.indexOf(evt) >= 0); }).map(function (evt) {
             addEvent(element, evt, listener, null);
             if (_domlisteners.indexOf(evt) == -1) _domlisteners.push(evt);
@@ -1051,7 +1080,7 @@ Dom = _class("Dom")({
      */
     off: function (events, handler) {
         handler = handler || null;
-        const _domlisteners = this.__get__(DOM_LISTENNERS);
+        const _domlisteners = __get__.call(this, DOM_LISTENNERS);
         if (this.el) {
             var evs = (events && events.length) ? events.split(" ") : domEvents;
             if (evs.length) {
@@ -1114,7 +1143,7 @@ Dom = _class("Dom")({
      */
     on: function on(event, handler) {
         var self = this;
-        const __transmissionEventListeners = this.__get__(TRANSMISTION_LISTENNERS);
+        const __transmissionEventListeners = __get__.call(this, TRANSMISTION_LISTENNERS);
         if (isString(event)) {
             var args = getArguments(arguments);
             if (isDomEvent(event)) {
@@ -1600,6 +1629,14 @@ Dom = _class("Dom")({
         var self = this;
         if (isFunction(child) && child.isDomClass) child = child('#inp-' + Str.rand());
         if (isArray(child)) {
+            if (child.isDomComponentBag && child.Component) {
+                var __dom__base__object__ = __get__.call(this, DOM_BASE_OBJECT);
+                this.append(child.Component.with({
+                    parent: this,
+                    __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
+                }, child));
+                return this;
+            }
             for (var index = 0; index < child.length; index++) {
                 this.append(child[index]);
 
@@ -1630,12 +1667,65 @@ Dom = _class("Dom")({
                 this.el.appendChild(child);
                 this.children.push(child);
             }
+            else if (child instanceof Text) {
+                this.el.appendChild(child);
+                this.children.push(child);
+            }
+            else if ((child instanceof BindingText) || child.isBindingText) {
+                var key = child.key;
+                var vl = getEl(this, key);
+                var vld = isState(vl) ? vl.__toData__() : vl;
+
+                var text = document.createTextNode(vld);
+                this.el.appendChild(text);
+                this.children.push(text);
+
+                if (key) {
+                    if (this.__ob__) {
+                        this.__ob__.subscribe(key, function (v) {
+                            vld = isState(v) ? v.__toData__() : v;
+                            text.nodeValue = vld;
+                        })
+                    }
+                }
+            }
+
         }
         else if (child instanceof Element) {
             this.el.appendChild(child);
             this.children.push(child);
         }
+        else if (child instanceof Text) {
+            this.el.appendChild(child);
+            this.children.push(child);
+        }
+        else if ((child instanceof BindingText) || child.isBindingText) {
+            var key = child.key;
+            var vl = getEl(this, key);
+            var vld = isState(vl) ? vl.__toData__() : vl;
+
+            var text = document.createTextNode(vld);
+            this.el.appendChild(text);
+            this.children.push(text);
+
+            if (key) {
+                if (this.__ob__) {
+                    this.__ob__.subscribe(key, function (v) {
+                        vld = isState(v) ? v.__toData__() : v;
+                        text.nodeValue = vld;
+                    })
+                }
+            }
+        }
         else {
+            var ts = parseTextData(child);
+            if (isArray(ts) && ts.length) {
+                ts.map(function (c) {
+                    self.append(c);
+                })
+                return self;
+            }
+
             var c = parse(child);
             if (c) {
                 this.el.appendChild(c);
@@ -1653,6 +1743,16 @@ Dom = _class("Dom")({
      * @returns {Query|Dom}
      */
     const$before: function (child, childTarget) {
+        if (isArray(child)) {
+            if (child.isDomComponentBag && child.Component) {
+                var __dom__base__object__ = __get__.call(this, DOM_BASE_OBJECT);
+                this.before(child.Component.with({
+                    parent: this,
+                    __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
+                }, child), childTarget);
+                return this;
+            }
+        }
         if (typeof child == "undefined" || isNull(child) || simpleTags.indexOf(this.tagName) !== -1 || !childTarget) return this;
         let index = 0;
         var target = null;
@@ -1690,6 +1790,24 @@ Dom = _class("Dom")({
                     this.children.splice(index, 0, child);
                     this.el.insertBefore(child, target);
                 }
+                else if ((child instanceof BindingText) || child.isBindingText) {
+                    var key = child.key;
+                    var vl = getEl(this, key);
+                    var vld = isState(vl) ? vl.__toData__() : vl;
+
+                    var text = document.createTextNode(vld);
+                    this.children.splice(index, 0, text);
+                    this.el.insertBefore(text, target);
+                    if (key) {
+                        if (this.__ob__) {
+                            this.__ob__.subscribe(key, function (v) {
+                                vld = isState(v) ? v.__toData__() : v;
+                                text.nodeValue = vld;
+                            })
+                        }
+                    }
+                }
+
             }
             if (child.isDom) {
                 child.parent = self;
@@ -1706,6 +1824,24 @@ Dom = _class("Dom")({
                 this.el.insertBefore(child, this.el.firstChild);
                 this.children.unshift(child);
             }
+            else if ((child instanceof BindingText) || child.isBindingText) {
+                var key = child.key;
+                var vl = getEl(this, key);
+                var vld = isState(vl) ? vl.__toData__() : vl;
+
+                var text = document.createTextNode(vld);
+                this.el.insertBefore(text, this.el.firstChild);
+                this.children.unshift(text);
+
+                if (key) {
+                    if (this.__ob__) {
+                        this.__ob__.subscribe(key, function (v) {
+                            vld = isState(v) ? v.__toData__() : v;
+                            text.nodeValue = vld;
+                        })
+                    }
+                }
+            }
         }
         return this;
     },
@@ -1716,7 +1852,16 @@ Dom = _class("Dom")({
      */
     const$prepend: function (child) {
         if (typeof child == "undefined" || isNull(child) || simpleTags.indexOf(this.tagName) !== -1) return this;
-
+        if (isArray(child)) {
+            if (child.isDomComponentBag && child.Component) {
+                var __dom__base__object__ = __get__.call(this, DOM_BASE_OBJECT);
+                this.prepend(child.Component.with({
+                    parent: this,
+                    __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
+                }, child));
+                return this;
+            }
+        }
         var self = this;
         if (isFunction(child) && child.isDomClass) child = child('#inp-' + Str.rand());
 
@@ -1747,9 +1892,35 @@ Dom = _class("Dom")({
                 this.el.insertBefore(child, this.el.firstChild);
                 this.children.unshift(child);
             }
+            else if ((child instanceof BindingText) || child.isBindingText) {
+                var key = child.key;
+                var vl = getEl(this, key);
+                var vld = isState(vl) ? vl.__toData__() : vl;
 
+                var text = document.createTextNode(vld);
+                this.el.insertBefore(text, this.el.firstChild);
+                this.children.unshift(text);
+
+                if (key) {
+                    if (this.__ob__) {
+                        this.__ob__.subscribe(key, function (v) {
+                            vld = isState(v) ? v.__toData__() : v;
+                            text.nodeValue = vld;
+                        })
+                    }
+                }
+            }
 
         } else {
+            var ts = parseTextData(child);
+            if (isArray(ts) && ts.length) {
+                for (let index = ts.length - 1; index > -1; index--) {
+                    const c = ts[index];
+                    self.prepend(c);
+                }
+                return self;
+            }
+
             var c = parse(child);
             this.el.insertBefore(c, this.el.firstChild);
             this.children.unshift(c);
@@ -1770,14 +1941,14 @@ Dom = _class("Dom")({
             parent.append(this);
         } else if (parent instanceof Element) {
             parent.appendChild(this.el);
-            this.__set__(PARENT_NODE, parent);
+            __set__.call(this, PARENT_NODE, parent);
 
         }
         else if (isString(parent)) {
             var domEl = $document.querySelector(parent);
             if (domEl && _instanceof(domEl, Element)) {
                 domEl.appendChild(this.el);
-                this.__set__(PARENT_NODE, domEl);
+                __set__.call(this, PARENT_NODE, domEl);
             }
         }
         return this;
@@ -1788,12 +1959,12 @@ Dom = _class("Dom")({
             parent.prepend(this);
         } else if (parent instanceof Element) {
             parent.insertBefore(this.el, parent.firstChild);
-            this.__set__(PARENT_NODE, parent);
+            __set__.call(this, PARENT_NODE, parent);
         } else if (isString(parent)) {
             var domEl = $document.querySelector(parent);
             if (domEl && _instanceof(domEl, Element)) {
                 domEl.insertBefore(this.el, domEl.firstChild);
-                this.__set__(PARENT_NODE, domEl);
+                __set__.call(this, PARENT_NODE, domEl);
             }
         }
 
@@ -1914,7 +2085,7 @@ Dom = _class("Dom")({
     },
 
     final$stopTransmission: function () {
-        this.__set__(TRANSMISTION_STATUS, false);
+        __set__.call(this, TRANSMISTION_STATUS, false);
     },
     /**
      * tuyền dữ liệu giữ các component cha -> con
@@ -2212,7 +2383,7 @@ Dom = _class("Dom")({
     },
 
     set$children: function onSetChildren(value) {
-        var csc = this.__get__(CAN_SET_CHILDREN);
+        var csc = __get__.call(this, CAN_SET_CHILDREN);
         if (!csc) console.warn("Bạn không thể set giá trị cho children");
         return csc;
     },
@@ -2220,9 +2391,9 @@ Dom = _class("Dom")({
         var returnValue = value;
         if (!isArray(value)) {
             returnValue = [];
-            this.__set__(CAN_SET_CHILDREN, true);
+            __set__.call(this, CAN_SET_CHILDREN, true);
             this.children = returnValue;
-            this.__set__(CAN_SET_CHILDREN, false);
+            __set__.call(this, CAN_SET_CHILDREN, false);
         }
         return returnValue;
     },
@@ -2243,7 +2414,7 @@ Dom = _class("Dom")({
             }
 
             if (s !== false) {
-                this.__set__(PARENT_NODE, parent.el);
+                __set__.call(this, PARENT_NODE, parent.el);
                 if (typeof this.becomeAChild == "function") {
                     this.becomeAChild(parent);
                 }
@@ -2275,6 +2446,21 @@ Dom = _class("Dom")({
             parent: parent
         };
         return self.apply(null, params);
+    },
+    static$with: function (data, args) {
+        var self = this;
+        if (isObject(data)) {
+            oneTimeData = {};
+            assignValue(oneTimeData, data);
+            return self.apply(null, isArray(args) ? args : []);
+        }
+        if (isString(data)) {
+            oneTimeData = {};
+            oneTimeData[data] = args;
+            return self.apply(null, arguments.length == 3 ? (isArray(arguments[2]) ? arguments[2] : [arguments[2]]) : (arguments.length > 3 ? getArguments(arguments, 2) : []));
+        }
+        return self();
+
 
     }
 
@@ -2336,7 +2522,7 @@ function __buildChildren__() {
     } else {
         this.renderChildren();
     }
-    this.__set__(IS_BUILDED, true);
+    __set__.call(this, IS_BUILDED, true);
 }
 
 function bootData(bag) {
@@ -2361,7 +2547,7 @@ function bootData(bag) {
         }
     }
 
-    const _data_containers = this.__get__(DATA_CONTAINERS);
+    const _data_containers = __get__.call(this, DATA_CONTAINERS);
     if (!isEmpty(_data_containers)) {
         for (const key in _data_containers) {
             if (Object.prototype.hasOwnProperty.call(_data_containers, key)) {
@@ -2392,7 +2578,7 @@ function bootData(bag) {
 
 
 function __build__() {
-    if (!this.autoRender && !this.__get__(IS_BUILDED)) {
+    if (!this.autoRender && !__get__.call(this, IS_BUILDED)) {
         this.renderChildren();
     }
 }
@@ -2406,7 +2592,7 @@ function __build__() {
 function __sendToChildren__(channel, data, sentId) {
     var instanceID = this.__instance__id__;
     if (!sentId) sentId = instanceID;
-    this.__set__(TRANSMISTION_STATUS, true);
+    __set__.call(this, TRANSMISTION_STATUS, true);
     // truyền cho các thằng con
     if (this.children.length) {
         for (var i = 0; i < this.children.length; i++) {
@@ -2414,7 +2600,7 @@ function __sendToChildren__(channel, data, sentId) {
 
             if (child.isDom) {
                 receiveFromParent.call(child, channel, data, sentId);
-                if (this.__get__(TRANSMISTION_STATUS) === false) {
+                if (__get__.call(this, TRANSMISTION_STATUS) === false) {
                     if (sentId != instanceID && this.parent) {
                         this.parent.stopTransmission();
                     }
@@ -2423,7 +2609,7 @@ function __sendToChildren__(channel, data, sentId) {
             }
         }
     }
-    this.__set__(TRANSMISTION_STATUS, true);
+    __set__.call(this, TRANSMISTION_STATUS, true);
     return this;
 }
 
@@ -2434,7 +2620,7 @@ function __sendToChildren__(channel, data, sentId) {
  * @param {*} data dữ liệu bất kỳ
  */
 function receiveFromParent(channel, data, sentId) {
-    var __transmissionEventListeners = this.__get__(TRANSMISTION_LISTENNERS);
+    var __transmissionEventListeners = __get__.call(this, TRANSMISTION_LISTENNERS);
     var next = true;
     var self = this;
     var a = 0;
@@ -2559,9 +2745,9 @@ function receiveFromChildren(channel, data) {
     var next = true;
     var a = 0;
     var arr, fn, s = undefined;
-    this.__set__(TRANSMISTION_STATUS, true);
+    __set__.call(this, TRANSMISTION_STATUS, true);
 
-    const __transmissionEventListeners = this.__get__(TRANSMISTION_LISTENNERS);
+    const __transmissionEventListeners = __get__.call(this, TRANSMISTION_LISTENNERS);
     if (Object.hasOwnProperty.call(__transmissionEventListeners.fromChildren, channel)) {
         arr = __transmissionEventListeners.fromChildren[channel];
         if (arr.length) {
@@ -2656,7 +2842,7 @@ function receiveFromChildren(channel, data) {
 
         this.sendToParent(channel, data);
     }
-    this.__set__(TRANSMISTION_STATUS, true);
+    __set__.call(this, TRANSMISTION_STATUS, true);
 
 }
 
@@ -2747,7 +2933,7 @@ function __callChildrenMethod__(method, args, className) {
  * @param {*} data du lieu
  */
 function onReceiveFromSiblings(channel, data) {
-    const __transmissionEventListeners = this.__get__(TRANSMISTION_LISTENNERS);
+    const __transmissionEventListeners = __get__.call(this, TRANSMISTION_LISTENNERS);
     var self = this;
     var next = true;
     var a = 0;
@@ -2892,7 +3078,7 @@ function ___assignDynamicProperties___() {
     function show(time, callback) {
 
         // function _show() {
-        if (self.__get__(SHOW)) return self;
+        if (__get__.call(self, SHOW)) return self;
         var t = isNumber(time) ? parseInt(time) : 0;
         var cb = isCallable(time) ? time : (isCallable(callback) ? callback : emptyFunc);
 
@@ -2934,20 +3120,20 @@ function ___assignDynamicProperties___() {
         }
 
         // if(!_show()) return this;
-        var mc = self.__get__(MARK_COMMENT);
+        var mc = __get__.call(self, MARK_COMMENT);
         if (mc) {
             mc.parentNode.insertBefore(self.el, mc);
-            self.__set__(SHOW, true);
+            __set__.call(self, SHOW, true);
             _show();
         } else {
             var _next = next(function (el) { return el.isDom && el.__get__(SHOW) });
             if (_next) {
                 _next.el.parentNode.insertBefore(self.el, _next.el);
-                self.__set__(SHOW, true);
+                __set__.call(self, SHOW, true);
                 _show();
             } else if (self.parent) {
                 self.parent.el.appendChild(self.el);
-                self.__set__(SHOW, true);
+                __set__.call(self, SHOW, true);
                 _show();
             }
         }
@@ -2966,12 +3152,12 @@ function ___assignDynamicProperties___() {
         var t = isNumber(time) ? parseInt(time) : 0;
         var cb = isCallable(time) ? time : (isCallable(callback) ? callback : emptyFunc);
         if (!self.el.parentNode) return self;
-        if (!self.__get__(PARENT_NODE)) self.__set__(PARENT_NODE, self.el.parentNode);
-        if (!self.__get__(MARK_COMMENT)) {
-            self.__set__(MARK_COMMENT, document.createComment("/" + self.tagName + (self.el.id ? "#" + self.id : "") + (self.el.className ? "." + self.el.className.split(" ").map(function (t) { return t.trim(); }).filter(function (t) { return t.length > 0; }).join(".") : "")))
-            self.__get__(PARENT_NODE).insertBefore(self.__get__(MARK_COMMENT), self.el);
+        if (!__get__.call(self, PARENT_NODE)) __set__.call(self, PARENT_NODE, self.el.parentNode);
+        if (!__get__.call(self, MARK_COMMENT)) {
+            __set__.call(self, MARK_COMMENT, document.createComment("/" + self.tagName + (self.el.id ? "#" + self.id : "") + (self.el.className ? "." + self.el.className.split(" ").map(function (t) { return t.trim(); }).filter(function (t) { return t.length > 0; }).join(".") : "")))
+            __get__.call(self, PARENT_NODE).insertBefore(__get__.call(self, MARK_COMMENT), self.el);
         }
-        self.__set__(SHOW, false);
+        __set__.call(self, SHOW, false);
         if (t > 0) {
             var vpt = 1 / time;
             var opc = 1;
@@ -3009,14 +3195,14 @@ function ___assignDynamicProperties___() {
             configurable: false,
             enumerable: false,
             value: function () {
-                return self.__get__(SHOW);
+                return __get__.call(self, SHOW);
             }
         },
         __toData__: {
             configurable: false,
             enumerable: false,
             value: function () {
-                return self.__get__(SHOW);
+                return __get__.call(self, SHOW);
             }
         },
         isBoolean: {
@@ -3031,14 +3217,14 @@ function ___assignDynamicProperties___() {
             configurable: false,
             enumerable: false,
             value: function () {
-                return !self.__get__(SHOW);
+                return !__get__.call(self, SHOW);
             }
         },
         __toData__: {
             configurable: false,
             enumerable: false,
             value: function () {
-                return !self.__get__(SHOW);
+                return !__get__.call(self, SHOW);
             }
         },
         isBoolean: {
@@ -3114,11 +3300,11 @@ function addDynamicAttr(attr, value) {
         var self = this;
         if ((isObject(value) && (value.isObjectData || value.isArrayData) || value.isPrimitive) || (isFunction(value) && value.isPrimitive)) return setDataTypeAttribute.call(this, attr, value);
         this.attr(attr, value);
-        var oneWayBinding = this.__get__(DYNAMIC_ATTRS);
+        var oneWayBinding = __get__.call(this, DYNAMIC_ATTRS);
         Object.defineProperty(this, attr, {
             configurable: true,
             set: function (val) {
-                this.__set__(DYNAMIC_SYNC, false);
+                __set__.call(this, DYNAMIC_SYNC, false);
                 var stt = true;
                 this.trigger({
                     type: "change.attr." + attr,
@@ -3137,7 +3323,7 @@ function addDynamicAttr(attr, value) {
                     this.attr(attr, val);
 
                 }
-                this.__set__(DYNAMIC_SYNC, true);
+                __set__.call(this, DYNAMIC_SYNC, true);
             },
             get: function () {
                 return oneWayBinding[attr] || null;
@@ -3166,32 +3352,74 @@ function addDynamicAttr(attr, value) {
 function addOneWayBindingAttr(attr, value, type) {
     var self = this;
     if (isString(attr)) {
+        var key = String(attr).toLowerCase();
         if (type == 'state') {
-            this.attr(attr, value.__toData__());
-            value.subscribe(function (vl) {
-                if (isState(vl)) {
-                    self.attr(attr, vl.__toData__());
+            var vl = value.__toData__();
+            if (key == 'value') {
+                this.val(vl)
+            } else {
+                this.attr(attr, vl);
+            }
+
+            value.subscribe(function (v) {
+                if (isState(v)) {
+                    vl = vl.__toData__();
 
                 } else {
-                    self.attr(attr);
+                    vl = v;
                 }
+                if (key == 'value') {
+                    self.val(vl)
+                } else {
+                    self.attr(attr, vl);
+                }
+
             });
         }
         else if (type == 'prop') {
             var vl = getEl(this, value);
-            this.attr(attr, vl);
-            if (value) {
-                var key = value.split(".").shift();
-                if (!this.__ob__ || (!inArray(this.__ob__.indexKeys, key) && typeof this[kwy] != "undefined")) {
-                    //
+            if (key == 'value') {
+                this.val(vl)
+            } else {
+                this.attr(attr, vl);
+            }
 
+            if (value) {
+                var _key = value.split(".").shift();
+                if (!this.__ob__ || (!inArray(this.__ob__.indexKeys, _key) && typeof this[_key] != "undefined")) {
+                    var dbo = __get__.call(self, DOM_BASE_OBJECT);
+                    if (dbo) {
+                        if (!dbo.__ob__ || (!inArray(dbo.__ob__.indexKeys, _key) && typeof dbo[_key] != "undefined")) {
+
+                        } else {
+                            dbo.__ob__.subscribe(value, function (v) {
+                                if (isState(v)) {
+                                    vl = v.__toData__();
+
+                                } else {
+                                    vl = v;
+                                }
+                                if (key == 'value') {
+                                    self.val(vl)
+                                } else {
+                                    self.attr(attr, vl);
+                                }
+                            })
+                        }
+                    }
                 }
                 else if (this.__ob__) {
                     this.__ob__.subscribe(value, function (v) {
                         if (isState(v)) {
-                            self.attr(attr, v.__toData__());
+                            vl = v.__toData__();
+
                         } else {
-                            self.attr(attr, v);
+                            vl = v;
+                        }
+                        if (key == 'value') {
+                            self.val(vl)
+                        } else {
+                            self.attr(attr, vl);
                         }
                     })
                 }
@@ -3207,7 +3435,11 @@ function addOneWayBindingAttr(attr, value, type) {
                     },
                     set: function (val) {
                         value = val;
-                        this.attr(attr, val);
+                        if (key == 'value') {
+                            self.val(value);
+                        } else {
+                            self.attr(attr, value);
+                        }
                     }
                 })
             }
@@ -3237,21 +3469,33 @@ function addTwoWayBindingAttr(attr, value, type) {
     if (isString(attr)) {
         let attrKey = this.__instance__id__ + "_" + attr;
         PropChangeStatus[attrKey] = true;
+        var key = String(attr).toLowerCase();
         if (type == 'state') {
             var domValue = value.__toData__();
-            this.attr(attr, domValue);
+            if (key == 'value') {
+                this.val(domValue)
+            } else {
+                this.attr(attr, domValue);
+            }
+
             value.subscribe(function (vl) {
                 if (PropChangeStatus[attrKey]) {
                     if (isState(vl)) {
-                        self.attr(attr, vl.__toData__());
+                        domValue = vl.__toData__();
 
                     } else {
-                        self.attr(attr);
+                        domValue = vl;
                     }
+                    if (key == 'value') {
+                        self.val(domValue)
+                    } else {
+                        self.attr(attr, domValue);
+                    }
+
                 }
             });
             this.on("attribute.changed", function (event) {
-                var old = this.attr(attr);
+                var old = key == 'value' ? this.val() : this.attr(attr);
                 if (old != domValue) {
                     PropChangeStatus[attrKey] = false;
                     if (!objectHasKey(this, attr)) {
@@ -3259,12 +3503,16 @@ function addTwoWayBindingAttr(attr, value, type) {
                             configurable: true,
                             enumerable: true,
                             get: function () {
-                                return value;
+                                return domValue;
                             },
                             set: function (val) {
-                                value = val;
+                                domValue = val;
                                 if (PropChangeStatus[attrKey]) {
-                                    this.attr(attr, val);
+                                    if (key == 'value') {
+                                        self.val(val)
+                                    } else {
+                                        self.attr(attr, val);
+                                    }
                                 }
 
                             }
@@ -3279,29 +3527,65 @@ function addTwoWayBindingAttr(attr, value, type) {
         else if (type == 'prop') {
             var vl = getEl(this, value);
             var vld = isState(vl) ? vl.__toData__() : vl;
-            this.attr(attr, vld);
+            if (key == 'value') {
+                this.val(vld)
+            } else {
+                this.attr(attr, vld);
+            }
             if (value) {
-                if (this.__ob__) {
+                var _key = value.split(".").shift();
+                var dbo = __get__.call(self, DOM_BASE_OBJECT);
+                if (dbo) {
+                    if (!dbo.__ob__ || (!inArray(dbo.__ob__.indexKeys, _key) && typeof dbo[_key] != "undefined")) {
+
+                    } else {
+                        dbo.__ob__.subscribe(value, function (v) {
+                            if (isState(v)) {
+                                vl = v.__toData__();
+
+                            } else {
+                                vl = v;
+                            }
+                            if (key == 'value') {
+                                self.val(vl)
+                            } else {
+                                self.attr(attr, vl);
+                            }
+                        })
+                    }
+                }
+
+                else if (this.__ob__ && inArray(this.__ob__.indexKeys, _key)) {
                     this.__ob__.subscribe(value, function (v) {
 
                         vld = isState(v) ? v.__toData__() : v;
                         if (PropChangeStatus[attrKey]) {
-                            self.attr(attr, vld);
+                            if (key == 'value') {
+                                self.val(vld)
+                            } else {
+                                self.attr(attr, vld);
+                            }
+
                         }
                     })
                 }
+                
                 this.on("attribute.changed", function (event) {
-                    var old = this.attr(attr);
+                    var old = key == 'value' ? this.val() : this.attr(attr);
                     if (old != vld && PropChangeStatus[attrKey]) {
                         vld = old;
                         PropChangeStatus[attrKey] = false;
-                        setEl(self, value, old);
+                        setEl(dbo?dbo:self, value, old);
                         PropChangeStatus[attrKey] = true;
                     }
                 })
             }
         } else {
-            self.attr(attr, value);
+            if (key == 'value') {
+                this.val(value)
+            } else {
+                this.attr(attr, value);
+            }
             if (!objectHasKey(this, attr)) {
                 Object.defineProperty(this, attr, {
                     configurable: true,
@@ -3312,7 +3596,11 @@ function addTwoWayBindingAttr(attr, value, type) {
                     set: function (v) {
                         value = isState(v) ? v.__toData__() : v;
                         if (PropChangeStatus[attrKey]) {
-                            this.attr(attr, value);
+                            if (key == 'value') {
+                                self.val(value)
+                            } else {
+                                self.attr(attr, value);
+                            }
                         }
 
                     }
@@ -3322,12 +3610,16 @@ function addTwoWayBindingAttr(attr, value, type) {
                 this.__ob__.subscribe(value, function (v) {
                     value = isState(v) ? v.__toData__() : v;
                     if (PropChangeStatus[attrKey]) {
-                        self.attr(attr, value);
+                        if (key == 'value') {
+                            self.val(value)
+                        } else {
+                            self.attr(attr, value);
+                        }
                     }
                 })
             }
             this.on("attribute.changed", function (event) {
-                var old = self.attr(attr);
+                var old = key == 'value' ? self.val() : self.attr(attr);
                 if (old != vld && PropChangeStatus[attrKey]) {
                     vld = old;
                     PropChangeStatus[attrKey] = false;
@@ -3453,7 +3745,7 @@ function create(tag, children, attributes) {
             if (isObject(vl)) {
                 var container = {};
                 container[k] = vl;
-                self.__set__(FOREIGN_DATA, container);
+                __set__.call(self, FOREIGN_DATA, container);
             }
         }
         else if (inArray(['attr', 'attrs', 'attribute', 'attributes', 'prop', 'props'], k)) {
@@ -3486,6 +3778,7 @@ function create(tag, children, attributes) {
             if (isArray(vl)) {
                 for (var j = 0; j < vl.length; j++) {
                     contents.push(vl[j]);
+
                 }
             } else {
                 contents.push(vl);
@@ -3535,11 +3828,28 @@ function create(tag, children, attributes) {
                 else if (inArray(["content", "children"], s)) {
                     if (isArray(vl)) {
                         for (var j = 0; j < vl.length; j++) {
-                            var cnt = vl[j];
-                            contents.push(cnt);
+                            let cnt = vl[j];
+                            let texts = parseTextData(cnt);
+                            if (isArray(texts) && texts.length) {
+                                texts.map(function (c) {
+                                    contents.push(c);
+                                })
+                            }
+                            else {
+                                contents.push(cnt);
+                            }
+
                         }
                     } else {
-                        contents.push(vl);
+                        let texts = parseTextData(vl);
+                        if (isArray(texts) && texts.length) {
+                            texts.map(function (c) {
+                                contents.push(c);
+                            })
+                        }
+                        else {
+                            contents.push(vl);
+                        }
                     }
                 }
                 else {
@@ -3574,11 +3884,27 @@ function create(tag, children, attributes) {
         }
         else if (isString(arg)) {
             isTwoContent = 0;
-            contents.push(arg);
+            let texts = parseTextData(arg);
+            if (isArray(texts) && texts.length) {
+                texts.map(function (c) {
+                    contents.push(c);
+                })
+            }
+            else {
+                contents.push(arg);
+            }
         } else if (isArray(arg)) {
             isArrayContent = true;
             for (var j = 0; j < arg.length; j++) {
-                contents.push(arg[j]);
+                let texts = parseTextData(arg[j]);
+                if (isArray(texts) && texts.length) {
+                    texts.map(function (c) {
+                        contents.push(c);
+                    })
+                }
+                else {
+                    contents.push(arg[j]);
+                }
             }
         } else if (isFunction(arg) && arg.isDomClass) {
             contents.push(arg);
@@ -3788,6 +4114,74 @@ function create(tag, children, attributes) {
         parent: parent
     };
 
+}
+
+function parseTextData(str) {
+    if (!isString(str)) return str;
+    var s = String(str);
+
+    var a = /\{\{\s*[A-z0-9\._\$]+\s*\}\}/i.test(s);
+    if (!a) return str;
+    var tests = [
+        ""
+    ];
+    var n = 0;
+
+    var last = '';
+    var isOpen = false;
+    var currentKey = '';
+    for (let i = 0; i < s.length; i++) {
+        const c = s[i];
+        if (isOpen) {
+            if (c == '{') {
+                if (last == '{') {
+                    tests[n] += c;
+                }
+                else {
+                    tests[n] += '{{' + currentKey + c;
+                    isOpen = false;
+                    currentKey = '';
+                }
+            }
+            else if (c == '}') {
+                if (last == '}') {
+                    n++;
+                    tests[n] = new BindingText(currentKey.trim());
+                    currentKey = '';
+                    n++;
+                    last = '';
+                    isOpen = false;
+                    if (i < s.length - 1) tests[n] = '';
+                }
+            }
+            else if (last == '}') {
+                tests[n] += '{{' + currentKey + '}' + c;
+                isOpen = false;
+                currentKey = '';
+            }
+            else if (/[A-z0-9\._\$\s]/i.test(c)) {
+                currentKey += c;
+            }
+            else {
+                tests[n] += '{{' + currentKey + c;
+                isOpen = false;
+                currentKey = '';
+            }
+        }
+        else if (c == '{') {
+            if (last == '{') {
+                isOpen = true;
+                tests[n] = tests[n].substring(0, tests[n].length - 1);
+            }
+            else {
+                tests[n] += c;
+            }
+        } else {
+            tests[n] += c;
+        }
+        if (!i || last != '') last = c;
+    }
+    return tests;
 }
 
 
@@ -4067,6 +4461,8 @@ var createEl = function createEl(tag, ...args) {
     return htmlObject;
 
 }
+
+
 /**
  * lấy ra đối tượng dom từ tham số đầu vào
  * @param {*} str giá trị bất kì
@@ -4094,7 +4490,7 @@ function parse(str) {
             return createEl(str);
         }
     }
-    div.innerHTML = isString(str) && !isNumber(str) ? String(str).trim() : str;
+    div.innerHTML = isString(str) && !isNumber(str) ? String(str) : str;
 
     // Change this to div.childNodes to support multiple top-level nodes
     return div.firstChild;
@@ -4660,12 +5056,12 @@ function emptyFunc() { }
 export default Dom;
 
 export {
-  create,
-  createEl,
-  Dom,
-  domEvents,
-  getDomInf,
-  htmlTags,
-  inputTags,
-  inputTypes,
+    create,
+    createEl,
+    Dom,
+    domEvents,
+    getDomInf,
+    htmlTags,
+    inputTags,
+    inputTypes,
 };

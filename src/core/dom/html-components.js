@@ -1,4 +1,4 @@
-import { assignValue, assignWithout, date, getArguments, getType, inArray, isArray, isBoolean, isEmpty, isFunction, isNull, isObject, isString, objectKeys, Str, _defineProperty, _instanceof } from '../utils.js';
+import { assignValue, assignWithout, date, getArguments, getType, inArray, isArray, isBoolean, isEmpty, isFunction, isNull, isObject, isString, objectHasKey, objectKeys, Str, _defineProperty, _instanceof } from '../utils.js';
 // import Dom, { $, Query, query } from './dom.js';
 import createClass, { _class } from '../es5-class.js';
 import Dom, { getDomInf, inputTypes, inputTags, createEl, create } from './dom.js';
@@ -304,11 +304,307 @@ function createElementClass(tag, properties) {
 }
 
 /**
+ * Tạo một lớp đối tượng
+ * @param {string} tag tên thẻ bạn muốn khởi tạo
+ * @returns {Html}
+ */
+ function createDomElementClass(tag, properties) {
+    var prop = {};
+    if (isObject(properties)) {
+        for (var key in properties) {
+            if (Object.hasOwnProperty.call(properties, key)) {
+                var fn = properties[key];
+                if (key == "constructor") {
+                    if (typeof fn == "function") prop.__constructor__ = fn;
+                }
+                else {
+                    prop[key] = fn;
+                }
+            }
+        }
+    }
+    var t = tag.toLowerCase();
+    var classProps = {
+
+        const$tagName: tag,
+        constructor: function () {
+            var args = getArguments(arguments);
+            if (args.length && isString(args[0])) {
+                if (args[0].match(/^(\.|\#|\[|\:)[A-Za-z_\-]+/i) !== null) {
+                    var a = getDomInf(args[0]);
+                    if (a.isElement) {
+                        if (a.isDefault) {
+                            args[0] = tag.toLowerCase() + args[0];
+                        } else {
+                            args[0] = this.tagName + args[0].substr(a.tagName.length);
+                        }
+                    }
+                    else {
+                        args.unshift(this.tagName);
+                    }
+                }
+                else {
+                    args.unshift(this.tagName);
+                    if (args[0].match(/^\{.*\}$/i) !== null) {
+                        args[0] = args[0].substr(1, args[0].length - 2);
+                    }
+                }
+
+            }
+            else {
+                args.unshift(this.tagName);
+            }
+            this.setElement.apply(this, args);
+        }
+    };
+    classProps['const$is' + Str.ucfirst(t)] = true;
+    if (t == 'img') {
+        assignValue(classProps, {
+            $isImage: true,
+            $srcSync: false,
+            $src: null,
+            inits: '__src_init__',
+            get$src: function (value) {
+                // return this.val();
+            },
+            set$src: function (value) {
+                if (this.srcSync) this.attr('src', value);
+            },
+            __src_init__: function () {
+                this.src = this.attr('src');
+                var self = this;
+                this.on('change', function (e) {
+                    var value = this.attr('src');
+                    if (value != self.src) {
+                        self.valueSync = false;
+                        self.src = value;
+                        self.srcSync = true;
+                    }
+                });
+                this.srcSync = true;
+            },
+            constructor: function constructor() {
+                var args = getArguments(arguments);
+                var src = null;
+                var createArgs = [];
+                var attrs = {};
+                var hasTag = false;
+                for (var index = 0; index < args.length; index++) {
+                    var vl = args[index];
+                    if (index == 0) {
+                        if (isString(vl)) {
+                            if (checkImageURL(vl)) {
+                                src = vl;
+                                createArgs.unshift(this.tagName);
+                            } else {
+                                var a = getDomInf(vl);
+                                if (a.isElement) {
+                                    if (a.isDefault) {
+                                        createArgs.push(tag.toLowerCase() + args[0]);
+                                        hasTag = true;
+                                    } else {
+                                        createArgs.push(this.tagName + args[0].substr(a.tagName.length));
+                                        hasTag = true;
+                                    }
+                                }
+                                else {
+                                    createArgs.unshift(this.tagName);
+                                }
+                            }
+
+                        }
+                        else {
+                            createArgs.unshift(this.tagName);
+                            assignValue(attrs, vl);
+                        }
+                    }
+                    else {
+                        if (isString(vl)) {
+                            if (!src && checkImageURL(vl)) {
+                                src = vl;
+                            }
+                            else {
+                                attrs.alt = vl;
+                            }
+
+                        }
+                        else if (isObject(vl)) {
+                            assignValue(attrs, vl);
+                        }
+                    }
+                }
+
+                if (src && !attrs.src) attrs.src = src;
+                createArgs.push(attrs);
+
+                this.setElement.apply(this, createArgs);
+            }
+        });
+    }
+    else if (t == 'input') {
+        assignValue(classProps, {
+            $valueSync: false,
+            $value: null,
+            inits: '__value_init__',
+            onGet$Value: function (value) {
+                // return this.val();
+            },
+            onset$value: function (value) {
+                if (this.valueSync) this.val(value);
+            },
+            __value_init__: function () {
+                this.value = this.val();
+                var self = this;
+                this.on('change', function (e) {
+                    var value = this.val();
+                    if (value != self.value) {
+                        self.valueSync = false;
+                        self.value = value;
+                        self.valueSync = true;
+                    }
+                });
+                this.valueSync = true;
+            },
+            constructor: function constructor() {
+                var args = getArguments(arguments);
+                // nếu nhập vào ("select", "name", "value", data)
+                var createArgs = [];
+                var domEls = [];
+                if (args.length) {
+                    if (isObject(args[0]) && !args[0].isDom) {
+
+                        createArgs.push(args[0])
+
+                    }
+                    else {
+                        var inputOptions = {
+                            type: "",
+                            name: "",
+                            value: "",
+                            default: "",
+                            data: {}
+                        }
+                        var s = 0;
+                        var domEls = [];
+                        for (var index = 0; index < args.length; index++) {
+                            var vl = args[index];
+
+                            if (isString(vl)) {
+                                var vlow = String(vl).toLowerCase();
+                                if (!s) {
+                                    var a = getDomInf(vl);
+                                    if (inputTypes.indexOf(vlow) !== -1 || inputTags.indexOf(vlow) !== -1) {
+                                        inputOptions.type = vlow;
+                                        s++;
+                                    }
+                                    else if (a.isElement) {
+                                        var tg = a.tagName.toLowerCase();
+                                        if (inputTypes.indexOf(tg) !== -1) {
+                                            inputOptions.type = tg;
+                                        }
+                                        else if (inputTags.indexOf(tg) != -1) {
+                                            inputOptions.type = tg;
+                                        }
+                                        s++;
+                                        if (!isEmpty(a.attrs)) {
+                                            assignValue(inputOptions, a.attrs);
+                                        };
+                                        if (!isEmpty(a.props)) assignValue(inputOptions, a.props);
+                                        if (a.className) {
+                                            inputOptions.className = a.className;
+                                        }
+                                        if (a.id) {
+                                            inputOptions.id = a.id;
+                                        }
+
+                                    } else {
+                                        inputOptions.name = vl;
+                                        s++;
+                                    }
+
+                                }
+                                else if (index < 3) {
+                                    if ((inputOptions.name && inputTypes.indexOf(vlow) !== -1 || inputTags.indexOf(vlow) !== -1) && !inputOptions.type) {
+                                        inputOptions.type = vlow;
+                                    }
+                                    else if (!inputOptions.name && vl.match(/^[A-z_]+[A-z_\[\]0-9\.\-]*$/i) != null) {
+                                        inputOptions.name = vl;
+                                    }
+                                    else {
+                                        inputOptions.value = vl;
+                                    }
+                                }
+                            }
+                            else if (isObject(vl)) {
+                                if (vl.isDom) {
+                                    domEls.push(vl);
+                                }
+                                else {
+                                    assignValue(inputOptions, vl);
+                                }
+
+                            }
+
+
+                        }
+                        if (!inputOptions.type) inputOptions.type = 'text';
+                        createArgs.push(inputOptions);
+                    }
+                }
+                if (createArgs.length) {
+                    var elem = input1.apply(this, createArgs);
+                    var el = elem.el;
+                    if (el) {
+
+                        if (!el.id && this.id) el.id = this.id;
+                        if (!el.className && this.className) el.className = this.className;
+
+                        this.el = el;
+                        if (!isEmpty(elem.dynamicAttrs)) {
+                            this.addDynamicAttr(elem.dynamicAttrs);
+                        }
+                        // console.log(this, args, elem.contents);
+                        if (elem.tag == 'select' && !isEmpty(elem.contents)) {
+                            this.setHtml(Dom('div', elem.contents).html());
+
+                        }
+                        if (!isEmpty(elem.events)) {
+                            this.on(elem.events);
+                        }
+
+                        // DoanDepTrai
+                        if (!isEmpty(elem.methods)) {
+                            for (var method in elem.methods) {
+                                if (Object.hasOwnProperty.call(elem.methods, method)) {
+                                    var fn = elem.methods[method];
+                                    // console.log(method, fn)
+                                    _defineProperty(this, method, fn);
+                                }
+                            }
+                        }
+                        if (this._pendingContents.length) {
+                            while (this._pendingContents.length) {
+                                var a = this._pendingContents.shift();
+                                this[a.key] = a.content;
+                                this.append(a.content);
+                            }
+                        }
+                    }
+                }
+
+            }
+        });
+    }
+
+    return createClass(Str.ucfirst(tag), false).extends(Dom).uses(prop)(classProps);
+}
+
+/**
  * tạo hàm tạo tag
  * @param {string} tag tên thẻ HTML
  * @returns {function(...args):Element}
  */
-function createHtmlElementFunction(tag) {
+function createHtmlElementFunction1(tag) {
     var tagName = tag.toLowerCase();
     var fn = function (...args) {
         if (args.length && isString(args[0])) {
@@ -685,6 +981,77 @@ const Video = createElementClass("video");
 const Wbr = createElementClass("wbr");
 
 
+
+
+const tags = {
+    A: A, Abbr: Abbr, Acronym: Acronym, Address: Address, Applet: Applet, Area: Area, Article: Article, Aside: Aside, Audio: Audio,
+    B: B, Base: Base, Basefont: Basefont, Bb: Bb, Bdo: Bdo, Big: Big, Blockquote: Blockquote, Body: Body, Br: Br, Button: Button,
+    Canvas: Canvas, Caption: Caption, Center: Center, Cite: Cite, Code: Code, Col: Col, Colgroup: Colgroup, Command: Command,
+    Datagrid: Datagrid, Datalist: Datalist, Dd: Dd, Del: Del, Details: Details, Dfn: Dfn, Dialog: Dialog, Dir: Dir, Div: Div, Dl: Dl, Dt: Dt,
+    Em: Em, Embed: Embed, Eventsource: Eventsource, Fieldset: Fieldset, Figcaption: Figcaption, Figure: Figure, Font: Font, Footer: Footer, Form: Form, Frame: Frame, Frameset: Frameset,
+    H1: H1, H2: H2, H3: H3, H4: H4, H5: H5, H6: H6, Head: Head, Header: Header, Hgroup: Hgroup, Hr: Hr,
+    I: I, Iframe: Iframe, Img: Img, Input: Input, Ins: Ins, Isindex: Isindex,
+    Kbd: Kbd, Keygen: Keygen,
+    Label: Label, Legend: Legend, Li: Li, Link: Link,
+    Map: Map, Mark: Mark, Menu: Menu, Meta: Meta, Meter: Meter,
+    Nav: Nav, Noframes: Noframes, Noscript: Noscript,
+    Ol: Ol, Optgroup: Optgroup, Option: Option, Output: Output,
+    P: P, Param: Param, Pre: Pre, Progress: Progress,
+    Q: Q, Rp: Rp, Rt: Rt, Ruby: Ruby,
+    S: S, Samp: Samp, Script: Script, Section: Section, Select: Select, Small: Small, Source: Source, Span: Span, Strike: Strike, Strong: Strong, Style: Style, Sub: Sub, Sup: Sup,
+    Table: Table, Tbody: Tbody, Td: Td, Textarea: Textarea, Tfoot: Tfoot, Th: Th, Thead: Thead, Time: Time, Title: Title, Tr: Tr, Track: Track, Tt: Tt,
+    U: U, Ul: Ul,
+    Video: Video, Wbr: Wbr,
+    Loop:Loop, ForInc:ForInc, ForDec: ForDec,
+
+    a: A, abbr: Abbr, acronym: Acronym, address: Address, applet: Applet, area: Area, article: Article, aside: Aside, audio: Audio,
+    b: B, base: Base, Basefont: Basefont, bb: Bb, Bdo: Bdo, big: Big, blockquote: Blockquote, body: Body, br: Br, button: Button,
+    canvas: Canvas, caption: Caption, center: Center, cite: Cite, code: Code, col: Col, colgroup: Colgroup, command: Command,
+    datagrid: Datagrid, datalist: Datalist, dd: Dd, del: Del, details: Details, dfn: Dfn, dialog: Dialog, dir: Dir, div: Div, dl: Dl, Dt: Dt,
+    em: Em, embed: Embed, eventsource: Eventsource, 
+    fieldset: Fieldset, figcaption: Figcaption, figure: Figure, font: Font, footer: Footer, form: Form, frame: Frame, frameset: Frameset,
+    h1: H1, h2: H2, h3: H3, h4: H4, h5: H5, h6: H6, head: Head, header: Header, hgroup: Hgroup, hr: Hr,
+    i: I, iframe: Iframe, img: Img, input: Input, ins: Ins, isindex: Isindex,
+    kbd: Kbd, keygen: Keygen,
+    label: Label, legend: Legend, li: Li, link: Link,
+    map: Map, mark: Mark, menu: Menu, meta: Meta, meter: Meter, 
+    nav: Mav, noframes: Moframes, noscript: Moscript, 
+    ol: Ol, optgroup: Optgroup, option: Option, output: Output,
+    p: P, param: Param, pre: Pre, progress: Progress,
+    q: Q,
+    rp: Rp, rt: Rt, ruby: Ruby,
+    s: S, samp: Samp, script: Script, section: Section, select: Select, small: Small, source: Source, span: Span, strike: Strike, strong: Strong, style: style, sub: sub, sup: sup,
+    table: Table, tbody: Tbody, td: Td, textarea: Textarea, tfoot: Tfoot, th: Th, thead: Thead, time: Time, title: Title, tr: Tr, track: Track, tt: Tt,
+    u: U, ul: Ul,
+    video: Video,
+    wbr: Wbr,
+
+}
+/**
+ * tạo hàm tạo thẻ
+ * @param {string} tag thẻ
+ */
+function createHtmlElementFunction(tag){
+    var tagName = tag.toLowerCase();
+
+    const Component = objectHasKey(tags, tag)?tags[tag]: Dom;
+        return function(...args){
+            var arg = getArguments(arguments);
+            Object.defineProperty(arg, 'isDomComponentBag', {
+                value: true, 
+                enumerable: false,
+                writable: false,
+                configurable: false,
+            })
+            Object.defineProperty(arg, 'Component', {
+                value: Component, 
+                enumerable: false,
+                writable: false,
+                configurable: false,
+            })
+            return Component;
+        };
+}
 const a = createHtmlElementFunction("a"), abbr = createHtmlElementFunction("abbr"), acronym = createHtmlElementFunction("acronym"), address = createHtmlElementFunction("address"), applet = createHtmlElementFunction("applet"), area = createHtmlElementFunction("area"), article = createHtmlElementFunction("article"), aside = createHtmlElementFunction("aside"), audio = createHtmlElementFunction("audio"),
     b = createHtmlElementFunction("b"), base = createHtmlElementFunction("base"), basefont = createHtmlElementFunction("basefont"), bb = createHtmlElementFunction("bb"), bdo = createHtmlElementFunction("bdo"), big = createHtmlElementFunction("big"), blockquote = createHtmlElementFunction("blockquote"), body = createHtmlElementFunction("body"), br = createHtmlElementFunction("br"), button = createHtmlElementFunction("button"),
     canvas = createHtmlElementFunction("canvas"), caption = createHtmlElementFunction("caption"), center = createHtmlElementFunction("center"), cite = createHtmlElementFunction("cite"), code = createHtmlElementFunction("code"), col = createHtmlElementFunction("col"), colgroup = createHtmlElementFunction("colgroup"), command = createHtmlElementFunction("command"),
@@ -718,7 +1085,7 @@ const a = createHtmlElementFunction("a"), abbr = createHtmlElementFunction("abbr
  */
 
 
-var Html = function () {
+const Html = function () {
     var $class = _class("Html").extends(Dom)({
         const$isHtml: true,
         __call(...args) {
