@@ -819,12 +819,12 @@ function arrayJoin(target) {
         var ks = String(key).split(d);
         for (let index = 0; index < ks.length; index++) {
             const e = ks[index];
-            if (objectHasKey(c, e)) {
+            if (typeof c[e] != "undefined") {
                 c = c[e];
             } else {
                 c = defaultValue;
             }
-            if (index < ks.length - 1 && (!isObject(c) && !isArray(c))) return defaultValue;
+            if (index < ks.length - 1 && ((!isObject(c) && !isArray(c)) || c===defaultValue)) return defaultValue;
         }
         return c;
 
@@ -2174,14 +2174,71 @@ var getFirstValueInList = function (list, key, checkFn) {
 };
 
 export {
-    _instanceof, _defineProperties, _createClass, _defineProperty, addToGlobal,
-    getType, checkType, isArray, isBoolean, isObject, isString, isNumber, isInteger, isEmail, isNull, isFormData, isEmpty, isCallable, isFunction, isProperty, isMethod, hasValue, inArray,
-
-    cutWithout, copyWithout, copyArray, objectKeys, objectValues, merge, combine, arrayJoin, objectHasKey, objectHasProperty, destroyObject, assignOneValue,
-
-    Num, Str, date, getEl, setEl, getObjectMethod, assignValue, assignWithout, assignIfNotExists, objectAssign, colorToHex, invertHexColor, minOf, maxOf, copyByList, isFloat,
-
-    Queue, queueTask, combineElenentsToArrList, combineElenentsJoinStringList, getArguments, JsonToBase64, b64toBlob, resizeImage, getTimeStamp,
-
-    degreeToRadians, radianToDegrees, newObj, emptyObject, getInputCfg, getFirstValueInList, EMPTY_VALUE
+  _createClass,
+  _defineProperties,
+  _defineProperty,
+  _instanceof,
+  addToGlobal,
+  arrayJoin,
+  assignIfNotExists,
+  assignOneValue,
+  assignValue,
+  assignWithout,
+  b64toBlob,
+  checkType,
+  colorToHex,
+  combine,
+  combineElenentsJoinStringList,
+  combineElenentsToArrList,
+  copyArray,
+  copyByList,
+  copyWithout,
+  cutWithout,
+  date,
+  degreeToRadians,
+  destroyObject,
+  EMPTY_VALUE,
+  emptyObject,
+  getArguments,
+  getEl,
+  getFirstValueInList,
+  getInputCfg,
+  getObjectMethod,
+  getTimeStamp,
+  getType,
+  hasValue,
+  inArray,
+  invertHexColor,
+  isArray,
+  isBoolean,
+  isCallable,
+  isEmail,
+  isEmpty,
+  isFloat,
+  isFormData,
+  isFunction,
+  isInteger,
+  isMethod,
+  isNull,
+  isNumber,
+  isObject,
+  isProperty,
+  isString,
+  JsonToBase64,
+  maxOf,
+  merge,
+  minOf,
+  newObj,
+  Num,
+  objectAssign,
+  objectHasKey,
+  objectHasProperty,
+  objectKeys,
+  objectValues,
+  Queue,
+  queueTask,
+  radianToDegrees,
+  resizeImage,
+  setEl,
+  Str,
 };

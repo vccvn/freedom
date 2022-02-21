@@ -1,91 +1,35 @@
-var { _class, Dom, Html, isString, Component, app, Div, P, I, A, Span, H1, H2, H3, H4, observe } = FD;
-var AppComponent = _class("AppComponent").extends(Component)({
-    constructor(props) {
-        this.props = props;
-    },
-    builder: function builder() {
-        return [
-            Div('.wrapper', {
-                setTitle: function (title) {
-                    this.attr(title);
-                },
-                children: [
-                    P('#paragraph', 'Lorem'),
-                    P('#paragraph', 'Lorem2'),
-                    Div('.net', {
-                        receiveMessage: function (message) {
-                            this.callParent('reciveMessage', [this, message]);
-                            return false;
-                        },
-                        children: ["Hello World ", I("haha")]
-                    })
-                ]
-            }),
-            Div('.footer', A("[href=#]", "Click Me", {
-                onCllick: function (e) {
-                    console.log("Click");
-                    this.callParent('reciveMessage', [this, "Click A"]);
-                }
-            }))
-        ]
-    },
-    receiveMessage: function (child, message) {
-        console.log(child, message);
-    },
-});
-var ac = AppComponent({name: "Doãn"});
-ac.appendTo(document.body);
+var { _class, Dom, Html, isString, Component, app, Div, P, I, A, Span, H1, H2, H3, H4, observe,a,div,p,h2,h3 } = FD;
 
-var div = Div('.test-div', {
+var AppComponent = Component.maker("AppComponent", {
+    $autoRender: true,
     data: {
-        source: 1,
-        uuid: FD.Str.rand()
+        name: "Test",
+        count: 0
     },
-    methods:{
-        handle: function (event) {
-            console.log(event);
+    computed: {
+        powOfCount: function(){
+            return Math.pow(this.count, 3);
         }
     },
-    attrs:{
-        $title: "{{uuid}}"
+    changeCount: function(e){
+        this.count++;
     },
-    content: "Test"
-});
-
-document.body.appendChild(div.el)
-var Demo = Component.maker('Demo', {
-    $selector: "demo.dkm",
-    $stack: 1,
-    over: 10,
-    bind$id: "{{demoID}}",
-    sync$classData: '{{demoClass}}',
-    data: {
-        demoID: 'Doan',
-        demoClass: 'test'
+    changeName: function(name){
+        this.name = name;
     },
-    set$stack: function(val){
-        console.log('set Stack', val);
-    },
-    constructor: function(data){
-        this.data1 = data;
-    },
-
     builder: function(){
-        var self = this;
-        return [
-            Div(".header", H3(".sub-title", "Tiêu đề")),
-            Div(".container", Div(".main", P("Doãn Đẹp Trai"), P(".link", A(".link-item", {
-                href: "#Doan",
-                content: "Click Me",
-                onclick: function(e){
-                    e.preventDefault();
-                    self.over++;
-                }
-            }))))
-        ]
+        var _a = Div('.app-main', [
+            H2("Hello World"),
+            P("Tên: {{name}}"),
+            P("click: {{count}}"),
+            P("pow: {{powOfCount}}"),
+            
+            P(A("#a[href=#a]", "Click Me", {
+                onClick: "changeCount"
+            }))
+        ]);
+        return _a;
     }
 });
-
-var demo = Demo("demo");
-
-document.body.appendChild(demo.el)
+var app = AppComponent();
+document.body.appendChild(app.el);

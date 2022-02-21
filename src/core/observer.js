@@ -450,7 +450,7 @@ var obsDefaultKey = '___OBSERVER_DEFAULT_KEY___';
  * @param {*} value 
  * @param {Observer} parent đối tượng cha
  */
-var Observer = function Observer(value, parent) {
+var Observer = function Observer(value, parent, isState) {
     this.value = value;
     this.parents = _instanceof(parent, Observer) ? [parent] : [];
     this.listeners = {};
@@ -462,9 +462,9 @@ var Observer = function Observer(value, parent) {
         } else {
             copyAugment(value, arrayMethods, arrayKeys);
         }
-        this.observeArray(value);
+        this.observeArray(value, isState);
     } else {
-        this.walk(value);
+        this.walk(value, isState);
     }
 };
 
@@ -473,7 +473,7 @@ var Observer = function Observer(value, parent) {
  * getter/setters. This method should only be called when
  * value type is Object.
  */
-Observer.prototype.walk = function walk(obj) {
+Observer.prototype.walk = function walk(obj, isState) {
     var keys = Object.keys(obj);
     this.indexKeys = keys;
     for (var i = 0; i < keys.length; i++) {
@@ -485,11 +485,11 @@ Observer.prototype.walk = function walk(obj) {
 /**
  * Observe a list of Array items.
  */
-Observer.prototype.observeArray = function observeArray(items) {
+Observer.prototype.observeArray = function observeArray(items, isState) {
     this.indexKeys = [];
     for (var i = 0, l = items.length; i < l; i++) {
         this.indexKeys.push(i);
-        observe(items[i], this);
+        observe(items[i], this, isState);
     }
 };
 
@@ -751,7 +751,7 @@ function copyAugment(target, src, keys) {
  * returns the new observer if successfully observed,
  * or the existing observer if the value already has one.
  */
-function observe(value, parent) {
+function observe(value, parent, isState) {
     if (!isObject(value)) {
         return
     }
@@ -761,7 +761,7 @@ function observe(value, parent) {
     } else if (
         (Array.isArray(value) || isPlainObject(value)) && Object.isExtensible(value)
     ) {
-        ob = new Observer(value, parent);
+        ob = new Observer(value, parent, isState);
     }
     if (parent && ob.parents.indexOf(parent) == -1) {
         ob.addParent(parent);
@@ -772,7 +772,7 @@ function observe(value, parent) {
 /**
  * Define a reactive property on an Object.
  */
-function defineReactive$$1(obj, key, val, customSetter, shallow) {
+function defineReactive$$1(obj, key, val, isState) {
     // var dep = new Dep();
 
     var self = this;
@@ -787,8 +787,25 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
     if ((!getter || setter) && arguments.length === 2) {
         val = obj[key];
     }
+    var type = getType(val);
 
-    var childOb = !shallow && observe(val, this);
+    var childOb = observe(val, this, isState);
+    if(isState === true){
+        if ((type == "object" && val.isPrimitive) || (isFunction(val) && val.isPrimitive)) {
+            if (val.parents.indexOf(this) == -1) {
+                val.parents.addParent(this);
+            }
+        }
+        else if (!(type == 'object' || type == 'array')) {
+            val = parsePrimitive(val);
+            if (val.parents.indexOf(this) == -1) {
+                val.parents.addParent(this);
+            }
+        }
+    
+    }
+    
+
     Object.defineProperty(obj, key, {
         enumerable: true,
         configurable: true,
@@ -804,17 +821,31 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
                 return
             }
             /* eslint-enable no-self-compare */
-            if (customSetter) {
-                customSetter();
-            }
+            // if (customSetter) {
+            //     customSetter();
+            // }
             // #7981: for accessor properties without setter
+            if (isState === true) {
+                var type = getType(newVal);
+                if ((type == "object" && newVal.isPrimitive) || (isFunction(newVal) && newVal.isPrimitive)) {
+                    if (newVal.parents.indexOf(this) == -1) {
+                        newVal.parents.addParent(this);
+                    }
+                }
+                else if (!(type == 'object' || type == 'array')) {
+                    newVal = parsePrimitive(newVal);
+                    if (newVal.parents.indexOf(this) == -1) {
+                        newVal.parents.addParent(this);
+                    }
+                }
+            }
             if (getter && !setter) { return }
             if (setter) {
                 setter.call(obj, newVal);
             } else {
                 val = newVal;
             }
-            childOb = !shallow && observe(newVal, self);
+            childOb = observe(newVal, self, isState);
             obj.__ob__.dispatch(key, val, old, obj);
         }
     });

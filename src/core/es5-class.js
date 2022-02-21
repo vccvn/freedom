@@ -1100,32 +1100,6 @@ export const createClass = function (className, makeGlobal) {
 
             addParent(this);
 
-            // if (!isEmpty($classData.parent)) {
-            //     for (var key in $classData.parent) {
-            //         if ($classData.parent.hasOwnProperty(key)) {
-            //             var parentOpt = $classData.parent[key];
-            //             __addAccessorValue(instanceID, "__parent",
-            //                 new stdParent(this, key)
-            //             );
-            //         }
-            //     }
-            // }
-
-
-            // if (oneTimeData && isObject(oneTimeData) && !isEmpty(oneTimeData)) {
-            //     for (const key in oneTimeData) {
-            //         if (Object.hasOwnProperty.call(oneTimeData, key)) {
-            //             const value = oneTimeData[key];
-            //             this[key] = value;
-            //         }
-            //     }
-            //     oneTimeData = {};
-            // }
-
-
-
-
-
 
 
 

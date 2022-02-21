@@ -202,7 +202,7 @@ declare function arrayJoin(target: Array<any>, ...args: any) : any[]
  * @param delimiter 
  * @returns 
  */
-declare function getEl(obj: any, key?: any, delimiter?: string): any
+declare function getEl(obj: any, key?: any, defaultValue?:any, delimiter?: string): any
 export interface Num {
     rand(from: number, to: number): number
     currency(x: string): string

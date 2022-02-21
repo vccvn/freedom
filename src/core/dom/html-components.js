@@ -1,8 +1,27 @@
-import { assignValue, assignWithout, date, getArguments, getType, inArray, isArray, isBoolean, isEmpty, isFunction, isNull, isObject, isString, objectHasKey, objectKeys, Str, _defineProperty, _instanceof } from '../utils.js';
 // import Dom, { $, Query, query } from './dom.js';
 import createClass, { _class } from '../es5-class.js';
-import Dom, { getDomInf, inputTypes, inputTags, createEl, create } from './dom.js';
-
+import {
+  _defineProperty,
+  _instanceof,
+  assignValue,
+  getArguments,
+  isArray,
+  isBoolean,
+  isEmpty,
+  isFunction,
+  isNumber,
+  isObject,
+  isString,
+  objectKeys,
+  Str,
+} from '../utils.js';
+import Dom, {
+  create,
+  createEl,
+  getDomInf,
+  inputTags,
+  inputTypes,
+} from './dom.js';
 
 function checkImageURL(url) {
     return (url.match(/\.(jpeg|jpg|gif|png|svg)$/) != null || url.match(/^(http|https)\:\/\//) != null);
@@ -29,11 +48,27 @@ function createElementClass(tag, properties) {
     }
     var t = tag.toLowerCase();
     var classProps = {
-
         const$tagName: tag,
+        __call__: function(...args){
+            var Component = this;
+            var arg = getArguments(arguments);
+                Object.defineProperty(arg, 'isDomComponentBag', {
+                    value: true,
+                    enumerable: false,
+                    writable: false,
+                    configurable: false,
+                })
+                Object.defineProperty(arg, 'Component', {
+                    value: Component,
+                    enumerable: false,
+                    writable: false,
+                    configurable: false,
+                })
+                return arg;
+        },
         constructor: function () {
             var args = getArguments(arguments);
-            if (args.length && isString(args[0])) {
+            if (args.length && isString(args[0]) && !isNumber(args[0])) {
                 if (args[0].match(/^(\.|\#|\[|\:)[A-Za-z_\-]+/i) !== null) {
                     var a = getDomInf(args[0]);
                     if (a.isElement) {
@@ -308,7 +343,7 @@ function createElementClass(tag, properties) {
  * @param {string} tag tên thẻ bạn muốn khởi tạo
  * @returns {Html}
  */
- function createDomElementClass(tag, properties) {
+function createDomElementClass(tag, properties) {
     var prop = {};
     if (isObject(properties)) {
         for (var key in properties) {
@@ -330,7 +365,7 @@ function createElementClass(tag, properties) {
         constructor: function () {
             var args = getArguments(arguments);
             if (args.length && isString(args[0])) {
-                if (args[0].match(/^(\.|\#|\[|\:)[A-Za-z_\-]+/i) !== null) {
+                if (args[0].match(/^(\.|\#|\[|\:)+[A-Za-z_\-]+/i) !== null) {
                     var a = getDomInf(args[0]);
                     if (a.isElement) {
                         if (a.isDefault) {
@@ -345,9 +380,9 @@ function createElementClass(tag, properties) {
                 }
                 else {
                     args.unshift(this.tagName);
-                    if (args[0].match(/^\{.*\}$/i) !== null) {
-                        args[0] = args[0].substr(1, args[0].length - 2);
-                    }
+                    // if (args[1].match(/^\{.*\}$/i) !== null) {
+                    //     args[1] = args[1].substr(1, args[0].length - 2);
+                    // }
                 }
 
             }
@@ -604,7 +639,7 @@ function createElementClass(tag, properties) {
  * @param {string} tag tên thẻ HTML
  * @returns {function(...args):Element}
  */
-function createHtmlElementFunction1(tag) {
+function createHtmlElementFunction(tag) {
     var tagName = tag.toLowerCase();
     var fn = function (...args) {
         if (args.length && isString(args[0])) {
@@ -981,135 +1016,6 @@ const Video = createElementClass("video");
 const Wbr = createElementClass("wbr");
 
 
-
-
-const tags = {
-    A: A, Abbr: Abbr, Acronym: Acronym, Address: Address, Applet: Applet, Area: Area, Article: Article, Aside: Aside, Audio: Audio,
-    B: B, Base: Base, Basefont: Basefont, Bb: Bb, Bdo: Bdo, Big: Big, Blockquote: Blockquote, Body: Body, Br: Br, Button: Button,
-    Canvas: Canvas, Caption: Caption, Center: Center, Cite: Cite, Code: Code, Col: Col, Colgroup: Colgroup, Command: Command,
-    Datagrid: Datagrid, Datalist: Datalist, Dd: Dd, Del: Del, Details: Details, Dfn: Dfn, Dialog: Dialog, Dir: Dir, Div: Div, Dl: Dl, Dt: Dt,
-    Em: Em, Embed: Embed, Eventsource: Eventsource, Fieldset: Fieldset, Figcaption: Figcaption, Figure: Figure, Font: Font, Footer: Footer, Form: Form, Frame: Frame, Frameset: Frameset,
-    H1: H1, H2: H2, H3: H3, H4: H4, H5: H5, H6: H6, Head: Head, Header: Header, Hgroup: Hgroup, Hr: Hr,
-    I: I, Iframe: Iframe, Img: Img, Input: Input, Ins: Ins, Isindex: Isindex,
-    Kbd: Kbd, Keygen: Keygen,
-    Label: Label, Legend: Legend, Li: Li, Link: Link,
-    Map: Map, Mark: Mark, Menu: Menu, Meta: Meta, Meter: Meter,
-    Nav: Nav, Noframes: Noframes, Noscript: Noscript,
-    Ol: Ol, Optgroup: Optgroup, Option: Option, Output: Output,
-    P: P, Param: Param, Pre: Pre, Progress: Progress,
-    Q: Q, Rp: Rp, Rt: Rt, Ruby: Ruby,
-    S: S, Samp: Samp, Script: Script, Section: Section, Select: Select, Small: Small, Source: Source, Span: Span, Strike: Strike, Strong: Strong, Style: Style, Sub: Sub, Sup: Sup,
-    Table: Table, Tbody: Tbody, Td: Td, Textarea: Textarea, Tfoot: Tfoot, Th: Th, Thead: Thead, Time: Time, Title: Title, Tr: Tr, Track: Track, Tt: Tt,
-    U: U, Ul: Ul,
-    Video: Video, Wbr: Wbr,
-    Loop:Loop, ForInc:ForInc, ForDec: ForDec,
-
-    a: A, abbr: Abbr, acronym: Acronym, address: Address, applet: Applet, area: Area, article: Article, aside: Aside, audio: Audio,
-    b: B, base: Base, Basefont: Basefont, bb: Bb, Bdo: Bdo, big: Big, blockquote: Blockquote, body: Body, br: Br, button: Button,
-    canvas: Canvas, caption: Caption, center: Center, cite: Cite, code: Code, col: Col, colgroup: Colgroup, command: Command,
-    datagrid: Datagrid, datalist: Datalist, dd: Dd, del: Del, details: Details, dfn: Dfn, dialog: Dialog, dir: Dir, div: Div, dl: Dl, Dt: Dt,
-    em: Em, embed: Embed, eventsource: Eventsource, 
-    fieldset: Fieldset, figcaption: Figcaption, figure: Figure, font: Font, footer: Footer, form: Form, frame: Frame, frameset: Frameset,
-    h1: H1, h2: H2, h3: H3, h4: H4, h5: H5, h6: H6, head: Head, header: Header, hgroup: Hgroup, hr: Hr,
-    i: I, iframe: Iframe, img: Img, input: Input, ins: Ins, isindex: Isindex,
-    kbd: Kbd, keygen: Keygen,
-    label: Label, legend: Legend, li: Li, link: Link,
-    map: Map, mark: Mark, menu: Menu, meta: Meta, meter: Meter, 
-    nav: Mav, noframes: Moframes, noscript: Moscript, 
-    ol: Ol, optgroup: Optgroup, option: Option, output: Output,
-    p: P, param: Param, pre: Pre, progress: Progress,
-    q: Q,
-    rp: Rp, rt: Rt, ruby: Ruby,
-    s: S, samp: Samp, script: Script, section: Section, select: Select, small: Small, source: Source, span: Span, strike: Strike, strong: Strong, style: style, sub: sub, sup: sup,
-    table: Table, tbody: Tbody, td: Td, textarea: Textarea, tfoot: Tfoot, th: Th, thead: Thead, time: Time, title: Title, tr: Tr, track: Track, tt: Tt,
-    u: U, ul: Ul,
-    video: Video,
-    wbr: Wbr,
-
-}
-/**
- * tạo hàm tạo thẻ
- * @param {string} tag thẻ
- */
-function createHtmlElementFunction(tag){
-    var tagName = tag.toLowerCase();
-
-    const Component = objectHasKey(tags, tag)?tags[tag]: Dom;
-        return function(...args){
-            var arg = getArguments(arguments);
-            Object.defineProperty(arg, 'isDomComponentBag', {
-                value: true, 
-                enumerable: false,
-                writable: false,
-                configurable: false,
-            })
-            Object.defineProperty(arg, 'Component', {
-                value: Component, 
-                enumerable: false,
-                writable: false,
-                configurable: false,
-            })
-            return Component;
-        };
-}
-const a = createHtmlElementFunction("a"), abbr = createHtmlElementFunction("abbr"), acronym = createHtmlElementFunction("acronym"), address = createHtmlElementFunction("address"), applet = createHtmlElementFunction("applet"), area = createHtmlElementFunction("area"), article = createHtmlElementFunction("article"), aside = createHtmlElementFunction("aside"), audio = createHtmlElementFunction("audio"),
-    b = createHtmlElementFunction("b"), base = createHtmlElementFunction("base"), basefont = createHtmlElementFunction("basefont"), bb = createHtmlElementFunction("bb"), bdo = createHtmlElementFunction("bdo"), big = createHtmlElementFunction("big"), blockquote = createHtmlElementFunction("blockquote"), body = createHtmlElementFunction("body"), br = createHtmlElementFunction("br"), button = createHtmlElementFunction("button"),
-    canvas = createHtmlElementFunction("canvas"), caption = createHtmlElementFunction("caption"), center = createHtmlElementFunction("center"), cite = createHtmlElementFunction("cite"), code = createHtmlElementFunction("code"), col = createHtmlElementFunction("col"), colgroup = createHtmlElementFunction("colgroup"), command = createHtmlElementFunction("command"),
-    datagrid = createHtmlElementFunction("datagrid"), datalist = createHtmlElementFunction("datalist"), dd = createHtmlElementFunction("dd"), del = createHtmlElementFunction("del"), details = createHtmlElementFunction("details"), dfn = createHtmlElementFunction("dfn"), dialog = createHtmlElementFunction("dialog"), dir = createHtmlElementFunction("dir"), div = createHtmlElementFunction("div"), dl = createHtmlElementFunction("dl"), dt = createHtmlElementFunction("dt"),
-    em = createHtmlElementFunction("em"), embed = createHtmlElementFunction("embed"), eventsource = createHtmlElementFunction("eventsource"), fieldset = createHtmlElementFunction("fieldset"), figcaption = createHtmlElementFunction("figcaption"), figure = createHtmlElementFunction("figure"), font = createHtmlElementFunction("font"), footer = createHtmlElementFunction("footer"), form = createHtmlElementFunction("form"), frame = createHtmlElementFunction("frame"), frameset = createHtmlElementFunction("frameset"),
-    h1 = createHtmlElementFunction("h1"), h2 = createHtmlElementFunction("h2"), h3 = createHtmlElementFunction("h3"), h4 = createHtmlElementFunction("h4"), h5 = createHtmlElementFunction("h5"), h6 = createHtmlElementFunction("h6"), head = createHtmlElementFunction("head"), header = createHtmlElementFunction("header"), hgroup = createHtmlElementFunction("hgroup"), hr = createHtmlElementFunction("hr"),
-    i = createHtmlElementFunction("i"), iframe = createHtmlElementFunction("iframe"), img = createHtmlElementFunction("img"), input = createHtmlElementFunction("input"), ins = createHtmlElementFunction("ins"), isindex = createHtmlElementFunction("isindex"),
-    kbd = createHtmlElementFunction("kbd"), keygen = createHtmlElementFunction("keygen"),
-    label = createHtmlElementFunction("label"), legend = createHtmlElementFunction("legend"), li = createHtmlElementFunction("li"), link = createHtmlElementFunction("link"),
-    map = createHtmlElementFunction("map"), mark = createHtmlElementFunction("mark"), menu = createHtmlElementFunction("menu"), meta = createHtmlElementFunction("meta"),
-    meter = createHtmlElementFunction("meter"), nav = createHtmlElementFunction("nav"),
-    noframes = createHtmlElementFunction("noframes"), noscript = createHtmlElementFunction("noscript"), ol = createHtmlElementFunction("ol"), optgroup = createHtmlElementFunction("optgroup"), option = createHtmlElementFunction("option"), output = createHtmlElementFunction("output"),
-    p = createHtmlElementFunction("p"), param = createHtmlElementFunction("param"), pre = createHtmlElementFunction("pre"), progress = createHtmlElementFunction("progress"),
-    q = createHtmlElementFunction("q"),
-    rp = createHtmlElementFunction("rp"), rt = createHtmlElementFunction("rt"), ruby = createHtmlElementFunction("ruby"),
-    s = createHtmlElementFunction("s"), samp = createHtmlElementFunction("samp"), script = createHtmlElementFunction("script"), section = createHtmlElementFunction("section"), select = createHtmlElementFunction("select"), small = createHtmlElementFunction("small"), source = createHtmlElementFunction("source"), span = createHtmlElementFunction("span"), strike = createHtmlElementFunction("strike"), strong = createHtmlElementFunction("strong"), style = createHtmlElementFunction("style"), sub = createHtmlElementFunction("sub"), sup = createHtmlElementFunction("sup"),
-    table = createHtmlElementFunction("table"), tbody = createHtmlElementFunction("tbody"), td = createHtmlElementFunction("td"), textarea = createHtmlElementFunction("textarea"), tfoot = createHtmlElementFunction("tfoot"), th = createHtmlElementFunction("th"), thead = createHtmlElementFunction("thead"), time = createHtmlElementFunction("time"), title = createHtmlElementFunction("title"), tr = createHtmlElementFunction("tr"), track = createHtmlElementFunction("track"), tt = createHtmlElementFunction("tt"),
-    u = createHtmlElementFunction("u"), ul = createHtmlElementFunction("ul"),
-    video = createHtmlElementFunction("video"),
-    wbr = createHtmlElementFunction("wbr");
-
-
-
-/**
- * Tạo đối tượng dom
- * @param {string|object} selector
- * @param {string|Element|string[]|Element[]} children
- * @param {object} attributes
- * @returns {DomFactory}
- * @note {string} Đoạn này thật ra không cần thiết. nhưng viết bào để trình soạn thảo sử dụng gợi ỳ
- */
-
-
-const Html = function () {
-    var $class = _class("Html").extends(Dom)({
-        const$isHtml: true,
-        __call(...args) {
-            return createEl(...args);
-        }
-    });
-    return $class
-}();
-
-Html.static = function (props) {
-    if (isObject(props)) {
-        for (const key in props) {
-            if (Object.hasOwnProperty.call(props, key)) {
-                const vl = props[key];
-                Object.defineProperty(this, key, {
-                    configurable: true,
-                    enumerable: true,
-                    value: vl
-                })
-            }
-        }
-    }
-}
-
 const Loop = _class("Loop")({
     static$isDomClass: true,
     $el: null,
@@ -1298,7 +1204,7 @@ const ForInc = _class("ForInc").extends(Loop)({
                         }
                     }
                 }
-                
+
             }
             else if (isArray(this.object)) {
                 for (let index = 0; index < this.object.length; index++) {
@@ -1360,6 +1266,65 @@ const ForDec = _class("ForDec").extends(Loop)({
     }
 })
 
+const a = createHtmlElementFunction("a"), abbr = createHtmlElementFunction("abbr"), acronym = createHtmlElementFunction("acronym"), address = createHtmlElementFunction("address"), applet = createHtmlElementFunction("applet"), area = createHtmlElementFunction("area"), article = createHtmlElementFunction("article"), aside = createHtmlElementFunction("aside"), audio = createHtmlElementFunction("audio"),
+    b = createHtmlElementFunction("b"), base = createHtmlElementFunction("base"), basefont = createHtmlElementFunction("basefont"), bb = createHtmlElementFunction("bb"), bdo = createHtmlElementFunction("bdo"), big = createHtmlElementFunction("big"), blockquote = createHtmlElementFunction("blockquote"), body = createHtmlElementFunction("body"), br = createHtmlElementFunction("br"), button = createHtmlElementFunction("button"),
+    canvas = createHtmlElementFunction("canvas"), caption = createHtmlElementFunction("caption"), center = createHtmlElementFunction("center"), cite = createHtmlElementFunction("cite"), code = createHtmlElementFunction("code"), col = createHtmlElementFunction("col"), colgroup = createHtmlElementFunction("colgroup"), command = createHtmlElementFunction("command"),
+    datagrid = createHtmlElementFunction("datagrid"), datalist = createHtmlElementFunction("datalist"), dd = createHtmlElementFunction("dd"), del = createHtmlElementFunction("del"), details = createHtmlElementFunction("details"), dfn = createHtmlElementFunction("dfn"), dialog = createHtmlElementFunction("dialog"), dir = createHtmlElementFunction("dir"), div = createHtmlElementFunction("div"), dl = createHtmlElementFunction("dl"), dt = createHtmlElementFunction("dt"),
+    em = createHtmlElementFunction("em"), embed = createHtmlElementFunction("embed"), eventsource = createHtmlElementFunction("eventsource"), fieldset = createHtmlElementFunction("fieldset"), figcaption = createHtmlElementFunction("figcaption"), figure = createHtmlElementFunction("figure"), font = createHtmlElementFunction("font"), footer = createHtmlElementFunction("footer"), form = createHtmlElementFunction("form"), frame = createHtmlElementFunction("frame"), frameset = createHtmlElementFunction("frameset"),
+    h1 = createHtmlElementFunction("h1"), h2 = createHtmlElementFunction("h2"), h3 = createHtmlElementFunction("h3"), h4 = createHtmlElementFunction("h4"), h5 = createHtmlElementFunction("h5"), h6 = createHtmlElementFunction("h6"), head = createHtmlElementFunction("head"), header = createHtmlElementFunction("header"), hgroup = createHtmlElementFunction("hgroup"), hr = createHtmlElementFunction("hr"),
+    i = createHtmlElementFunction("i"), iframe = createHtmlElementFunction("iframe"), img = createHtmlElementFunction("img"), input = createHtmlElementFunction("input"), ins = createHtmlElementFunction("ins"), isindex = createHtmlElementFunction("isindex"),
+    kbd = createHtmlElementFunction("kbd"), keygen = createHtmlElementFunction("keygen"),
+    label = createHtmlElementFunction("label"), legend = createHtmlElementFunction("legend"), li = createHtmlElementFunction("li"), link = createHtmlElementFunction("link"),
+    map = createHtmlElementFunction("map"), mark = createHtmlElementFunction("mark"), menu = createHtmlElementFunction("menu"), meta = createHtmlElementFunction("meta"),
+    meter = createHtmlElementFunction("meter"), nav = createHtmlElementFunction("nav"),
+    noframes = createHtmlElementFunction("noframes"), noscript = createHtmlElementFunction("noscript"), ol = createHtmlElementFunction("ol"), optgroup = createHtmlElementFunction("optgroup"), option = createHtmlElementFunction("option"), output = createHtmlElementFunction("output"),
+    p = createHtmlElementFunction("p"), param = createHtmlElementFunction("param"), pre = createHtmlElementFunction("pre"), progress = createHtmlElementFunction("progress"),
+    q = createHtmlElementFunction("q"),
+    rp = createHtmlElementFunction("rp"), rt = createHtmlElementFunction("rt"), ruby = createHtmlElementFunction("ruby"),
+    s = createHtmlElementFunction("s"), samp = createHtmlElementFunction("samp"), script = createHtmlElementFunction("script"), section = createHtmlElementFunction("section"), select = createHtmlElementFunction("select"), small = createHtmlElementFunction("small"), source = createHtmlElementFunction("source"), span = createHtmlElementFunction("span"), strike = createHtmlElementFunction("strike"), strong = createHtmlElementFunction("strong"), style = createHtmlElementFunction("style"), sub = createHtmlElementFunction("sub"), sup = createHtmlElementFunction("sup"),
+    table = createHtmlElementFunction("table"), tbody = createHtmlElementFunction("tbody"), td = createHtmlElementFunction("td"), textarea = createHtmlElementFunction("textarea"), tfoot = createHtmlElementFunction("tfoot"), th = createHtmlElementFunction("th"), thead = createHtmlElementFunction("thead"), time = createHtmlElementFunction("time"), title = createHtmlElementFunction("title"), tr = createHtmlElementFunction("tr"), track = createHtmlElementFunction("track"), tt = createHtmlElementFunction("tt"),
+    u = createHtmlElementFunction("u"), ul = createHtmlElementFunction("ul"),
+    video = createHtmlElementFunction("video"),
+    wbr = createHtmlElementFunction("wbr");
+
+
+
+/**
+ * Tạo đối tượng dom
+ * @param {string|object} selector
+ * @param {string|Element|string[]|Element[]} children
+ * @param {object} attributes
+ * @returns {DomFactory}
+ * @note {string} Đoạn này thật ra không cần thiết. nhưng viết bào để trình soạn thảo sử dụng gợi ỳ
+ */
+
+
+const Html = function () {
+    var $class = _class("Html").extends(Dom)({
+        const$isHtml: true,
+        __call(...args) {
+            return createEl(...args);
+        }
+    });
+    return $class
+}();
+
+Html.static = function (props) {
+    if (isObject(props)) {
+        for (const key in props) {
+            if (Object.hasOwnProperty.call(props, key)) {
+                const vl = props[key];
+                Object.defineProperty(this, key, {
+                    configurable: true,
+                    enumerable: true,
+                    value: vl
+                })
+            }
+        }
+    }
+}
+
+
 Html.static({
     A: A, Abbr: Abbr, Acronym: Acronym, Address: Address, Applet: Applet, Area: Area, Article: Article, Aside: Aside, Audio: Audio,
     B: B, Base: Base, Basefont: Basefont, Bb: Bb, Bdo: Bdo, Big: Big, Blockquote: Blockquote, Body: Body, Br: Br, Button: Button,
@@ -1379,7 +1344,7 @@ Html.static({
     Table: Table, Tbody: Tbody, Td: Td, Textarea: Textarea, Tfoot: Tfoot, Th: Th, Thead: Thead, Time: Time, Title: Title, Tr: Tr, Track: Track, Tt: Tt,
     U: U, Ul: Ul,
     Video: Video, Wbr: Wbr,
-    Loop:Loop, ForInc:ForInc, ForDec: ForDec,
+    Loop: Loop, ForInc: ForInc, ForDec: ForDec,
     a: a, abbr: abbr, acronym: acronym, address: address, applet: applet, area: area, article: article, aside: aside, audio: audio,
     b: b, base: base, basefont: basefont, bb: bb, bdo: bdo, big: big, blockquote: blockquote, body: body, br: br, button: button,
     canvas: canvas, caption: caption, center: center, cite: cite, code: code, col: col, colgroup: colgroup, command: command,
@@ -1406,47 +1371,250 @@ Html.static({
 
 export default Html;
 export {
-    createElementClass,
-    Html,
-    A, Abbr, Acronym, Address, Applet, Area, Article, Aside, Audio,
-    B, Base, Basefont, Bb, Bdo, Big, Blockquote, Body, Br, Button,
-    Canvas, Caption, Center, Cite, Code, Col, Colgroup, Command,
-    Datagrid, Datalist, Dd, Del, Details, Dfn, Dialog, Dir, Div, Dl, Dt,
-    Em, Embed, Eventsource,
-    Fieldset, Figcaption, Figure, Font, Footer, Form, Frame, Frameset,
-    H1, H2, H3, H4, H5, H6, Head, Header, Hgroup, Hr,
-    I, Iframe, Img, Input, Ins, Isindex,
-    Kbd, Keygen,
-    Label, Legend, Li, Link,
-    Map, Mark, Menu, Meta, Meter,
-    Nav, Noframes, Noscript,
-    Ol, Optgroup, Option, Output,
-    P, Param, Pre, Progress,
-    Q,
-    Rp, Rt, Ruby,
-    S, Samp, Script, Section, Select, Small, Source, Span, Strike, Strong, Style, Sub, Sup,
-    Table, Tbody, Td, Textarea, Tfoot, Th, Thead, Time, Title, Tr, Track, Tt,
-    U, Ul,
-    Video, Wbr,
-    Loop, ForInc, ForDec,
-    a, abbr, acronym, address, applet, area, article, aside, audio,
-    b, base, basefont, bb, bdo, big, blockquote, body, br, button,
-    canvas, caption, center, cite, code, col, colgroup, command,
-    datagrid, datalist, dd, del, details, dfn, dialog, dir, div, dl, dt,
-    em, embed, eventsource,
-    fieldset, figcaption, figure, font, footer, form, frame, frameset,
-    h1, h2, h3, h4, h5, h6, head, header, hgroup, hr,
-    i, iframe, img, input, ins, isindex, kbd, keygen,
-    label, legend, li, link,
-    map, mark, menu, meta, meter,
-    nav, noframes, noscript,
-    ol, optgroup, option, output,
-    p, param, pre, progress,
-    q,
-    rp, rt, ruby,
-    s, samp, script, section, select, small, source, span, strike, strong, style, sub, sup,
-    table, tbody, td, textarea, tfoot, th, thead, time, title, tr, track, tt,
-    u, ul,
-    video,
-    wbr
+  a,
+  A,
+  abbr,
+  Abbr,
+  acronym,
+  Acronym,
+  address,
+  Address,
+  applet,
+  Applet,
+  area,
+  Area,
+  article,
+  Article,
+  aside,
+  Aside,
+  audio,
+  Audio,
+  b,
+  B,
+  base,
+  Base,
+  basefont,
+  Basefont,
+  bb,
+  Bb,
+  bdo,
+  Bdo,
+  big,
+  Big,
+  blockquote,
+  Blockquote,
+  body,
+  Body,
+  br,
+  Br,
+  button,
+  Button,
+  canvas,
+  Canvas,
+  caption,
+  Caption,
+  center,
+  Center,
+  cite,
+  Cite,
+  code,
+  Code,
+  col,
+  Col,
+  colgroup,
+  Colgroup,
+  command,
+  Command,
+  createElementClass,
+  createHtmlElementFunction,
+  datagrid,
+  Datagrid,
+  datalist,
+  Datalist,
+  dd,
+  Dd,
+  del,
+  Del,
+  details,
+  Details,
+  dfn,
+  Dfn,
+  dialog,
+  Dialog,
+  dir,
+  Dir,
+  div,
+  Div,
+  dl,
+  Dl,
+  dt,
+  Dt,
+  em,
+  Em,
+  embed,
+  Embed,
+  eventsource,
+  Eventsource,
+  fieldset,
+  Fieldset,
+  figcaption,
+  Figcaption,
+  figure,
+  Figure,
+  font,
+  Font,
+  footer,
+  Footer,
+  ForDec,
+  ForInc,
+  form,
+  Form,
+  frame,
+  Frame,
+  frameset,
+  Frameset,
+  h1,
+  H1,
+  h2,
+  H2,
+  h3,
+  H3,
+  h4,
+  H4,
+  h5,
+  H5,
+  h6,
+  H6,
+  head,
+  Head,
+  header,
+  Header,
+  hgroup,
+  Hgroup,
+  hr,
+  Hr,
+  Html,
+  i,
+  I,
+  iframe,
+  Iframe,
+  img,
+  Img,
+  input,
+  Input,
+  ins,
+  Ins,
+  isindex,
+  Isindex,
+  kbd,
+  Kbd,
+  keygen,
+  Keygen,
+  label,
+  Label,
+  legend,
+  Legend,
+  li,
+  Li,
+  link,
+  Link,
+  Loop,
+  map,
+  Map,
+  mark,
+  Mark,
+  menu,
+  Menu,
+  meta,
+  Meta,
+  meter,
+  Meter,
+  nav,
+  Nav,
+  noframes,
+  Noframes,
+  noscript,
+  Noscript,
+  ol,
+  Ol,
+  optgroup,
+  Optgroup,
+  option,
+  Option,
+  output,
+  Output,
+  p,
+  P,
+  param,
+  Param,
+  pre,
+  Pre,
+  progress,
+  Progress,
+  q,
+  Q,
+  rp,
+  Rp,
+  rt,
+  Rt,
+  ruby,
+  Ruby,
+  s,
+  S,
+  samp,
+  Samp,
+  script,
+  Script,
+  section,
+  Section,
+  select,
+  Select,
+  small,
+  Small,
+  source,
+  Source,
+  span,
+  Span,
+  strike,
+  Strike,
+  strong,
+  Strong,
+  style,
+  Style,
+  sub,
+  Sub,
+  sup,
+  Sup,
+  table,
+  Table,
+  tbody,
+  Tbody,
+  td,
+  Td,
+  textarea,
+  Textarea,
+  tfoot,
+  Tfoot,
+  th,
+  Th,
+  thead,
+  Thead,
+  time,
+  Time,
+  title,
+  Title,
+  tr,
+  Tr,
+  track,
+  Track,
+  tt,
+  Tt,
+  u,
+  U,
+  ul,
+  Ul,
+  video,
+  Video,
+  wbr,
+  Wbr,
 };
