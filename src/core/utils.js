@@ -2172,6 +2172,40 @@ var getFirstValueInList = function (list, key, checkFn) {
     }
     return val;
 };
+/**
+ * for each
+ * @param {*} obj doi tuong
+ * @param {function} callback hàm xử lý
+ * @returns array
+ */
+function forEach(obj, callback){
+    if(!obj) return [];
+    var foreachData = [];
+    var type = getType(obj);
+    if(inArray(['array', 'object'], type) && isFunction(callback)){
+        var isStop = false;
+        var stop = () => isStop = true;
+        if(isArray(obj)){
+            for (let index = 0; index < obj.length; index++) {
+                const value = obj[index];
+                const parseData = callback(value, index, stop);
+                if(isStop) break;
+                foreachData.push(parseData);
+            }
+        }
+        else{
+            var keys = Object.keys(obj);
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                const value = obj[key];
+                const parseData = callback(value, key, stop);
+                if(isStop) break;
+                foreachData.push(parseData);
+            }
+        }
+    }
+    return foreachData;
+}
 
 export {
   _createClass,
@@ -2199,6 +2233,7 @@ export {
   destroyObject,
   EMPTY_VALUE,
   emptyObject,
+  forEach,
   getArguments,
   getEl,
   getFirstValueInList,

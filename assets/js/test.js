@@ -25,7 +25,8 @@ var AppComponent = Component.maker("AppComponent", {
             P("pow: {{powOfCount}}"),
             
             P(A("#a[href=#a]", "Click Me", {
-                onClick: "changeCount"
+                onClick: "changeCount",
+                
             }))
         ]);
         return _a;

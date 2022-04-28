@@ -4,12 +4,16 @@ import createClass, {
   createInstance,
   getClassData,
 } from '../es5-class.js';
-import { observe } from '../observer.js';
+import {
+  defConst,
+  observe,
+} from '../observer.js';
 import {
   _defineProperty,
   _instanceof,
   assignValue,
   date,
+  forEach,
   getArguments,
   getEl,
   getObjectMethod,
@@ -316,6 +320,7 @@ function addPendingData(_classCtx, data) {
 function BindingText(key) {
     this.key = String(key).trim();
     this.isBindingText = true;
+    this.type = 'self';
 }
 
 /**
@@ -388,9 +393,11 @@ Dom = _class("Dom")({
             var vt = getType(value);
             var valType = isState(value) ? 'state' : vt;
             var $t = valType, $v = value;
-            if (isString(value) && !isNumber(value) && value.substr(0, 2) == '{{' && value.substr(value.length - 2) == '}}') {
-                $t = 'prop';
-                $v = value.substr(2, value.length - 4).trim();
+            // var $text = vt == 'string'?parseTextData()
+            var startlt = value.split("{{").length;
+            if (isString(value) && !isNumber(value) && startlt > 1 && startlt == value.split("}}").length) {
+                $t = 'proptext';
+                $v = value;
             }
 
             if (bindType == "sync") {
@@ -515,6 +522,8 @@ Dom = _class("Dom")({
 
         }
     },
+
+
     __boot__: function () {
         addDomClassData(this.__instance__id__, {});
         __set__.call(this, TRANSMISTION_LISTENNERS, {
@@ -540,7 +549,7 @@ Dom = _class("Dom")({
         __set__.call(this, SYNC_CHANGE, true)
         __set__.call(this, DATA_SYNC, true)
         __set__.call(this, COMPUTED_FUNCTS, {})
-        
+
 
 
         this.children = [];
@@ -564,7 +573,7 @@ Dom = _class("Dom")({
             oneTimeData = {};
         }
         bootData.apply(this);
-        
+
         let bag = getDataBag(this.static);
         addBagData.apply(this, [bag]);
         ___assignDynamicProperties___.call(this);
@@ -658,7 +667,7 @@ Dom = _class("Dom")({
     },
 
     constructor: function Dom() {
-        this.setElement.apply(this, arguments);
+        this.__setElement__.apply(this, arguments);
         __build__.call(this);
         this.isDom = true;
     },
@@ -736,117 +745,16 @@ Dom = _class("Dom")({
      * thiết lập
      * @param {string|object}
      */
-    const$setElement: function setElement(params) {
+    __setElement__: function setElement(params) {
         var args = getArguments(arguments);
-        if (args.length && typeof args[0] != "string") {
-            args.unshift(this.getDefaultSelector());
-        }
-
-        var elem = create.apply(this, args);
-
-        var el = elem.el;
-        if (el) {
-            if (!this.tagName && this.static.__class__ == "Dom") {
-                this.tagName = elem.tag;
-            }
-
-            if (!el.id && this.id) el.id = this.id;
-            if (!el.className && this.className) el.className = this.className;
-
-
-            this.el = el;
-
-            const FOREIGN = __get__.call(this, FOREIGN_DATA);
-            addBagData.call(this, FOREIGN);
-
-            var self = this;
-
-
-            const COMPUTED = __get__.call(this, COMPUTED_FUNCTS);
-            var keys = Object.keys(COMPUTED);
-            
-            keys.map(function(k){
-                var fn = COMPUTED[k];
-                var first = fn.call(self);
-                self[k] = first;
-            });
-
-
-
-            observe(self);
-            Object.keys(self).map(function(k){
-                if(keys.indexOf(k) == -1){
-                    self.__ob__.subscribe(k, function(v){
-                        keys.map(function(_k){
-                            var fn = COMPUTED[_k];
-                            var vl = fn.call(self);
-                            self[_k] = vl;
-                        });
-            
-                    })
-                }
-            })
-
-
-            let bag = getDataBag(this.static);
-            let oneWayBinding = {};
-            assignValue(oneWayBinding, elem.oneWayBinding)
-            assignValue(oneWayBinding, bag.oneWayBinding)
-            if (!isEmpty(oneWayBinding)) {
-                addOneWayBindingAttr.call(this, oneWayBinding);
-            }
-            let twoWayBinding = {};
-            assignValue(twoWayBinding, elem.twoWayBinding)
-            assignValue(twoWayBinding, bag.twoWayBinding)
-            if (!isEmpty(twoWayBinding)) {
-                addTwoWayBindingAttr.call(this, twoWayBinding);
-            }
-
-
-            if (!isEmpty(elem.dataTypeAttrs)) {
-                for (const key in elem.dataTypeAttrs) {
-                    if (Object.hasOwnProperty.call(elem.dataTypeAttrs, key)) {
-                        const vl = elem.dataTypeAttrs[key];
-                        setDataTypeAttribute.call(this, key, vl);
-                    }
-                }
-            }
-            if (elem.contents && elem.contents.length) {
-                // this._pendingContents = elem.contents;
-                var _pendingChildren = __get__.call(this, PENDING_CHILDREN);
-                for (var index = 0; index < elem.contents.length; index++) {
-                    _pendingChildren.push(elem.contents[index]);
-
-                }
-            }
-            if (!isEmpty(elem.events)) {
-                this.on(elem.events);
-            }
-            if (elem.parent) {
-                this.parent = elem.parent;
-            }
-
-            if (!isEmpty(elem.methods)) {
-                for (var method in elem.methods) {
-                    if (Object.hasOwnProperty.call(elem.methods, method)) {
-                        var fn = elem.methods[method];
-                        // console.log(method, fn)
-                        _defineProperty(this, method, fn);
-                    }
-                }
-            }
-
-        }
-
-        __set__.call(this, IS_STARTED, true);
-        return this;
+        return __setElement__.apply(this, args);
     },
     /**
      * giống element
      * @param {*} args thông tin element
      */
     final$setup: function setup(args) {
-        return this.setElement.apply(this, getArguments(arguments));
+        return this.__setElement__.apply(this, getArguments(arguments));
     },
 
     const$getDefaultSelector: function () {
@@ -1647,6 +1555,8 @@ Dom = _class("Dom")({
     width: function (width) {
         return typeof width == "undefined" ? (this.el ? (this.el.clientWidth || this.el.offsetWidth) : 0) : this.css({ width: width });
     },
+
+
     /**
      * Thêm phần tử con vào cuối danh danh sách phần tử con của element
      * @param {*} child 
@@ -1793,19 +1703,29 @@ Dom = _class("Dom")({
 
         }
         else {
-            var ts = parseTextData(child);
+            var ts = parseTextData(self, child);
             if (isArray(ts) && ts.length) {
                 ts.map(function (c) {
                     self.append(c);
                 })
                 return self;
             }
+            else if (isFunction(ts)) {
+                var textNode = document.createTextNode("");
+                this.el.appendChild(textNode);
+                this.children.push(textNode);
+                textNode.nodeValue = ts(text => textNode.nodeValue = text);
+                return self;
+
+            }
+
+
+
 
             var c = parse(child);
-            if (c) {
-                this.el.appendChild(c);
-                this.children.push(c);
-            }
+            this.el.appendChild(c);
+            this.children.push(c);
+
 
 
         }
@@ -2069,6 +1989,13 @@ Dom = _class("Dom")({
                     const c = ts[index];
                     self.prepend(c);
                 }
+                return self;
+            }
+            else if (isFunction(ts)) {
+                var textNode = document.createTextNode("");
+                this.el.insertBefore(textNode, this.el.firstChild);
+                this.children.unshift(textNode);
+                textNode.nodeValue = ts(text => textNode.nodeValue = text);
                 return self;
             }
 
@@ -2576,7 +2503,7 @@ Dom = _class("Dom")({
 
     static$toString: function () {
         var self = this;
-        return createInstance(self,['#' + Str.rand()]);
+        return createInstance(self, ['#' + Str.rand()]);
     },
     static$withParent: function (parent) {
         var self = this;
@@ -2609,8 +2536,8 @@ Dom = _class("Dom")({
             oneTimeData = {};
             oneTimeData[data] = args;
             return createInstance(self, arguments.length == 3 ? (
-                    isArray(arguments[2]) ? arguments[2] : [arguments[2]]
-                ) : (arguments.length > 3 ? getArguments(arguments, 2) : []));
+                isArray(arguments[2]) ? arguments[2] : [arguments[2]]
+            ) : (arguments.length > 3 ? getArguments(arguments, 2) : []));
         }
         return new self();
 
@@ -2619,7 +2546,111 @@ Dom = _class("Dom")({
 
 
 });
+function __setElement__(params) {
+    var args = getArguments(arguments);
+    if (args.length && typeof args[0] != "string") {
+        args.unshift(this.getDefaultSelector());
+    }
 
+    var elem = create.apply(this, args);
+
+    var el = elem.el;
+    if (el) {
+        if (!this.tagName && this.static.__class__ == "Dom") {
+            this.tagName = elem.tag;
+        }
+
+        if (!el.id && this.id) el.id = this.id;
+        if (!el.className && this.className) el.className = this.className;
+
+
+        this.el = el;
+
+        const FOREIGN = __get__.call(this, FOREIGN_DATA);
+        addBagData.call(this, FOREIGN);
+
+        var self = this;
+
+
+        const COMPUTED = __get__.call(this, COMPUTED_FUNCTS);
+        var keys = Object.keys(COMPUTED);
+
+        keys.map(function (k) {
+            var fn = COMPUTED[k];
+            var first = fn.call(self);
+            self[k] = first;
+        });
+
+
+
+        observe(self);
+        Object.keys(self).map(function (k) {
+            if (keys.indexOf(k) == -1) {
+                self.__ob__.subscribe(k, function (v) {
+                    keys.map(function (_k) {
+                        var fn = COMPUTED[_k];
+                        var vl = fn.call(self);
+                        self[_k] = vl;
+                    });
+
+                })
+            }
+        })
+
+
+        let bag = getDataBag(this.static);
+        let oneWayBinding = {};
+        assignValue(oneWayBinding, elem.oneWayBinding)
+        assignValue(oneWayBinding, bag.oneWayBinding)
+        if (!isEmpty(oneWayBinding)) {
+            addOneWayBindingAttr.call(this, oneWayBinding);
+        }
+        let twoWayBinding = {};
+        assignValue(twoWayBinding, elem.twoWayBinding)
+        assignValue(twoWayBinding, bag.twoWayBinding)
+        if (!isEmpty(twoWayBinding)) {
+            addTwoWayBindingAttr.call(this, twoWayBinding);
+        }
+
+
+        if (!isEmpty(elem.dataTypeAttrs)) {
+            for (const key in elem.dataTypeAttrs) {
+                if (Object.hasOwnProperty.call(elem.dataTypeAttrs, key)) {
+                    const vl = elem.dataTypeAttrs[key];
+                    setDataTypeAttribute.call(this, key, vl);
+                }
+            }
+        }
+        if (elem.contents && elem.contents.length) {
+            // this._pendingContents = elem.contents;
+            var _pendingChildren = __get__.call(this, PENDING_CHILDREN);
+            for (var index = 0; index < elem.contents.length; index++) {
+                _pendingChildren.push(elem.contents[index]);
+
+            }
+        }
+        if (!isEmpty(elem.events)) {
+            this.on(elem.events);
+        }
+        if (elem.parent) {
+            this.parent = elem.parent;
+        }
+
+        if (!isEmpty(elem.methods)) {
+            for (var method in elem.methods) {
+                if (Object.hasOwnProperty.call(elem.methods, method)) {
+                    var fn = elem.methods[method];
+                    // console.log(method, fn)
+                    _defineProperty(this, method, fn);
+                }
+            }
+        }
+
+    }
+
+    __set__.call(this, IS_STARTED, true);
+    return this;
+}
 
 function __build_data_ref__(data) {
     if (isObject(data)) {
@@ -2678,7 +2709,7 @@ function __buildChildren__() {
     __set__.call(this, IS_BUILDED, true);
 }
 
-function addBagData(bag){
+function addBagData(bag) {
     let data = {};
     if (isObject(bag)) {
         var computed = null;
@@ -2696,19 +2727,19 @@ function addBagData(bag){
                 else if (key == 'data') {
                     assignValue(data, scopeData);
                 }
-                else if(key == 'computed' && isObject(scopeData)){
+                else if (key == 'computed' && isObject(scopeData)) {
                     computed = scopeData;
                 }
             }
         }
-        if(isObject(computed)){
+        if (isObject(computed)) {
             var self = this;
             var ckeys = Object.keys(computed);
             var COMPUTED = __get__.call(this, COMPUTED_FUNCTS);
             for (let index = 0; index < ckeys.length; index++) {
                 const key = ckeys[index];
                 var fn = computed[key];
-                if(isFunction(fn)){
+                if (isFunction(fn)) {
                     COMPUTED[key] = fn;
                 }
             }
@@ -3553,6 +3584,31 @@ function addOneWayBindingAttr(attr, value, type) {
 
             });
         }
+        else if (type == 'binding' || (type == 'prop' && isFunction(value))) {
+            if (key == 'value') {
+                self.val(value(text => self.val(text)));
+
+            } else {
+                self.attr(value(text => self.attr(text)));
+            }
+        }
+        else if (type == 'proptext') {
+            var texts = parseTextData(self, value);
+            if(isFunction(texts)){
+                if (key == 'value') {
+                    self.val(texts(text => self.val(text)));
+    
+                } else {
+                    self.attr(texts(text => self.attr(text)));
+                }
+            }
+            else if (key == 'value') {
+                self.val(value);
+
+            } else {
+                self.attr(value);
+            }
+        }
         else if (type == 'prop') {
             var vl = getEl(this, value);
             if (key == 'value') {
@@ -3563,6 +3619,7 @@ function addOneWayBindingAttr(attr, value, type) {
 
             if (value) {
                 var _key = value.split(".").shift();
+                // nếu không có __ob__ hoặc không tồn tại key và cũng ko có trong obj
                 if (!this.__ob__ || (!inArray(this.__ob__.indexKeys, _key) && typeof this[_key] != "undefined")) {
                     var dbo = __get__.call(self, DOM_BASE_OBJECT);
                     if (dbo) {
@@ -3701,6 +3758,72 @@ function addTwoWayBindingAttr(attr, value, type) {
             })
 
         }
+        else if (type == 'binding' || (type == 'prop' && isFunction(value))) {
+            var vld = null;
+            if (key == 'value') {
+                vld = value(text => {
+                    vld = text;
+                    if (PropChangeStatus[attrKey]) self.val(text);
+                });
+                self.val(vld);
+
+            } else {
+                vld = value(text => {
+                    vld = text;
+                    if (PropChangeStatus[attrKey]) self.attr(text);
+                });
+                self.attr(vld);
+            }
+
+            this.on("attribute.changed", function (event) {
+                var old = key == 'value' ? this.val() : this.attr(attr);
+                if (old != vld && PropChangeStatus[attrKey]) {
+                    vld = old;
+                    PropChangeStatus[attrKey] = false;
+                    setEl(value._dboKeys.length ? dbo : self, vld, old);
+                    PropChangeStatus[attrKey] = true;
+                }
+            })
+
+        }
+        else if (type == 'proptext') {
+            var texts = parseTextData(self, value);
+            if(isFunction(texts)){
+                var vld = null;
+                value = texts;
+                if (key == 'value') {
+                    vld = value(text => {
+                        vld = text;
+                        if (PropChangeStatus[attrKey]) self.val(text);
+                    });
+                    self.val(vld);
+    
+                } else {
+                    vld = value(text => {
+                        vld = text;
+                        if (PropChangeStatus[attrKey]) self.attr(text);
+                    });
+                    self.attr(vld);
+                }
+    
+                this.on("attribute.changed", function (event) {
+                    var old = key == 'value' ? this.val() : this.attr(attr);
+                    if (old != vld && PropChangeStatus[attrKey]) {
+                        vld = old;
+                        PropChangeStatus[attrKey] = false;
+                        setEl(value._dboKeys.length ? dbo : self, vld, old);
+                        PropChangeStatus[attrKey] = true;
+                    }
+                })
+            }
+            else if (key == 'value') {
+                self.val(value);
+
+            } else {
+                self.attr(value);
+            }
+        }
+        
         else if (type == 'prop') {
             var vl = getEl(this, value);
             var vld = isState(vl) ? vl.__toData__() : vl;
@@ -3712,7 +3835,22 @@ function addTwoWayBindingAttr(attr, value, type) {
             if (value) {
                 var _key = value.split(".").shift();
                 var dbo = __get__.call(self, DOM_BASE_OBJECT);
-                if (dbo) {
+                if (this.__ob__ && inArray(this.__ob__.indexKeys, _key)) {
+                    this.__ob__.subscribe(value, function (v) {
+
+                        vld = isState(v) ? v.__toData__() : v;
+                        if (PropChangeStatus[attrKey]) {
+                            if (key == 'value') {
+                                self.val(vld)
+                            } else {
+                                self.attr(attr, vld);
+                            }
+
+                        }
+                    })
+                }
+
+                else if (dbo) {
                     if (!dbo.__ob__ || (!inArray(dbo.__ob__.indexKeys, _key) && typeof dbo[_key] != "undefined")) {
 
                     } else {
@@ -3732,27 +3870,12 @@ function addTwoWayBindingAttr(attr, value, type) {
                     }
                 }
 
-                else if (this.__ob__ && inArray(this.__ob__.indexKeys, _key)) {
-                    this.__ob__.subscribe(value, function (v) {
-
-                        vld = isState(v) ? v.__toData__() : v;
-                        if (PropChangeStatus[attrKey]) {
-                            if (key == 'value') {
-                                self.val(vld)
-                            } else {
-                                self.attr(attr, vld);
-                            }
-
-                        }
-                    })
-                }
-
                 this.on("attribute.changed", function (event) {
                     var old = key == 'value' ? this.val() : this.attr(attr);
                     if (old != vld && PropChangeStatus[attrKey]) {
                         vld = old;
                         PropChangeStatus[attrKey] = false;
-                        setEl(dbo ? dbo : self, value, old);
+                        setEl(dbo ? dbo : self, vld, old);
                         PropChangeStatus[attrKey] = true;
                     }
                 })
@@ -3846,7 +3969,6 @@ function create(tag, children, attributes) {
         ;
 
     function addAttrValue(k, vl) {
-
         var s = String(k).toLowerCase();
         var parts = s.split("$");
         var f = k.substring(0, 1);
@@ -3856,13 +3978,15 @@ function create(tag, children, attributes) {
         var vt = getType(vl);
         var valType = isState(vl) ? 'state' : vt;
         var $t = valType, $v = vl;
-        if (isString(vl) && !isNumber(vl) && vl.substr(0, 2) == '{{' && vl.substr(vl.length - 2) == '}}') {
+        var $text = (vt == 'string') ? parseTextData(vl) : null;
+        var isBindingText = isFunction($text);
+        if (vt == 'string' && !isNumber(vl) && isBindingText && $text.texts.length == 1) {
             $t = 'prop';
-            $v = vl.substr(2, vl.length - 4).trim();
+            $v = $text;
         }
 
         if (f2 == '$$') {
-            twoWayBinding[s.substr(2)] = {
+            twoWayBinding[s.substring(2)] = {
                 type: $t,
                 value: $v
             };;
@@ -3914,7 +4038,7 @@ function create(tag, children, attributes) {
                 }
             }
         }
-        else if (k == 'parent' && ((isObject(vl) && vl.isDom) || vl instanceof Element)) {
+        else if (k == 'parent' && ((vt == 'object' && vl.isDom) || vl instanceof Element)) {
             parent = val;
 
         }
@@ -3936,13 +4060,13 @@ function create(tag, children, attributes) {
         else if (inArray(['tag', 'tagname'], s)) {
             // tagName = vl;
         }
-        else if (f2 == 'on' && isDomEvent(s.substr(2))) {
-            events[s.substr(2)] = vl;
+        else if (f2 == 'on' && isDomEvent(s.substring(2))) {
+            events[s.substring(2)] = vl;
         }
         else if (f == '@' && isDomEvent(n)) {
             events[n] = vl;
         }
-        else if (s == "on" && isObject(vl)) {
+        else if (s == "on" && vt == 'object') {
             for (const v in vl) {
                 if (Object.hasOwnProperty.call(vl, v)) {
                     const ev = vl[v];
@@ -3961,7 +4085,7 @@ function create(tag, children, attributes) {
                 contents.push(vl);
             }
         }
-        else if (typeof vl == "function") {
+        else if (vt == "function") {
             if (vl.isPrimitive) {
                 oneWayBinding[k] = {
                     type: $t,
@@ -3979,61 +4103,61 @@ function create(tag, children, attributes) {
 
 
         }
+        else if (isFunction($text)) {
+            oneWayBinding[k] = {
+                type: 'binding',
+                value: $text
+            };
+        }
 
         else {
             attrs[k] = vl;
         }
     }
-    if ((isObject(tag) && (tag.isQuery || tag.isDomQuery))) {
-        contents.push(tag);
-    }
-    else if (isObject(tag) && tag.isDom) {
-        contents.push(tag);
-    }
-    else if (isObject(tag) && tag.isDomBag) {
-        contents.push(tag);
-    }
-
-    else if (isObject(tag)) {
-        for (var k in tag) {
-            if (tag.hasOwnProperty(k)) {
-                var vl = tag[k];
-                var s = String(k).toLowerCase();
-                if (inArray(['tag', 'tagname'], s)) {
-                    tagName = vl;
-                }
-                else if (inArray(["content", "children"], s)) {
-                    if (isArray(vl)) {
-                        for (var j = 0; j < vl.length; j++) {
-                            let cnt = vl[j];
-                            let texts = parseTextData(cnt);
-                            if (isArray(texts) && texts.length) {
-                                texts.map(function (c) {
-                                    contents.push(c);
-                                })
-                            }
-                            else {
-                                contents.push(cnt);
-                            }
-
-                        }
-                    } else {
-                        let texts = parseTextData(vl);
+    var isTagObject = isObject(tag);
+    // kiểm tra tag xem có là query hay ko
+    if (isTagObject) {
+        if (tag.isQuery || tag.isDomQuery) contents.push(tag);
+        else if (tag.isDom) contents.push(tag);
+        else if (tag.isDomBag) contents.push(tag);
+        else forEach(tag, function (vl, k) {
+            var s = String(k).toLowerCase();
+            if (inArray(['tag', 'tagname'], s)) {
+                tagName = vl;
+            }
+            else if (inArray(["content", "children"], s)) {
+                if (isArray(vl)) {
+                    for (var j = 0; j < vl.length; j++) {
+                        let cnt = vl[j];
+                        let texts = parseTextData(self, cnt);
                         if (isArray(texts) && texts.length) {
                             texts.map(function (c) {
                                 contents.push(c);
                             })
                         }
+
                         else {
-                            contents.push(vl);
+                            contents.push(cnt);
                         }
                     }
-                }
-                else {
-                    addAttrValue(k, vl);
+                } else {
+                    let texts = parseTextData(self, vl);
+                    if (isArray(texts) && texts.length) {
+                        texts.map(function (c) {
+                            contents.push(c);
+                        })
+                    }
+                    else {
+                        contents.push(vl);
+                    }
                 }
             }
-        }
+            else {
+                addAttrValue(k, vl);
+            }
+        });
+
+
     }
 
     else if (isString(tag)) tagName = tag;
@@ -4061,7 +4185,7 @@ function create(tag, children, attributes) {
         }
         else if (aType == "string") {
             isTwoContent = 0;
-            let texts = parseTextData(arg);
+            let texts = parseTextData(self, arg);
             if (isArray(texts) && texts.length) {
                 texts.map(function (c) {
                     contents.push(c);
@@ -4084,7 +4208,7 @@ function create(tag, children, attributes) {
                         contents.push(currentArg);
                     }
                     else {
-                        let texts = parseTextData(currentArg);
+                        let texts = parseTextData(self, currentArg);
                         if (isArray(texts) && texts.length) {
                             texts.map(function (c) {
                                 contents.push(c);
@@ -4149,87 +4273,71 @@ function create(tag, children, attributes) {
 
         var csk, v;
         var css = {};
-        for (var prop in attrs) {
-            if (Object.prototype.hasOwnProperty.call(attrs, prop)) {
-                var val = attrs[prop];
-                var key = prop.toLowerCase();
-                var k = key;
-                var f = k.substring(0, 1);
-                var f2 = k.substring(0, 2);
-                var isEvent = domEvents.indexOf(key) >= 0;
-                if (inArray(['tag', 'tagname'], s)) {
-                    // tagName = vl;
-                }
-                else if (f == '$' && (isString(vl) || isNumber(vl) || getType(vl) == "boolean")) {
-                    oneWayBinding[k.substr(1)] = vl;
-                }
-                else if (key == "style") {
+        forEach(attrs, function (val, prop) {
+            var key = prop.toLowerCase();
+            var k = key;
+            var f = k.substring(0, 1);
+            var f2 = k.substring(0, 2);
+            var isEvent = domEvents.indexOf(key) >= 0;
+            if (inArray(['tag', 'tagname'], key)) {
+                // tagName = vl;
+            }
+            else if (f == '$' && inArray(['string', 'number', 'boolean'], getType(val))) {
+                twoWayBinding[k.substr(1)] = val;
+            }
+            else if (key == "style") {
+                if (typeof val == "object") {
+                    forEach(val, function (v, cssKey) {
+                        css[cssKey] = v;
+                    });
+                    forEach(css, function (cv, ck) {
+                        setCssProp(htmlObject, ck, cv);
+                    });
 
-                    if (typeof val == "object") {
-                        for (var cssKey in val) {
-                            if (Object.prototype.hasOwnProperty.call(val, cssKey)) {
-                                v = val[cssKey];
-                                css[cssKey] = v;
-                            }
-                        }
-
-                        for (var ck in css) {
-                            if (css.hasOwnProperty(ck)) {
-                                var cv = css[ck];
-                                // htmlObject.style[ck] = cv;
-                                // console.log(`htmlObject.style['${ck}'] = ${cv};`)
-                                setCssProp(htmlObject, ck, cv);
-                            }
-                        }
-                    } else {
-                        htmlObject.setAttribute(key, val);
-                    }
-                }
-                else if (isObject(val)) {
-                    if (val.isDom || val.isDomBag || val.isDomQuery || _instanceof(val, Element)) {
-                        if (key == 'parent' || key == '@parent' || key == '$parent') {
-                            parent = val;
-                        }
-                        else {
-                            this._pendingContents.push({ key: key, content: val });
-                        }
-
-                    }
-                    else if (val.constructor != Object) {
-                        this[key] = val;
-                    }
-                    else {
-                        var attrObj = Str.convertTextObject({}, val, prop, '-');
-                        for (var ak in attrObj) {
-                            if (attrObj.hasOwnProperty(ak)) {
-                                var v = attrObj[ak];
-                                htmlObject.setAttribute(ak, v);
-                            }
-                        }
-                    }
-
-
-                }
-                else if (key == 'class' || key == 'classname') {
-                    htmlObject.className = val;
-                }
-                else if (typeof vl == "function") {
-                    methods[k] = vl;
-                }
-                else if (isBoolean(val)) {
-                    if (val === false) {
-                        htmlObject.removeAttribute(key);
-
-                    } else {
-                        htmlObject.setAttribute(key, key);
-                    }
-                }
-                else if (key != "content" || isSimple) {
-                    var slug = Str.camelToSlug(prop, '-');
-                    htmlObject.setAttribute(slug, val);
+                } else {
+                    htmlObject.setAttribute(key, val);
                 }
             }
-        }
+            else if (isObject(val)) {
+                if (val.isDom || val.isDomBag || val.isDomQuery || _instanceof(val, Element)) {
+                    if (key == 'parent' || key == '@parent' || key == '$parent') {
+                        parent = val;
+                    }
+                    else {
+                        this._pendingContents.push({ key: key, content: val });
+                    }
+
+                }
+                else if (val.constructor != Object) {
+                    this[key] = val;
+                }
+                else {
+                    forEach(Str.convertTextObject({}, val, prop, '-'), function (v, ak) {
+                        htmlObject.setAttribute(ak, v);
+                    });
+                }
+
+
+            }
+            else if (key == 'class' || key == 'classname') {
+                htmlObject.className = val;
+            }
+            else if (typeof vl == "function") {
+                methods[k] = vl;
+            }
+            else if (isBoolean(val)) {
+                if (val === false) {
+                    htmlObject.removeAttribute(key);
+
+                } else {
+                    htmlObject.setAttribute(key, key);
+                }
+            }
+            else if (key != "content" || isSimple) {
+                var slug = Str.camelToSlug(prop, '-');
+                htmlObject.setAttribute(slug, val);
+            }
+        })
     }
 
     if (!isEmpty(props)) {
@@ -4308,17 +4416,19 @@ function create(tag, children, attributes) {
 
 }
 
-function parseTextData(str) {
+function parseTextData(context, str) {
     if (!isString(str)) return str;
     var s = String(str);
 
     var a = /\{\{\s*[A-z0-9\._\$]+\s*\}\}/i.test(s);
     if (!a) return str;
-    var tests = [
+    var texts = [
         ""
     ];
     var n = 0;
-
+    var keys = [];
+    var dboKeys = [];
+    var dbo = __get__.call(context, DOM_BASE_OBJECT);
     var last = '';
     var isOpen = false;
     var currentKey = '';
@@ -4327,10 +4437,10 @@ function parseTextData(str) {
         if (isOpen) {
             if (c == '{') {
                 if (last == '{') {
-                    tests[n] += c;
+                    texts[n] += c;
                 }
                 else {
-                    tests[n] += '{{' + currentKey + c;
+                    texts[n] += '{{' + currentKey + c;
                     isOpen = false;
                     currentKey = '';
                 }
@@ -4338,16 +4448,30 @@ function parseTextData(str) {
             else if (c == '}') {
                 if (last == '}') {
                     n++;
-                    tests[n] = new BindingText(currentKey.trim());
+                    texts[n] = new BindingText(currentKey.trim());
+                    let fk = currentKey.split(".").shift();
+                    var y = false;
+                    if (context.__ob__ && context.__ob__.indexKeys.indexOf(fk) != -1) {
+                        if (keys.indexOf(currentKey) === -1) {
+                            keys.push(currentKey);
+                        }
+                        y = true;
+                    }
+                    else if (dbo && dbo.__ob__ && dbo.__ob__.indexKeys.indexOf(fk) != -1) {
+                        if (keys.indexOf(currentKey) === -1) {
+                            dboKeys.push(currentKey);
+                            texts[n].type = 'dbo';
+                        }
+                    }
                     currentKey = '';
                     n++;
                     last = '';
                     isOpen = false;
-                    if (i < s.length - 1) tests[n] = '';
+                    if (i < s.length - 1) texts[n] = '';
                 }
             }
             else if (last == '}') {
-                tests[n] += '{{' + currentKey + '}' + c;
+                texts[n] += '{{' + currentKey + '}' + c;
                 isOpen = false;
                 currentKey = '';
             }
@@ -4355,7 +4479,7 @@ function parseTextData(str) {
                 currentKey += c;
             }
             else {
-                tests[n] += '{{' + currentKey + c;
+                texts[n] += '{{' + currentKey + c;
                 isOpen = false;
                 currentKey = '';
             }
@@ -4363,17 +4487,83 @@ function parseTextData(str) {
         else if (c == '{') {
             if (last == '{') {
                 isOpen = true;
-                tests[n] = tests[n].substring(0, tests[n].length - 1);
+                texts[n] = texts[n].substring(0, texts[n].length - 1);
             }
             else {
-                tests[n] += c;
+                texts[n] += c;
             }
         } else {
-            tests[n] += c;
+            texts[n] += c;
         }
         if (!i || last != '') last = c;
     }
-    return tests;
+
+    if (keys.length || dboKeys.length) {
+        var fn = function (subscribe) {
+            var _text_ = '';
+            var getText = function () {
+                _text_ = '';
+                forEach(texts, function (value) {
+                    if (value instanceof BindingText) {
+                        let key = value.key;
+                        let text = '';
+                        if (value.type == 'dbo') {
+                            let v = getEl(dbo, key);
+                            text = isState(v) ? v.__toData__() : v;
+                        } else {
+                            let v = getEl(context, key);
+                            text = isState(v) ? v.__toData__() : v;
+                        }
+                        if(texts.length == 1) _text_ = text;
+                        else _text_ += text;
+
+                        
+
+
+                    } else {
+                        if(texts.length == 1)_text_ = value;
+                        else _text_ += value;
+                    }
+                });
+            }
+            getText();
+
+            if (subscribe && isFunction(subscribe)) {
+                forEach(texts, function (value) {
+                    if (value instanceof BindingText) {
+                        let key = value.key;
+                        if (value.type == 'dbo') {
+                            dbo.__ob__.subscribe(key, function (v) {
+                                getText();
+                                subscribe(_text_);
+                            })
+                        } else {
+                            seo.__ob__.subscribe(key, function (v) {
+                                getText();
+                                subscribe(_text_);
+                            })
+                        }
+
+
+                    }
+                });
+            }
+            return _text_;
+        }
+        defConst(fn, 'isBindingFactory', true);
+        defConst(fn, 'texts', texts);
+        defConst(fn, '_dboKeys', dboKeys, {
+            enumerable: false,
+            configurable: false
+        });
+        defConst(fn, '_keys', keys, {
+            enumerable: false,
+            configurable: false
+        });
+        return fn;
+
+    }
+    return texts;
 }
 
 
@@ -4426,7 +4616,7 @@ var createEl = function createEl(tag, ...args) {
                 else if (s.substr(0, 1) == '@' && isDomEvent(s.substr(1))) {
                     events[s.substr(1)] = vl;
                 }
-                else if (inArray(["content", "content", "children"], s)) {
+                else if (inArray(["content", "content", "children", "child"], s)) {
                     if (isArray(vl)) {
                         for (var j = 0; j < vl.length; j++) {
                             var cnt = vl[j];
@@ -5167,6 +5357,21 @@ function isQuery(obj) {
     return false;
 }
 
+function parseEventHandlerString(str){
+    var actions = [];
+    var isOpenFunc = false;
+    var isInFunctionName = false;
+    var stringType = "", stringOpen = false;
+    if(!isString(str)) return [];
+    var t = str.length;
+    for (let index = 0; index < t; index++) {
+        const c = str[index];
+        if(!isInFunctionName){
+            
+        }
+        
+    }
+}
 
 
 function emptyFunc() { }

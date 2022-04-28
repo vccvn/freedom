@@ -5,6 +5,7 @@ import {
   _instanceof,
   assignValue,
   getArguments,
+  getType,
   isArray,
   isBoolean,
   isEmpty,
@@ -49,22 +50,22 @@ function createElementClass(tag, properties) {
     var t = tag.toLowerCase();
     var classProps = {
         const$tagName: tag,
-        __call__: function(...args){
+        __call__: function (...args) {
             var Component = this;
             var arg = getArguments(arguments);
-                Object.defineProperty(arg, 'isDomComponentBag', {
-                    value: true,
-                    enumerable: false,
-                    writable: false,
-                    configurable: false,
-                })
-                Object.defineProperty(arg, 'Component', {
-                    value: Component,
-                    enumerable: false,
-                    writable: false,
-                    configurable: false,
-                })
-                return arg;
+            Object.defineProperty(arg, 'isDomComponentBag', {
+                value: true,
+                enumerable: false,
+                writable: false,
+                configurable: false,
+            })
+            Object.defineProperty(arg, 'Component', {
+                value: Component,
+                enumerable: false,
+                writable: false,
+                configurable: false,
+            })
+            return arg;
         },
         constructor: function () {
             var args = getArguments(arguments);
@@ -93,7 +94,7 @@ function createElementClass(tag, properties) {
             else {
                 args.unshift(this.tagName);
             }
-            this.setElement.apply(this, args);
+            this.__setElement__.apply(this, args);
         }
     };
     classProps['const$is' + Str.ucfirst(t)] = true;
@@ -176,7 +177,7 @@ function createElementClass(tag, properties) {
                 if (src && !attrs.src) attrs.src = src;
                 createArgs.push(attrs);
 
-                this.setElement.apply(this, createArgs);
+                this.__setElement__.apply(this, createArgs);
             }
         });
     }
@@ -1014,6 +1015,191 @@ const Table = createElementClass("table"), Tbody = createElementClass("tbody"), 
 const U = createElementClass("u"), Ul = createElementClass("ul");
 const Video = createElementClass("video");
 const Wbr = createElementClass("wbr");
+
+
+
+const ForLoop = createClass("ForLoop")({
+    static$isDomClass: true,
+    $el: null,
+    const$isDom: true,
+    $target: null,
+    $parent: null,
+    $eachFn: null,
+    $children: null,
+    $index: 0,
+    $key: 0,
+    $value: undefined,
+    $object: null,
+
+    $isFirst: false,
+    $isLast: false,
+
+    $_object: null,
+
+    $args: null,
+
+    /**
+     * ham khoi tao
+     * @param {*} arrObj data đầu vào
+     * @param 
+     */
+    constructor: function (arrObj, ...args) {
+        this._object = arrObj;
+        this.args = getArguments(arguments, 1);
+    },
+    __boot__: function () {
+        this.children = [];
+        this.el = document.createComment('For Loop Elememt');
+        this.object = [];
+    },
+    __init__: function () {
+
+    },
+    __destroy__: function () {
+        this.removeChild();
+    },
+    __setElement__: function setElement(params) {
+        // var args = getArguments(arguments);
+        // return __setElement__.apply(this, args);
+    },
+    
+    afterSet$parent: function (parent) {
+        this.render();
+    },
+
+    
+
+    render: function () {
+        this.removeChild();
+
+
+        let arrObj = null;
+        let mode = "null"
+        var objType = getType(this._object);
+        if(objType){
+            arrObj = this._object;
+            mode = "array";
+        }
+
+
+        if (isFunction(this.eachFn)) {
+            if (isObject(this.object)) {
+                var keys = objectKeys(this.object);
+                var length = keys.length;
+                var i = 0;
+                for (const key in this.object) {
+                    if (Object.hasOwnProperty.call(this.object, key)) {
+                        const value = this.object[key];
+                        this.value = value;
+                        this.key = key;
+                        this.index = i;
+                        this.isFirst = i == 0;
+                        this.isLast = i == length - 1;
+                        if (this.eachFn.length == 1) {
+                            this.addChild(this.eachFn.apply(this, [value]));
+                        } else if (this.eachFn.length == 2) {
+                            this.addChild(this.eachFn.apply(this, [key, value]));
+                        }
+                        i++;
+                    }
+                }
+            }
+            else if (isArray(this.object)) {
+                for (let index = 0; index < this.object.length; index++) {
+                    const value = this.object[index];
+                    this.key = key;
+                    this.index = index;
+                    this.isFirst = index == 0;
+                    this.isLast = index == this.object.length - 1;
+                    if (this.eachFn.length == 1) {
+                        this.addChild(this.eachFn.apply(this, [value]));
+                    } else if (this.eachFn.length == 2) {
+                        this.addChild(this.eachFn.apply(this, [key, value]));
+                    }
+                }
+            }
+        }
+    },
+
+    addChild: function (child) {
+        if (child) {
+            this.children.push(child);
+            if (this.parent) {
+                this.parent.before(child, this);
+            }
+        }
+    },
+
+    /**
+     * xóa phần tử con
+     * @param {Element|Dom|Dom|Dom.Query} child 
+     * @param {boolean} removeDomEl Xóa dom el
+     */
+    final$removeChild: function (child, removeDomEl) {
+        if (typeof removeDomEl == "undefined" || !isBoolean(removeDomEl) || child === true) removeDomEl = true;
+
+        if (child) {
+            var self = this;
+            let index = this.children.indexOf(child);
+            if (index != -1) {
+                this.children.splice(index, 1);
+                if (child.isDom) {
+                    child.remove(true);
+                    child.__destroy__();
+                }
+
+            }
+            else if (child instanceof Element) {
+                for (let i = 0; i < this.children.length; i++) {
+                    const c = this.children[i];
+                    if (c.el == child) {
+                        this.children.splice(i, 1);
+                        child.remove(true);
+                        child.__destroy__();
+                    }
+                }
+            }
+
+        }
+        else {
+            if (!isArray(this.children)) return this;
+            while (this.children.length > 0) {
+                let child = this.children.shift();
+                child.remove(true);
+                child.__destroy__();
+            }
+        }
+        return this;
+
+    },
+
+    /**
+     * Xóa
+     */
+    final$remove: function () {
+        var children = getArguments(arguments);
+        if (!children.length || (children.length == 1 && children[0] == true)) {
+            this.removeChild();
+            if (this.parent) {
+                this.parent.removeChild(this);
+            }
+            else if (this.el.parentNode) {
+                this.el.parentNode.removeChild(this.el);
+            }
+            if (children[0] == true) {
+                this.removeChild();
+            }
+
+        }
+        else if (children.length) {
+            var self = this;
+            children.map(function (child) {
+                self.removeChild(child);
+            });
+        }
+        return this;
+    }
+})
 
 
 const Loop = _class("Loop")({

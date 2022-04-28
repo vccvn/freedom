@@ -28,8 +28,10 @@ var AppComponent = Component.maker("AppComponent", {
                 onClick: "changeCount"
             }))
         ]);
+
         return _a;
     }
 });
 var app = AppComponent();
 document.body.appendChild(app.el);
+

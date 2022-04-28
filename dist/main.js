@@ -444,6 +444,7 @@ function addPendingData(_classCtx, data) {
 function BindingText(key) {
     this.key = String(key).trim();
     this.isBindingText = true;
+    this.type = 'self';
 }
 
 /**
@@ -516,9 +517,11 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             var vt = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getType */ .oL)(value);
             var valType = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(value) ? 'state' : vt;
             var $t = valType, $v = value;
-            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(value) && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNumber */ .hj)(value) && value.substr(0, 2) == '{{' && value.substr(value.length - 2) == '}}') {
-                $t = 'prop';
-                $v = value.substr(2, value.length - 4).trim();
+            // var $text = vt == 'string'?parseTextData()
+            var startlt = value.split("{{").length;
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(value) && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNumber */ .hj)(value) && startlt > 1 && startlt == value.split("}}").length) {
+                $t = 'proptext';
+                $v = value;
             }
 
             if (bindType == "sync") {
@@ -643,6 +646,8 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
         }
     },
+
+
     __boot__: function () {
         addDomClassData(this.__instance__id__, {});
         __set__.call(this, TRANSMISTION_LISTENNERS, {
@@ -668,7 +673,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
         __set__.call(this, SYNC_CHANGE, true)
         __set__.call(this, DATA_SYNC, true)
         __set__.call(this, COMPUTED_FUNCTS, {})
-        
+
 
 
         this.children = [];
@@ -692,7 +697,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             oneTimeData = {};
         }
         bootData.apply(this);
-        
+
         let bag = getDataBag(this.static);
         addBagData.apply(this, [bag]);
         ___assignDynamicProperties___.call(this);
@@ -892,8 +897,8 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
             const COMPUTED = __get__.call(this, COMPUTED_FUNCTS);
             var keys = Object.keys(COMPUTED);
-            
-            keys.map(function(k){
+
+            keys.map(function (k) {
                 var fn = COMPUTED[k];
                 var first = fn.call(self);
                 self[k] = first;
@@ -902,16 +907,15 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
 
             (0,_observer_js__WEBPACK_IMPORTED_MODULE_2__/* .observe */ .N7)(self);
-            console.log(Object.keys(self), keys)
-            Object.keys(self).map(function(k){
-                if(keys.indexOf(k) == -1){
-                    self.__ob__.subscribe(k, function(v){
-                        keys.map(function(_k){
+            Object.keys(self).map(function (k) {
+                if (keys.indexOf(k) == -1) {
+                    self.__ob__.subscribe(k, function (v) {
+                        keys.map(function (_k) {
                             var fn = COMPUTED[_k];
                             var vl = fn.call(self);
                             self[_k] = vl;
                         });
-            
+
                     })
                 }
             })
@@ -1776,6 +1780,8 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
     width: function (width) {
         return typeof width == "undefined" ? (this.el ? (this.el.clientWidth || this.el.offsetWidth) : 0) : this.css({ width: width });
     },
+
+
     /**
      * Thêm phần tử con vào cuối danh danh sách phần tử con của element
      * @param {*} child 
@@ -1922,19 +1928,29 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
         }
         else {
-            var ts = parseTextData(child);
+            var ts = parseTextData(self, child);
             if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(ts) && ts.length) {
                 ts.map(function (c) {
                     self.append(c);
                 })
                 return self;
             }
+            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(ts)) {
+                var textNode = document.createTextNode("");
+                this.el.appendChild(textNode);
+                this.children.push(textNode);
+                textNode.nodeValue = ts(text => textNode.nodeValue = text);
+                return self;
+
+            }
+
+
+
 
             var c = parse(child);
-            if (c) {
-                this.el.appendChild(c);
-                this.children.push(c);
-            }
+            this.el.appendChild(c);
+            this.children.push(c);
+
 
 
         }
@@ -2198,6 +2214,13 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
                     const c = ts[index];
                     self.prepend(c);
                 }
+                return self;
+            }
+            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(ts)) {
+                var textNode = document.createTextNode("");
+                this.el.insertBefore(textNode, this.el.firstChild);
+                this.children.unshift(textNode);
+                textNode.nodeValue = ts(text => textNode.nodeValue = text);
                 return self;
             }
 
@@ -2705,7 +2728,7 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
 
     static$toString: function () {
         var self = this;
-        return (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* .createInstance */ .Fs)(self,['#' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand()]);
+        return (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* .createInstance */ .Fs)(self, ['#' + _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.rand */ .W3.rand()]);
     },
     static$withParent: function (parent) {
         var self = this;
@@ -2738,8 +2761,8 @@ Dom = (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* ._class */ .nN)("Dom")({
             oneTimeData = {};
             oneTimeData[data] = args;
             return (0,_es5_class_js__WEBPACK_IMPORTED_MODULE_1__/* .createInstance */ .Fs)(self, arguments.length == 3 ? (
-                    (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(arguments[2]) ? arguments[2] : [arguments[2]]
-                ) : (arguments.length > 3 ? (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getArguments */ .Tu)(arguments, 2) : []));
+                (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(arguments[2]) ? arguments[2] : [arguments[2]]
+            ) : (arguments.length > 3 ? (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getArguments */ .Tu)(arguments, 2) : []));
         }
         return new self();
 
@@ -2807,7 +2830,7 @@ function __buildChildren__() {
     __set__.call(this, IS_BUILDED, true);
 }
 
-function addBagData(bag){
+function addBagData(bag) {
     let data = {};
     if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(bag)) {
         var computed = null;
@@ -2825,19 +2848,19 @@ function addBagData(bag){
                 else if (key == 'data') {
                     (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .assignValue */ .MP)(data, scopeData);
                 }
-                else if(key == 'computed' && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(scopeData)){
+                else if (key == 'computed' && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(scopeData)) {
                     computed = scopeData;
                 }
             }
         }
-        if((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(computed)){
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(computed)) {
             var self = this;
             var ckeys = Object.keys(computed);
             var COMPUTED = __get__.call(this, COMPUTED_FUNCTS);
             for (let index = 0; index < ckeys.length; index++) {
                 const key = ckeys[index];
                 var fn = computed[key];
-                if((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(fn)){
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(fn)) {
                     COMPUTED[key] = fn;
                 }
             }
@@ -3682,6 +3705,31 @@ function addOneWayBindingAttr(attr, value, type) {
 
             });
         }
+        else if (type == 'binding' || (type == 'prop' && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(value))) {
+            if (key == 'value') {
+                self.val(value(text => self.val(text)));
+
+            } else {
+                self.attr(value(text => self.attr(text)));
+            }
+        }
+        else if (type == 'proptext') {
+            var texts = parseTextData(self, value);
+            if((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(texts)){
+                if (key == 'value') {
+                    self.val(texts(text => self.val(text)));
+    
+                } else {
+                    self.attr(texts(text => self.attr(text)));
+                }
+            }
+            else if (key == 'value') {
+                self.val(value);
+
+            } else {
+                self.attr(value);
+            }
+        }
         else if (type == 'prop') {
             var vl = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getEl */ .Gn)(this, value);
             if (key == 'value') {
@@ -3692,6 +3740,7 @@ function addOneWayBindingAttr(attr, value, type) {
 
             if (value) {
                 var _key = value.split(".").shift();
+                // nếu không có __ob__ hoặc không tồn tại key và cũng ko có trong obj
                 if (!this.__ob__ || (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(this.__ob__.indexKeys, _key) && typeof this[_key] != "undefined")) {
                     var dbo = __get__.call(self, DOM_BASE_OBJECT);
                     if (dbo) {
@@ -3830,6 +3879,72 @@ function addTwoWayBindingAttr(attr, value, type) {
             })
 
         }
+        else if (type == 'binding' || (type == 'prop' && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(value))) {
+            var vld = null;
+            if (key == 'value') {
+                vld = value(text => {
+                    vld = text;
+                    if (PropChangeStatus[attrKey]) self.val(text);
+                });
+                self.val(vld);
+
+            } else {
+                vld = value(text => {
+                    vld = text;
+                    if (PropChangeStatus[attrKey]) self.attr(text);
+                });
+                self.attr(vld);
+            }
+
+            this.on("attribute.changed", function (event) {
+                var old = key == 'value' ? this.val() : this.attr(attr);
+                if (old != vld && PropChangeStatus[attrKey]) {
+                    vld = old;
+                    PropChangeStatus[attrKey] = false;
+                    (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .setEl */ .NR)(value._dboKeys.length ? dbo : self, vld, old);
+                    PropChangeStatus[attrKey] = true;
+                }
+            })
+
+        }
+        else if (type == 'proptext') {
+            var texts = parseTextData(self, value);
+            if((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(texts)){
+                var vld = null;
+                value = texts;
+                if (key == 'value') {
+                    vld = value(text => {
+                        vld = text;
+                        if (PropChangeStatus[attrKey]) self.val(text);
+                    });
+                    self.val(vld);
+    
+                } else {
+                    vld = value(text => {
+                        vld = text;
+                        if (PropChangeStatus[attrKey]) self.attr(text);
+                    });
+                    self.attr(vld);
+                }
+    
+                this.on("attribute.changed", function (event) {
+                    var old = key == 'value' ? this.val() : this.attr(attr);
+                    if (old != vld && PropChangeStatus[attrKey]) {
+                        vld = old;
+                        PropChangeStatus[attrKey] = false;
+                        (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .setEl */ .NR)(value._dboKeys.length ? dbo : self, vld, old);
+                        PropChangeStatus[attrKey] = true;
+                    }
+                })
+            }
+            else if (key == 'value') {
+                self.val(value);
+
+            } else {
+                self.attr(value);
+            }
+        }
+        
         else if (type == 'prop') {
             var vl = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getEl */ .Gn)(this, value);
             var vld = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(vl) ? vl.__toData__() : vl;
@@ -3841,7 +3956,22 @@ function addTwoWayBindingAttr(attr, value, type) {
             if (value) {
                 var _key = value.split(".").shift();
                 var dbo = __get__.call(self, DOM_BASE_OBJECT);
-                if (dbo) {
+                if (this.__ob__ && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(this.__ob__.indexKeys, _key)) {
+                    this.__ob__.subscribe(value, function (v) {
+
+                        vld = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(v) ? v.__toData__() : v;
+                        if (PropChangeStatus[attrKey]) {
+                            if (key == 'value') {
+                                self.val(vld)
+                            } else {
+                                self.attr(attr, vld);
+                            }
+
+                        }
+                    })
+                }
+
+                else if (dbo) {
                     if (!dbo.__ob__ || (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(dbo.__ob__.indexKeys, _key) && typeof dbo[_key] != "undefined")) {
 
                     } else {
@@ -3861,27 +3991,12 @@ function addTwoWayBindingAttr(attr, value, type) {
                     }
                 }
 
-                else if (this.__ob__ && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(this.__ob__.indexKeys, _key)) {
-                    this.__ob__.subscribe(value, function (v) {
-
-                        vld = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(v) ? v.__toData__() : v;
-                        if (PropChangeStatus[attrKey]) {
-                            if (key == 'value') {
-                                self.val(vld)
-                            } else {
-                                self.attr(attr, vld);
-                            }
-
-                        }
-                    })
-                }
-
                 this.on("attribute.changed", function (event) {
                     var old = key == 'value' ? this.val() : this.attr(attr);
                     if (old != vld && PropChangeStatus[attrKey]) {
                         vld = old;
                         PropChangeStatus[attrKey] = false;
-                        (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .setEl */ .NR)(dbo ? dbo : self, value, old);
+                        (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .setEl */ .NR)(dbo ? dbo : self, vld, old);
                         PropChangeStatus[attrKey] = true;
                     }
                 })
@@ -3975,7 +4090,6 @@ function create(tag, children, attributes) {
         ;
 
     function addAttrValue(k, vl) {
-
         var s = String(k).toLowerCase();
         var parts = s.split("$");
         var f = k.substring(0, 1);
@@ -3985,13 +4099,15 @@ function create(tag, children, attributes) {
         var vt = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getType */ .oL)(vl);
         var valType = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(vl) ? 'state' : vt;
         var $t = valType, $v = vl;
-        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(vl) && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNumber */ .hj)(vl) && vl.substr(0, 2) == '{{' && vl.substr(vl.length - 2) == '}}') {
+        var $text = (vt == 'string') ? parseTextData(vl) : null;
+        var isBindingText = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)($text);
+        if (vt == 'string' && !(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNumber */ .hj)(vl) && isBindingText && $text.texts.length == 1) {
             $t = 'prop';
-            $v = vl.substr(2, vl.length - 4).trim();
+            $v = $text;
         }
 
         if (f2 == '$$') {
-            twoWayBinding[s.substr(2)] = {
+            twoWayBinding[s.substring(2)] = {
                 type: $t,
                 value: $v
             };;
@@ -4043,7 +4159,7 @@ function create(tag, children, attributes) {
                 }
             }
         }
-        else if (k == 'parent' && (((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(vl) && vl.isDom) || vl instanceof Element)) {
+        else if (k == 'parent' && ((vt == 'object' && vl.isDom) || vl instanceof Element)) {
             parent = val;
 
         }
@@ -4065,13 +4181,13 @@ function create(tag, children, attributes) {
         else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
             // tagName = vl;
         }
-        else if (f2 == 'on' && isDomEvent(s.substr(2))) {
+        else if (f2 == 'on' && isDomEvent(s.substring(2))) {
             events[s.substr(2)] = vl;
         }
         else if (f == '@' && isDomEvent(n)) {
             events[n] = vl;
         }
-        else if (s == "on" && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(vl)) {
+        else if (s == "on" && vt == 'object') {
             for (const v in vl) {
                 if (Object.hasOwnProperty.call(vl, v)) {
                     const ev = vl[v];
@@ -4090,7 +4206,7 @@ function create(tag, children, attributes) {
                 contents.push(vl);
             }
         }
-        else if (typeof vl == "function") {
+        else if (vt == "function") {
             if (vl.isPrimitive) {
                 oneWayBinding[k] = {
                     type: $t,
@@ -4108,61 +4224,61 @@ function create(tag, children, attributes) {
 
 
         }
+        else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)($text)) {
+            oneWayBinding[k] = {
+                type: 'binding',
+                value: $text
+            };
+        }
 
         else {
             attrs[k] = vl;
         }
     }
-    if (((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag) && (tag.isQuery || tag.isDomQuery))) {
-        contents.push(tag);
-    }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag) && tag.isDom) {
-        contents.push(tag);
-    }
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag) && tag.isDomBag) {
-        contents.push(tag);
-    }
-
-    else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag)) {
-        for (var k in tag) {
-            if (tag.hasOwnProperty(k)) {
-                var vl = tag[k];
-                var s = String(k).toLowerCase();
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
-                    tagName = vl;
-                }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(["content", "children"], s)) {
-                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(vl)) {
-                        for (var j = 0; j < vl.length; j++) {
-                            let cnt = vl[j];
-                            let texts = parseTextData(cnt);
-                            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(texts) && texts.length) {
-                                texts.map(function (c) {
-                                    contents.push(c);
-                                })
-                            }
-                            else {
-                                contents.push(cnt);
-                            }
-
-                        }
-                    } else {
-                        let texts = parseTextData(vl);
+    var isTagObject = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(tag);
+    // kiểm tra tag xem có là query hay ko
+    if (isTagObject) {
+        if (tag.isQuery || tag.isDomQuery) contents.push(tag);
+        else if (tag.isDom) contents.push(tag);
+        else if (tag.isDomBag) contents.push(tag);
+        else (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .forEach */ .Ed)(tag, function (vl, k) {
+            var s = String(k).toLowerCase();
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
+                tagName = vl;
+            }
+            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(["content", "children"], s)) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(vl)) {
+                    for (var j = 0; j < vl.length; j++) {
+                        let cnt = vl[j];
+                        let texts = parseTextData(self, cnt);
                         if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(texts) && texts.length) {
                             texts.map(function (c) {
                                 contents.push(c);
                             })
                         }
+
                         else {
-                            contents.push(vl);
+                            contents.push(cnt);
                         }
                     }
-                }
-                else {
-                    addAttrValue(k, vl);
+                } else {
+                    let texts = parseTextData(self, vl);
+                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(texts) && texts.length) {
+                        texts.map(function (c) {
+                            contents.push(c);
+                        })
+                    }
+                    else {
+                        contents.push(vl);
+                    }
                 }
             }
-        }
+            else {
+                addAttrValue(k, vl);
+            }
+        });
+
+
     }
 
     else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(tag)) tagName = tag;
@@ -4190,7 +4306,7 @@ function create(tag, children, attributes) {
         }
         else if (aType == "string") {
             isTwoContent = 0;
-            let texts = parseTextData(arg);
+            let texts = parseTextData(self, arg);
             if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(texts) && texts.length) {
                 texts.map(function (c) {
                     contents.push(c);
@@ -4213,7 +4329,7 @@ function create(tag, children, attributes) {
                         contents.push(currentArg);
                     }
                     else {
-                        let texts = parseTextData(currentArg);
+                        let texts = parseTextData(self, currentArg);
                         if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(texts) && texts.length) {
                             texts.map(function (c) {
                                 contents.push(c);
@@ -4278,87 +4394,71 @@ function create(tag, children, attributes) {
 
         var csk, v;
         var css = {};
-        for (var prop in attrs) {
-            if (Object.prototype.hasOwnProperty.call(attrs, prop)) {
-                var val = attrs[prop];
-                var key = prop.toLowerCase();
-                var k = key;
-                var f = k.substring(0, 1);
-                var f2 = k.substring(0, 2);
-                var isEvent = domEvents.indexOf(key) >= 0;
-                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['tag', 'tagname'], s)) {
-                    // tagName = vl;
-                }
-                else if (f == '$' && ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(vl) || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isNumber */ .hj)(vl) || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getType */ .oL)(vl) == "boolean")) {
-                    oneWayBinding[k.substr(1)] = vl;
-                }
-                else if (key == "style") {
+        (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .forEach */ .Ed)(attrs, function (val, prop) {
+            var key = prop.toLowerCase();
+            var k = key;
+            var f = k.substring(0, 1);
+            var f2 = k.substring(0, 2);
+            var isEvent = domEvents.indexOf(key) >= 0;
+            if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['tag', 'tagname'], key)) {
+                // tagName = vl;
+            }
+            else if (f == '$' && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(['string', 'number', 'boolean'], (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getType */ .oL)(val))) {
+                twoWayBinding[k.substr(1)] = val;
+            }
+            else if (key == "style") {
+                if (typeof val == "object") {
+                    (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .forEach */ .Ed)(val, function (v, cssKey) {
+                        css[cssKey] = v;
+                    });
+                    (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .forEach */ .Ed)(css, function (cv, ck) {
+                        setCssProp(htmlObject, ck, cv);
+                    });
 
-                    if (typeof val == "object") {
-                        for (var cssKey in val) {
-                            if (Object.prototype.hasOwnProperty.call(val, cssKey)) {
-                                v = val[cssKey];
-                                css[cssKey] = v;
-                            }
-                        }
-
-                        for (var ck in css) {
-                            if (css.hasOwnProperty(ck)) {
-                                var cv = css[ck];
-                                // htmlObject.style[ck] = cv;
-                                // console.log(`htmlObject.style['${ck}'] = ${cv};`)
-                                setCssProp(htmlObject, ck, cv);
-                            }
-                        }
-                    } else {
-                        htmlObject.setAttribute(key, val);
-                    }
-                }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(val)) {
-                    if (val.isDom || val.isDomBag || val.isDomQuery || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(val, Element)) {
-                        if (key == 'parent' || key == '@parent' || key == '$parent') {
-                            parent = val;
-                        }
-                        else {
-                            this._pendingContents.push({ key: key, content: val });
-                        }
-
-                    }
-                    else if (val.constructor != Object) {
-                        this[key] = val;
-                    }
-                    else {
-                        var attrObj = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.convertTextObject */ .W3.convertTextObject({}, val, prop, '-');
-                        for (var ak in attrObj) {
-                            if (attrObj.hasOwnProperty(ak)) {
-                                var v = attrObj[ak];
-                                htmlObject.setAttribute(ak, v);
-                            }
-                        }
-                    }
-
-
-                }
-                else if (key == 'class' || key == 'classname') {
-                    htmlObject.className = val;
-                }
-                else if (typeof vl == "function") {
-                    methods[k] = vl;
-                }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isBoolean */ .jn)(val)) {
-                    if (val === false) {
-                        htmlObject.removeAttribute(key);
-
-                    } else {
-                        htmlObject.setAttribute(key, key);
-                    }
-                }
-                else if (key != "content" || isSimple) {
-                    var slug = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.camelToSlug */ .W3.camelToSlug(prop, '-');
-                    htmlObject.setAttribute(slug, val);
+                } else {
+                    htmlObject.setAttribute(key, val);
                 }
             }
-        }
+            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isObject */ .Kn)(val)) {
+                if (val.isDom || val.isDomBag || val.isDomQuery || (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* ._instanceof */ .lH)(val, Element)) {
+                    if (key == 'parent' || key == '@parent' || key == '$parent') {
+                        parent = val;
+                    }
+                    else {
+                        this._pendingContents.push({ key: key, content: val });
+                    }
+
+                }
+                else if (val.constructor != Object) {
+                    this[key] = val;
+                }
+                else {
+                    (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .forEach */ .Ed)(_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.convertTextObject */ .W3.convertTextObject({}, val, prop, '-'), function (v, ak) {
+                        htmlObject.setAttribute(ak, v);
+                    });
+                }
+
+
+            }
+            else if (key == 'class' || key == 'classname') {
+                htmlObject.className = val;
+            }
+            else if (typeof vl == "function") {
+                methods[k] = vl;
+            }
+            else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isBoolean */ .jn)(val)) {
+                if (val === false) {
+                    htmlObject.removeAttribute(key);
+
+                } else {
+                    htmlObject.setAttribute(key, key);
+                }
+            }
+            else if (key != "content" || isSimple) {
+                var slug = _utils_js__WEBPACK_IMPORTED_MODULE_3__/* .Str.camelToSlug */ .W3.camelToSlug(prop, '-');
+                htmlObject.setAttribute(slug, val);
+            }
+        })
     }
 
     if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isEmpty */ .xb)(props)) {
@@ -4437,17 +4537,19 @@ function create(tag, children, attributes) {
 
 }
 
-function parseTextData(str) {
+function parseTextData(context, str) {
     if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isString */ .HD)(str)) return str;
     var s = String(str);
 
     var a = /\{\{\s*[A-z0-9\._\$]+\s*\}\}/i.test(s);
     if (!a) return str;
-    var tests = [
+    var texts = [
         ""
     ];
     var n = 0;
-
+    var keys = [];
+    var dboKeys = [];
+    var dbo = __get__.call(context, DOM_BASE_OBJECT);
     var last = '';
     var isOpen = false;
     var currentKey = '';
@@ -4456,10 +4558,10 @@ function parseTextData(str) {
         if (isOpen) {
             if (c == '{') {
                 if (last == '{') {
-                    tests[n] += c;
+                    texts[n] += c;
                 }
                 else {
-                    tests[n] += '{{' + currentKey + c;
+                    texts[n] += '{{' + currentKey + c;
                     isOpen = false;
                     currentKey = '';
                 }
@@ -4467,16 +4569,30 @@ function parseTextData(str) {
             else if (c == '}') {
                 if (last == '}') {
                     n++;
-                    tests[n] = new BindingText(currentKey.trim());
+                    texts[n] = new BindingText(currentKey.trim());
+                    let fk = currentKey.split(".").shift();
+                    var y = false;
+                    if (context.__ob__ && context.__ob__.indexKeys.indexOf(fk) != -1) {
+                        if (keys.indexOf(currentKey) === -1) {
+                            keys.push(currentKey);
+                        }
+                        y = true;
+                    }
+                    else if (dbo && dbo.__ob__ && dbo.__ob__.indexKeys.indexOf(fk) != -1) {
+                        if (keys.indexOf(currentKey) === -1) {
+                            dboKeys.push(currentKey);
+                            texts[n].type = 'dbo';
+                        }
+                    }
                     currentKey = '';
                     n++;
                     last = '';
                     isOpen = false;
-                    if (i < s.length - 1) tests[n] = '';
+                    if (i < s.length - 1) texts[n] = '';
                 }
             }
             else if (last == '}') {
-                tests[n] += '{{' + currentKey + '}' + c;
+                texts[n] += '{{' + currentKey + '}' + c;
                 isOpen = false;
                 currentKey = '';
             }
@@ -4484,7 +4600,7 @@ function parseTextData(str) {
                 currentKey += c;
             }
             else {
-                tests[n] += '{{' + currentKey + c;
+                texts[n] += '{{' + currentKey + c;
                 isOpen = false;
                 currentKey = '';
             }
@@ -4492,17 +4608,83 @@ function parseTextData(str) {
         else if (c == '{') {
             if (last == '{') {
                 isOpen = true;
-                tests[n] = tests[n].substring(0, tests[n].length - 1);
+                texts[n] = texts[n].substring(0, texts[n].length - 1);
             }
             else {
-                tests[n] += c;
+                texts[n] += c;
             }
         } else {
-            tests[n] += c;
+            texts[n] += c;
         }
         if (!i || last != '') last = c;
     }
-    return tests;
+
+    if (keys.length || dboKeys.length) {
+        var fn = function (subscribe) {
+            var _text_ = '';
+            var getText = function () {
+                _text_ = '';
+                (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .forEach */ .Ed)(texts, function (value) {
+                    if (value instanceof BindingText) {
+                        let key = value.key;
+                        let text = '';
+                        if (value.type == 'dbo') {
+                            let v = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getEl */ .Gn)(dbo, key);
+                            text = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(v) ? v.__toData__() : v;
+                        } else {
+                            let v = (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .getEl */ .Gn)(context, key);
+                            text = (0,_state_js__WEBPACK_IMPORTED_MODULE_4__/* .isState */ .L)(v) ? v.__toData__() : v;
+                        }
+                        if(texts.length == 1) _text_ = text;
+                        else _text_ += text;
+
+                        
+
+
+                    } else {
+                        if(texts.length == 1)_text_ = value;
+                        else _text_ += value;
+                    }
+                });
+            }
+            getText();
+
+            if (subscribe && (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isFunction */ .mf)(subscribe)) {
+                (0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .forEach */ .Ed)(texts, function (value) {
+                    if (value instanceof BindingText) {
+                        let key = value.key;
+                        if (value.type == 'dbo') {
+                            dbo.__ob__.subscribe(key, function (v) {
+                                getText();
+                                subscribe(_text_);
+                            })
+                        } else {
+                            seo.__ob__.subscribe(key, function (v) {
+                                getText();
+                                subscribe(_text_);
+                            })
+                        }
+
+
+                    }
+                });
+            }
+            return _text_;
+        }
+        ;(0,_observer_js__WEBPACK_IMPORTED_MODULE_2__/* .defConst */ .o)(fn, 'isBindingFactory', true);
+        (0,_observer_js__WEBPACK_IMPORTED_MODULE_2__/* .defConst */ .o)(fn, 'texts', texts);
+        (0,_observer_js__WEBPACK_IMPORTED_MODULE_2__/* .defConst */ .o)(fn, '_dboKeys', dboKeys, {
+            enumerable: false,
+            configurable: false
+        });
+        (0,_observer_js__WEBPACK_IMPORTED_MODULE_2__/* .defConst */ .o)(fn, '_keys', keys, {
+            enumerable: false,
+            configurable: false
+        });
+        return fn;
+
+    }
+    return texts;
 }
 
 
@@ -4555,7 +4737,7 @@ var createEl = function createEl(tag, ...args) {
                 else if (s.substr(0, 1) == '@' && isDomEvent(s.substr(1))) {
                     events[s.substr(1)] = vl;
                 }
-                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(["content", "content", "children"], s)) {
+                else if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .inArray */ .d3)(["content", "content", "children", "child"], s)) {
                     if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_3__/* .isArray */ .kJ)(vl)) {
                         for (var j = 0; j < vl.length; j++) {
                             var cnt = vl[j];
@@ -7822,6 +8004,7 @@ function defineReactive$$1(obj, key, val, isState) {
 /* harmony export */   "yp": () => (/* binding */ destroyObject),
 /* harmony export */   "Ic": () => (/* binding */ EMPTY_VALUE),
 /* harmony export */   "FD": () => (/* binding */ emptyObject),
+/* harmony export */   "Ed": () => (/* binding */ forEach),
 /* harmony export */   "Tu": () => (/* binding */ getArguments),
 /* harmony export */   "Gn": () => (/* binding */ getEl),
 /* harmony export */   "X5": () => (/* binding */ getFirstValueInList),
@@ -10039,6 +10222,40 @@ var getFirstValueInList = function (list, key, checkFn) {
     }
     return val;
 };
+/**
+ * for each
+ * @param {*} obj doi tuong
+ * @param {function} callback hàm xử lý
+ * @returns array
+ */
+function forEach(obj, callback){
+    if(!obj) return [];
+    var foreachData = [];
+    var type = getType(obj);
+    if(inArray(['array', 'object'], type) && isFunction(callback)){
+        var isStop = false;
+        var stop = () => isStop = true;
+        if(isArray(obj)){
+            for (let index = 0; index < obj.length; index++) {
+                const value = obj[index];
+                const parseData = callback(value, index, stop);
+                if(isStop) break;
+                foreachData.push(parseData);
+            }
+        }
+        else{
+            var keys = Object.keys(obj);
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                const value = obj[key];
+                const parseData = callback(value, key, stop);
+                if(isStop) break;
+                foreachData.push(parseData);
+            }
+        }
+    }
+    return foreachData;
+}
 
 
 
@@ -10321,6 +10538,7 @@ __webpack_require__.d(__webpack_exports__, {
   "figure": () => (/* reexport */ figure),
   "font": () => (/* reexport */ font),
   "footer": () => (/* reexport */ footer),
+  "forEach": () => (/* reexport */ utils/* forEach */.Ed),
   "form": () => (/* reexport */ html_components_form),
   "frame": () => (/* reexport */ html_components_frame),
   "frameset": () => (/* reexport */ frameset),

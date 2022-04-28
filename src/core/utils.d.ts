@@ -378,3 +378,17 @@ declare function setEl(obj:any, key: string|number, value: any): any
  * @param key key thuộc tính
  */
 declare function getObjectMethod(obj:any, key: string): (...args:any[]) => any
+
+/**
+ * Foreach Mảng
+ * @param array mảng đầu vào
+ * @param callback Hàm xử lý
+ */
+ declare function forEach(array: Array<any>, callback: (value: any, index?:number, stop?:() => void) => any) : any[]
+
+ /**
+ * Foreach Object
+ * @param object mảng đầu vào
+ * @param callback Hàm xử lý
+ */
+declare function forEach(object: {[key:string]:any}, callback: (value: any, key?:string|number, stop?:() => void) => any) : any[]
