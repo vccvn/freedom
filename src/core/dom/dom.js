@@ -8,6 +8,7 @@ import {
   defConst,
   observe,
 } from '../observer.js';
+import { stringAnalysis } from '../string-analysis.js';
 import {
   _defineProperty,
   _instanceof,
@@ -327,13 +328,11 @@ function BindingText(key) {
  * Class Dom
  * @param {string} selector css selewctor of element
  * @param {Dom|Dom[]} children Dom con
- * @param {Object<key:value>} attributes thuộc tính
+ * @param {{[key:string]:any}} attributes thuộc tính
  */
 var Dom = function Dom(selector, children, attributes) {
     this.__instance__id__ = DEFAULT_VALUE;
 };
-
-
 
 function __set__(key, value) {
     setDomDataValue(this.__instance__id__, key, value);
@@ -354,8 +353,6 @@ Dom = _class("Dom")({
 
     $children: null,
     $parent: null,
-
-
 
     static$makeClass: function (name, props) {
         var wrapper = createClass(name).extends(this);
@@ -386,7 +383,8 @@ Dom = _class("Dom")({
             twoWayBinding: {},
             classes: [],
             classBinding: {},
-            styles: {}
+            styles: {},
+            inputs: {}
         };
         let p = {};
         function addData(key, value, bindType) {
@@ -400,7 +398,11 @@ Dom = _class("Dom")({
                 $v = value;
             }
 
-            if (bindType == "sync") {
+            if (bindType == "input") {
+                data.oneWayBinding[key] = value;
+            }
+
+            else if (bindType == "sync") {
                 data.twoWayBinding[key] = {
                     type: $t,
                     value: $v
@@ -457,6 +459,10 @@ Dom = _class("Dom")({
                         delete props[key];
                     }
                     else if (inArray(['sync', 'bind'], f)) {
+                        addData(fs[1], vl, f);
+                        delete props[key];
+                    }
+                    else if (inArray(['input', 'inp'], f)) {
                         addData(fs[1], vl, f);
                         delete props[key];
                     }
@@ -531,46 +537,47 @@ Dom = _class("Dom")({
             fromParent: {},
             fromSiblings: {},
             events: {}
-        })
-        __set__.call(this, TRANSMISTION_STATUS, true)
-        __set__.call(this, PENDING_CHILDREN, [])
-        __set__.call(this, PENDING_CONTENTS, [])
-        __set__.call(this, LISTENNERS, {})
-        __set__.call(this, DOM_LISTENNERS, [])
-        __set__.call(this, DATA_CONTAINERS, [])
-        __set__.call(this, FOREIGN_DATA, {})
-        __set__.call(this, PARENT_NODE, null)
-        __set__.call(this, SHOW, false)
-        __set__.call(this, MARK_COMMENT, null)
-        __set__.call(this, CAN_SET_CHILDREN, true)
-        __set__.call(this, DYNAMIC_ATTRS, {})
-        __set__.call(this, DATA_TYPES, {})
-        __set__.call(this, DATA_SUBSCRIBERS, {})
-        __set__.call(this, SYNC_CHANGE, true)
-        __set__.call(this, DATA_SYNC, true)
-        __set__.call(this, COMPUTED_FUNCTS, {})
+        });
+        __set__.call(this, TRANSMISTION_STATUS, true);
+        __set__.call(this, PENDING_CHILDREN, []);
+        __set__.call(this, PENDING_CONTENTS, []);
+        __set__.call(this, LISTENNERS, {});
+        __set__.call(this, DOM_LISTENNERS, []);
+        __set__.call(this, DATA_CONTAINERS, []);
+        __set__.call(this, FOREIGN_DATA, {});
+        __set__.call(this, PARENT_NODE, null);
+        __set__.call(this, SHOW, false);
+        __set__.call(this, MARK_COMMENT, null);
+        __set__.call(this, CAN_SET_CHILDREN, true);
+        __set__.call(this, DYNAMIC_ATTRS, {});
+        __set__.call(this, DATA_TYPES, {});
+        __set__.call(this, DATA_SUBSCRIBERS, {});
+        __set__.call(this, SYNC_CHANGE, true);
+        __set__.call(this, DATA_SYNC, true);
+        __set__.call(this, COMPUTED_FUNCTS, {});
 
 
 
         this.children = [];
 
         __set__.call(this, CAN_SET_CHILDREN, false);
-        if (oneTimeData && isObject(oneTimeData) && !isEmpty(oneTimeData)) {
-            for (const key in oneTimeData) {
-                if (Object.hasOwnProperty.call(oneTimeData, key)) {
-                    const value = oneTimeData[key];
-                    if (key == '__dom__base__object__') {
-                        if (value) {
-                            __set__.call(this, DOM_BASE_OBJECT, value);
-                        }
-                    } else {
-                        this[key] = value;
+        var otd = oneTimeData[this.static.__CLASS_ID__];
+        if (otd && isObject(otd) && !isEmpty(otd)) {
+            var keys = Object.keys(otd);
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                const value = otd[key];
+                if (key == '__dom__base__object__') {
+                    if (value) {
+                        __set__.call(this, DOM_BASE_OBJECT, value);
                     }
-
-
+                } else {
+                    this[key] = value;
+                    // console.log(value)
                 }
+
             }
-            oneTimeData = {};
+            oneTimeData[this.static.__CLASS_ID__] = {};
         }
         bootData.apply(this);
 
@@ -590,6 +597,9 @@ Dom = _class("Dom")({
         }
 
         this.__before__init__();
+        if (typeof this.beforeInit == "function") {
+            this.beforeInit();
+        }
         var self = this;
 
         if (typeof this.onInit == "function") {
@@ -607,6 +617,10 @@ Dom = _class("Dom")({
 
         if (typeof this.onAferInit == "function") {
             this.onAferInit();
+        }
+
+        if (typeof this.aferInit == "function") {
+            this.aferInit();
         }
 
 
@@ -769,7 +783,55 @@ Dom = _class("Dom")({
                 }).join('.') : 'dom-element'
             );
     },
+    parseMethodArgs: function (event, params) {
+        var args = [];
+        if (isArray(params)) {
+            for (let index = 0; index < params.length; index++) {
+                const p = params[index];
+                switch (p.type) {
+                    case 'function':
+                        args.push(this.__getInfinityMethod__(p.str).apply(this, this.parseMethodArgs(event, p.args)));
+                        break;
+                    case 'variable':
+                        if (inArray(['$event', '$e'], p.str.toLowerCase())) {
+                            args.push(event);
+                        }
+                        else {
+                            args.push(this.__getDataOrDBOData__(p.str));
+                        }
 
+                        break;
+
+
+                    default:
+                        args.push(p.str);
+                        break;
+                }
+            }
+        }
+        return args;
+    },
+
+    getHandlerActions: function (str) {
+        var actions = stringAnalysis(str);
+        var self = this;
+        var handlers = [];
+        for (let i = 0; i < actions.length; i++) {
+            const fnData = actions[i];
+            if (fnData.type == 'function') {
+                handlers.push({
+                    action: this.__getInfinityMethod__(fnData.str),
+                    args: fnData.args
+                });
+            }
+        }
+        return function (event) {
+            event.component = self;
+            handlers.map(handler => {
+                handler.action.apply(this, self.parseMethodArgs(event, handler.args));
+            })
+        }
+    },
 
     /**
      * chuẩn hóa hàn lắng nghe sự kiện
@@ -789,87 +851,7 @@ Dom = _class("Dom")({
             var instanceID = undefined;
 
 
-            var handleInfo = handler.split(".");
-            if (handleInfo.length == 2) {
-                instanceID = handleInfo[0];
-                handler = handleInfo[1];
-            }
-            var params = [];
-            var handleParams = handler.split(":");
-            if (handleParams.length == 2) {
-                handler = handleParams[0];
-                params = handleParams[1].split(",").map(function (s) { return s.trim(); });
-
-            }
-
-            var domBaseObject = __get__.call(this, DOM_BASE_OBJECT);
-            if (domBaseObject && typeof domBaseObject[handler] == "function") {
-                fnt = function (e) {
-                    // e.preventDefault();
-                    e.component = self;
-                    var args = [e];
-                    params.map(function (p) { args.push(p); });
-                    return domBaseObject[handler].apply(domBaseObject, args);
-
-                };
-            }
-            else if (this.parent && this.parent.isDom) {
-
-                if (!instanceID) {
-                    params.unshift(handler);
-                    var fn = self.getTreeMethod.apply(self, params);
-                    if (fn) {
-                        fnt = fn;
-                    }
-                    else fnt = function (e) {
-                        e.component = self;
-                    };
-                } else {
-                    fnt = function (e) {
-                        // e.preventDefault();
-                        e.component = self;
-                        var args = [e];
-
-                        params.map(function (p) { args.push(p); });
-                        if (!instanceID) {
-                            params.unshift(handler);
-                            var fn = self.getTreeMethod.apply(self, params);
-
-                            if (typeof fn == "function") {
-                                return fn.apply(self, args);
-                            }
-                        }
-
-                        if (typeof self[handler] == "function") {
-                            return self[handler].apply(self, args);
-                        } else {
-                            return self.callChildrenMethod(handler, args, instanceID);
-                        }
-                    };
-                }
-            }
-            else {
-                fnt = function (e) {
-                    // e.preventDefault();
-                    e.component = self;
-                    var args = [e];
-                    params.map(function (p) { args.push(p); });
-                    if (!instanceID) {
-                        params.unshift(handler);
-                        var fn = self.getTreeMethod.apply(self, params);
-
-                        if (typeof fn == "function") {
-                            return fn.apply(self, args);
-                        }
-                    }
-
-                    if (typeof self[handler] == "function") {
-                        return self[handler].apply(self, args);
-                    } else {
-                        return self.callChildrenMethod(handler, args, instanceID);
-                    }
-                };
-            }
+            fnt = this.getHandlerActions(handler);
 
         }
         else if (typeof handler == "function") {
@@ -1005,6 +987,7 @@ Dom = _class("Dom")({
         });
         return this;
     },
+
     hasEvent: function (event, listener) {
         return isDomEvent(event) ? hasEvent(this.el, event, listener) : this.hasEventListener(event, listener);
     },
@@ -1562,38 +1545,81 @@ Dom = _class("Dom")({
      * @param {*} child 
      * @returns {Dom}
      */
-    const$append: function (child) {
+    const$append: function (child, withKey, withValue, notSetParent) {
         if (typeof child == "undefined" || isNull(child) || simpleTags.indexOf(this.tagName) !== -1) return this;
         var self = this;
-        if (isFunction(child) && child.isDomClass) child = child('#inp-' + Str.rand());
+        if (isFunction(child) && child.isDomClass) {
+            if (withKey) {
+                if (isObject(withKey)) {
+                    child = child.width(withKey);
+                } else {
+                    var a = {};
+                    a[withKey] = withValue;
+                    child = child.width(a);
+                }
+            } else {
+                child = child('#inp-' + Str.rand());
+            }
+        }
+
         if (isArray(child)) {
             if (child.isDomComponentBag && child.Component) {
                 var __dom__base__object__ = __get__.call(this, DOM_BASE_OBJECT);
-                this.append(child.Component.with({
-                    parent: this,
-                    __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
-                }, child));
+                if (withKey) {
+                    var extra = {};
+                    if (isObject(withKey)) extra = withKey;
+                    else extra[withKey] = withValue;
+                    return this.append(child.Component.with(assignValue({
+                        parent: this,
+                        __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
+                    }, extra), child), false, false, true);
+                } else {
+                    return this.append(child.Component.with({
+                        parent: this,
+                        __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
+                    }, child), false, false, true);
+                }
+
                 return this;
             }
             for (var index = 0; index < child.length; index++) {
                 this.append(child[index]);
 
             }
-        } else if (isObject(child)) {
+        }
+
+        else if (isObject(child)) {
             if (child.isDom) {
-                child.parent = this;
+                if (notSetParent !== true) {
+                    child.parent = this;
+                }
+
                 this.el.appendChild(child.el);
                 this.children.push(child);
+                if (typeof child.becomeAChild == "function") {
+                    child.becomeAChild(this);
+                }
+                return child;
             }
             else if (child.isDomQuery) {
                 this.el.appendChild(child.el);
                 this.children.push(child);
+                if (typeof child.becomeAChild == "function") {
+                    child.becomeAChild(this);
+                }
+
+                return child
             }
             else if (child.isDomBag) {
                 let c = child.withParent(this);
                 __build__.call(c);
                 this.el.appendChild(c.el);
                 this.children.push(c);
+                if (typeof c.becomeAChild == "function") {
+                    c.becomeAChild(this);
+                }
+
+                return c;
             }
             else if (child.isQuery) {
                 child.map(function (el) {
@@ -1604,10 +1630,12 @@ Dom = _class("Dom")({
             else if (child instanceof Element) {
                 this.el.appendChild(child);
                 this.children.push(child);
+                return child;
             }
             else if (child instanceof Text) {
                 this.el.appendChild(child);
                 this.children.push(child);
+                return child;
             }
             else if ((child instanceof BindingText) || child.isBindingText) {
                 var key = child.key;
@@ -1617,48 +1645,26 @@ Dom = _class("Dom")({
                 this.children.push(text);
 
 
-                var _key = String(key).split(".").shift();
-                var vl = PENDING_CONTENTS;
-                var dbo = __get__.call(self, DOM_BASE_OBJECT);
 
-                if (dbo && !(!dbo.__ob__ || (!inArray(dbo.__ob__.indexKeys, _key) && typeof dbo[_key] != "undefined"))) {
-                    vl = getEl(dbo, key, PENDING_CONTENTS);
-                    if (vl != PENDING_CONTENTS) {
-                        vld = isState(vl) ? vl.__toData__() : vl;
-                        text.nodeValue = vld;
-                        if (dbo.__ob__) {
-                            dbo.__ob__.subscribe(key, function (v) {
-                                vld = isState(v) ? v.__toData__() : v;
-                                text.nodeValue = vld;
-                            })
-                        }
+                var vl = this.__getDataOrDBOData__(key, function (v) {
+                    vld = isState(v) ? v.__toData__() : v;
+                    text.nodeValue = vld;
+                });
+                text.nodeValue = vl;
 
-                    }
-                }
-                if (vl == PENDING_CONTENTS && (this.__ob__ && inArray(this.__ob__.indexKeys, _key))) {
-                    vl = getEl(dbo, key, PENDING_CONTENTS);
-                    if (vl != PENDING_CONTENTS) {
-                        vld = isState(vl) ? vl.__toData__() : vl;
-                        text.nodeValue = vld;
-                        if (this.__ob__) {
-                            this.__ob__.subscribe(key, function (v) {
-                                vld = isState(v) ? v.__toData__() : v;
-                                text.nodeValue = vld;
-                            })
-                        }
-
-                    }
-                }
+                return text;
             }
 
         }
         else if (child instanceof Element) {
             this.el.appendChild(child);
             this.children.push(child);
+            return child;
         }
         else if (child instanceof Text) {
             this.el.appendChild(child);
             this.children.push(child);
+            return child;
         }
         else if ((child instanceof BindingText) || child.isBindingText) {
             var key = child.key;
@@ -1668,39 +1674,13 @@ Dom = _class("Dom")({
             this.children.push(text);
 
 
-            var _key = String(key).split(".").shift();
-            var vl = PENDING_CONTENTS;
-            var dbo = __get__.call(self, DOM_BASE_OBJECT);
+            var vl = this.__getDataOrDBOData__(key, function (v) {
+                vld = isState(v) ? v.__toData__() : v;
+                text.nodeValue = vld;
+            });
+            text.nodeValue = vl;
 
-            if (dbo && !(!dbo.__ob__ || (!inArray(dbo.__ob__.indexKeys, _key) && typeof dbo[_key] != "undefined"))) {
-                vl = getEl(dbo, key, PENDING_CONTENTS);
-                if (vl != PENDING_CONTENTS) {
-                    vld = isState(vl) ? vl.__toData__() : vl;
-                    text.nodeValue = vld;
-                    if (dbo.__ob__) {
-                        dbo.__ob__.subscribe(key, function (v) {
-                            vld = isState(v) ? v.__toData__() : v;
-                            text.nodeValue = vld;
-                        })
-                    }
-
-                }
-            }
-            if (vl == PENDING_CONTENTS && (this.__ob__ && inArray(this.__ob__.indexKeys, _key))) {
-                vl = getEl(dbo, key, PENDING_CONTENTS);
-                if (vl != PENDING_CONTENTS) {
-                    vld = isState(vl) ? vl.__toData__() : vl;
-                    text.nodeValue = vld;
-                    if (this.__ob__) {
-                        this.__ob__.subscribe(key, function (v) {
-                            vld = isState(v) ? v.__toData__() : v;
-                            text.nodeValue = vld;
-                        })
-                    }
-
-                }
-            }
-
+            return text;
         }
         else {
             var ts = parseTextData(self, child);
@@ -1715,17 +1695,15 @@ Dom = _class("Dom")({
                 this.el.appendChild(textNode);
                 this.children.push(textNode);
                 textNode.nodeValue = ts(text => textNode.nodeValue = text);
-                return self;
+                return text;
 
             }
-
-
 
 
             var c = parse(child);
             this.el.appendChild(c);
             this.children.push(c);
-
+            return c;
 
 
         }
@@ -1737,23 +1715,50 @@ Dom = _class("Dom")({
      * @param {*} child 
      * @returns {Query|Dom}
      */
-    const$before: function (child, childTarget) {
+    const$before: function (child, childTarget, withKey, withValue, notSetParent) {
+        if (typeof child == "undefined" || isNull(child) || simpleTags.indexOf(this.tagName) !== -1 || !childTarget) return this;
+        // console.log(child, childTarget, withKey, withValue, notSetParent);
         if (isArray(child)) {
             if (child.isDomComponentBag && child.Component) {
                 var __dom__base__object__ = __get__.call(this, DOM_BASE_OBJECT);
-                this.before(child.Component.with({
-                    parent: this,
-                    __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
-                }, child), childTarget);
-                return this;
+
+                if (withKey) {
+                    var extra = {};
+                    if (isObject(withKey)) extra = withKey;
+                    else extra[withKey] = withValue;
+                    return this.before(child.Component.with(assignValue({
+                        parent: this,
+                        __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
+                    }, extra), child), childTarget, false, false, true);
+                } else {
+                    return this.before(child.Component.with({
+                        parent: this,
+                        __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
+                    }, child), childTarget, false, false, true);
+                }
+
             }
         }
-        if (typeof child == "undefined" || isNull(child) || simpleTags.indexOf(this.tagName) !== -1 || !childTarget) return this;
         let index = 0;
         var target = null;
         var self = this;
-        if (isFunction(child) && child.isDomClass) child = child('#inp-' + Str.rand());
+        if (isFunction(child) && child.isDomClass) {
+            if (withKey) {
+                if (isObject(withKey)) {
+                    child = child.width(withKey);
+                } else {
+                    var a = {};
+                    a[withKey] = withValue;
+                    child = child.width(a);
+                }
+            } else {
+                child = child('#inp-' + Str.rand());
+            }
+        }
+
+
         var i = this.children.indexOf(childTarget);
+        // console.log(childTarget, i)
         if (i !== -1) {
             index = i;
             target = childTarget.isDom ? childTarget.el : childTarget;
@@ -1771,19 +1776,30 @@ Dom = _class("Dom")({
         if (isObject(child)) {
             if (target) {
                 if (child.isDom) {
-                    child.parent = self;
+                    if (notSetParent !== true) child.parent = self;
                     this.children.splice(index, 0, child);
                     this.el.insertBefore(child.el, target);
+                    if (typeof child.becomeAChild == "function") {
+                        child.becomeAChild(this);
+                    }
+
+                    return child;
                 }
                 else if (child.isDomBag) {
                     let c = child.withParent(this);
                     __build__.call(c);
                     this.children.splice(index, 0, c);
                     this.el.insertBefore(c.el, target);
+                    if (typeof c.becomeAChild == "function") {
+                        c.becomeAChild(this);
+                    }
+
+                    return c;
                 }
                 else if (child instanceof Element) {
                     this.children.splice(index, 0, child);
                     this.el.insertBefore(child, target);
+                    return child;
                 }
                 else if ((child instanceof BindingText) || child.isBindingText) {
                     var key = child.key;
@@ -1794,39 +1810,13 @@ Dom = _class("Dom")({
                     this.el.insertBefore(text, target);
 
 
-                    var _key = String(key).split(".").shift();
-                    var vl = PENDING_CONTENTS;
-                    var dbo = __get__.call(self, DOM_BASE_OBJECT);
+                    var vl = this.__getDataOrDBOData__(key, function (v) {
+                        vld = isState(v) ? v.__toData__() : v;
+                        text.nodeValue = vld;
+                    });
+                    text.nodeValue = vl;
 
-                    if (dbo && !(!dbo.__ob__ || (!inArray(dbo.__ob__.indexKeys, _key) && typeof dbo[_key] != "undefined"))) {
-                        vl = getEl(dbo, key, PENDING_CONTENTS);
-                        if (vl != PENDING_CONTENTS) {
-                            vld = isState(vl) ? vl.__toData__() : vl;
-                            text.nodeValue = vld;
-                            if (dbo.__ob__) {
-                                dbo.__ob__.subscribe(key, function (v) {
-                                    vld = isState(v) ? v.__toData__() : v;
-                                    text.nodeValue = vld;
-                                })
-                            }
-
-                        }
-                    }
-                    if (vl == PENDING_CONTENTS && (this.__ob__ && inArray(this.__ob__.indexKeys, _key))) {
-                        vl = getEl(dbo, key, PENDING_CONTENTS);
-                        if (vl != PENDING_CONTENTS) {
-                            vld = isState(vl) ? vl.__toData__() : vl;
-                            text.nodeValue = vld;
-                            if (this.__ob__) {
-                                this.__ob__.subscribe(key, function (v) {
-                                    vld = isState(v) ? v.__toData__() : v;
-                                    text.nodeValue = vld;
-                                })
-                            }
-
-                        }
-                    }
-
+                    return text;
                 }
 
             }
@@ -1834,16 +1824,19 @@ Dom = _class("Dom")({
                 child.parent = self;
                 this.children.unshift(child);
                 this.el.insertBefore(child.el, this.el.firstChild);
+                return child;
             }
             else if (child.isDomBag) {
                 let c = child.withParent(this);
                 __build__.call(c);
                 this.el.insertBefore(child.el, this.el.firstChild);
                 this.children.unshift(child);
+                return c;
             }
             else if (child instanceof Element) {
                 this.el.insertBefore(child, this.el.firstChild);
                 this.children.unshift(child);
+                return child;
             }
             else if ((child instanceof BindingText) || child.isBindingText) {
                 var key = child.key;
@@ -1851,43 +1844,16 @@ Dom = _class("Dom")({
 
                 var vld = key;
                 var text = document.createTextNode(vld);
-                this.el.insertBefore(text, this.el.firstChild);
-                this.children.unshift(text);
+                this.children.splice(index, 0, text);
+                this.el.insertBefore(text, target);
 
+                var vl = this.__getDataOrDBOData__(key, function (v) {
+                    vld = isState(v) ? v.__toData__() : v;
+                    text.nodeValue = vld;
+                });
+                text.nodeValue = vl;
 
-                var _key = String(key).split(".").shift();
-                var vl = PENDING_CONTENTS;
-                var dbo = __get__.call(self, DOM_BASE_OBJECT);
-
-                if (dbo && !(!dbo.__ob__ || (!inArray(dbo.__ob__.indexKeys, _key) && typeof dbo[_key] != "undefined"))) {
-                    vl = getEl(dbo, key, PENDING_CONTENTS);
-                    if (vl != PENDING_CONTENTS) {
-                        vld = isState(vl) ? vl.__toData__() : vl;
-                        text.nodeValue = vld;
-                        if (dbo.__ob__) {
-                            dbo.__ob__.subscribe(key, function (v) {
-                                vld = isState(v) ? v.__toData__() : v;
-                                text.nodeValue = vld;
-                            })
-                        }
-
-                    }
-                }
-                if (vl == PENDING_CONTENTS && (this.__ob__ && inArray(this.__ob__.indexKeys, _key))) {
-                    vl = getEl(dbo, key, PENDING_CONTENTS);
-                    if (vl != PENDING_CONTENTS) {
-                        vld = isState(vl) ? vl.__toData__() : vl;
-                        text.nodeValue = vld;
-                        if (this.__ob__) {
-                            this.__ob__.subscribe(key, function (v) {
-                                vld = isState(v) ? v.__toData__() : v;
-                                text.nodeValue = vld;
-                            })
-                        }
-
-                    }
-                }
-
+                return text;
             }
         }
         return this;
@@ -1897,36 +1863,71 @@ Dom = _class("Dom")({
      * @param {*} child 
      * @returns {Query|Dom}
      */
-    const$prepend: function (child) {
+    const$prepend: function (child, withKey, withValue, notSetParent) {
         if (typeof child == "undefined" || isNull(child) || simpleTags.indexOf(this.tagName) !== -1) return this;
         if (isArray(child)) {
             if (child.isDomComponentBag && child.Component) {
                 var __dom__base__object__ = __get__.call(this, DOM_BASE_OBJECT);
-                this.prepend(child.Component.with({
-                    parent: this,
-                    __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
-                }, child));
+
+                if (withKey) {
+                    var extra = {};
+                    if (isObject(withKey)) extra = withKey;
+                    else extra[withKey] = withValue;
+                    return this.prepend(child.Component.with(assignValue({
+                        parent: this,
+                        __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
+                    }, extra), child), false, false, true);
+                } else {
+                    return this.prepend(child.Component.with({
+                        parent: this,
+                        __dom__base__object__: __dom__base__object__ ? __dom__base__object__ : this
+                    }, child), false, false, true);
+                }
+
                 return this;
+
+
             }
         }
         var self = this;
-        if (isFunction(child) && child.isDomClass) child = child('#inp-' + Str.rand());
+        if (isFunction(child) && child.isDomClass) {
+            if (withKey) {
+                if (isObject(withKey)) {
+                    child = child.width(withKey);
+                } else {
+                    var a = {};
+                    a[withKey] = withValue;
+                    child = child.width(a);
+                }
+            } else {
+                child = child('#inp-' + Str.rand());
+            }
+        }
 
         if (isObject(child)) {
             if (child.isDom) {
-                child.parent = self;
+                if (!notSetParent) child.parent = self;
                 this.children.unshift(child);
                 this.el.insertBefore(child.el, this.el.firstChild);
+                if (typeof child.becomeAChild == "function") {
+                    child.becomeAChild(this);
+                }
+                return child;
             }
             else if (child.isDomBag) {
                 let c = child.withParent(this);
                 __build__.call(c);
                 this.el.insertBefore(child.el, this.el.firstChild);
                 this.children.unshift(child);
+                if (typeof c.becomeAChild == "function") {
+                    c.becomeAChild(this);
+                }
+                return c;
             }
             else if (child.isDomQuery) {
                 this.el.insertBefore(child.el, this.el.firstChild);
                 this.children.unshift(child);
+                return child;
             }
             else if (child.isQuery) {
                 for (var index = child.length - 1; index > -1; index--) {
@@ -1938,6 +1939,7 @@ Dom = _class("Dom")({
             else if (child instanceof Element) {
                 this.el.insertBefore(child, this.el.firstChild);
                 this.children.unshift(child);
+                return child;
             }
             else if ((child instanceof BindingText) || child.isBindingText) {
                 var key = child.key;
@@ -1948,38 +1950,14 @@ Dom = _class("Dom")({
                 this.children.unshift(text);
 
 
-                var _key = String(key).split(".").shift();
-                var vl = PENDING_CONTENTS;
-                var dbo = __get__.call(self, DOM_BASE_OBJECT);
+                var vl = this.__getDataOrDBOData__(key, function (v) {
+                    vld = isState(v) ? v.__toData__() : v;
+                    text.nodeValue = vld;
+                });
+                text.nodeValue = vl;
 
-                if (dbo && !(!dbo.__ob__ || (!inArray(dbo.__ob__.indexKeys, _key) && typeof dbo[_key] != "undefined"))) {
-                    vl = getEl(dbo, key, PENDING_CONTENTS);
-                    if (vl != PENDING_CONTENTS) {
-                        vld = isState(vl) ? vl.__toData__() : vl;
-                        text.nodeValue = vld;
-                        if (dbo.__ob__) {
-                            dbo.__ob__.subscribe(key, function (v) {
-                                vld = isState(v) ? v.__toData__() : v;
-                                text.nodeValue = vld;
-                            })
-                        }
 
-                    }
-                }
-                if (vl == PENDING_CONTENTS && (this.__ob__ && inArray(this.__ob__.indexKeys, _key))) {
-                    vl = getEl(dbo, key, PENDING_CONTENTS);
-                    if (vl != PENDING_CONTENTS) {
-                        vld = isState(vl) ? vl.__toData__() : vl;
-                        text.nodeValue = vld;
-                        if (this.__ob__) {
-                            this.__ob__.subscribe(key, function (v) {
-                                vld = isState(v) ? v.__toData__() : v;
-                                text.nodeValue = vld;
-                            })
-                        }
-
-                    }
-                }
+                return text;
             }
 
         } else {
@@ -1996,12 +1974,13 @@ Dom = _class("Dom")({
                 this.el.insertBefore(textNode, this.el.firstChild);
                 this.children.unshift(textNode);
                 textNode.nodeValue = ts(text => textNode.nodeValue = text);
-                return self;
+                return textNode;
             }
 
             var c = parse(child);
             this.el.insertBefore(c, this.el.firstChild);
             this.children.unshift(c);
+            return c;
         }
 
         return this;
@@ -2067,11 +2046,21 @@ Dom = _class("Dom")({
         }
         return false;
     },
+    hasNodeChild: function (child) {
+        if (this.el.childNodes.length) {
+            for (var index = 0; index < this.el.childNodes.length; index++) {
+                var chl = this.el.childNodes[index];
+                if (chl === child) return true;
+            }
+        }
+        return false;
+    },
 
     removeDomChild: function (child) {
-        if (this.hasDomChild(child)) {
+        if (this.hasDomChild(child) || this.hasNodeChild(child)) {
             this.el.removeChild(child);
         }
+
     },
 
 
@@ -2145,7 +2134,7 @@ Dom = _class("Dom")({
             });
         }
         else if (this.parent) {
-            this.parent.removeChild(this);
+            this.parent.removeChild(this, true);
         }
         else if (this.el.parentNode) {
             this.el.parentNode.removeChild(this.el);
@@ -2493,12 +2482,165 @@ Dom = _class("Dom")({
 
             if (s !== false) {
                 __set__.call(this, PARENT_NODE, parent.el);
-                if (typeof this.becomeAChild == "function") {
-                    this.becomeAChild(parent);
-                }
+
             }
         }
 
+    },
+
+    final$__getInfinityMethod__: function (keys) {
+        var _key = keys.split(".").shift();
+        var mr = keys.split(".");
+        var self = this;
+        var fn = typeof successOrChange == "function" ? successOrChange : function (v) {
+            console.log.apply(console, arguments);
+        };
+
+        if (mr.length > 1) {
+            var mt = mr.pop();
+            var fk = mr.join(".");
+            if (typeof this[_key] == "undefined") {
+                var dbo = __get__.call(self, DOM_BASE_OBJECT);
+                if (dbo) {
+                    if (typeof dbo[_key] == "undefined") {
+                        if (this.parent) {
+                            return this.parent.__getInfinityMethod__(keys);
+                        }
+                    } else {
+                        var ob = getEl(dbo, fk);
+                        if (isObject(ob) && typeof ob[mt] == "undefined") {
+                            return function () {
+                                var args = getArguments(arguments);
+                                ob[mt].apply(ob, args);
+                            }
+                        } else if (this.parent) {
+                            if (this.parent) {
+                                return this.parent.__getInfinityMethod__(keys);
+                            }
+                        }
+                    }
+                } else if (this.parent) {
+                    return this.parent.__getInfinityMethod__(keys);
+                }
+                var ob = getEl(window, fk);
+                if (isObject(ob) && typeof ob[mt] == "undefined") {
+                    return function () {
+                        var args = getArguments(arguments);
+                        ob[mt].apply(ob, args);
+                    }
+                }
+                return fn;
+            }
+            else {
+                var ob = getEl(this, fk);
+                if (isObject(ob) && typeof ob[mt] == "undefined") {
+                    return function () {
+                        var args = getArguments(arguments);
+                        ob[mt].apply(ob, args);
+                    }
+                }
+            }
+            return fn;
+        }
+        // nếu không có __ob__ hoặc không tồn tại key và cũng ko có trong obj
+
+        if (typeof this[_key] == "undefined") {
+            var dbo = __get__.call(self, DOM_BASE_OBJECT);
+            if (dbo) {
+                if (typeof dbo[_key] != "function") {
+                    if (this.parent) {
+                        return this.parent.__getInfinityMethod__(keys);
+                    }
+                } else {
+                    return function () {
+                        var args = getArguments(arguments);
+                        dbo[_key].apply(dbo, args);
+                    }
+                }
+            } else if (this.parent) {
+                return this.parent.__getInfinityMethod__(keys);
+            }
+            else if (typeof window[_key] == "function") {
+                return function () {
+                    var args = getArguments(arguments);
+                    window[_key].apply(window, args);
+                }
+            }
+            return null;
+        }
+
+        return function () {
+            var args = getArguments(arguments);
+            self[_key].apply(self, args);
+        }
+
+    },
+    final$__getDataOrDBOData__: function (keys, successOrChange) {
+        var _key = keys.split(".").shift();
+        var self = this;
+        // nếu không có __ob__ hoặc không tồn tại key và cũng ko có trong obj
+        var fn = typeof successOrChange == "function" ? successOrChange : function (v) {
+            // console.log(v);
+        };
+
+        if (!this.__ob__ || (!inArray(this.__ob__.indexKeys, _key) && typeof this[_key] == "undefined")) {
+            var dbo = __get__.call(self, DOM_BASE_OBJECT);
+            if (dbo) {
+                dbo.__ob__.subscribe(keys, function (v) {
+                    fn(getEl(dbo, keys));
+                });
+                if (!dbo.__ob__ || (!inArray(dbo.__ob__.indexKeys, _key) && typeof dbo[_key] == "undefined")) {
+                    if (this.parent) {
+                        return this.parent.__getDataOrDBOData__(keys, successOrChange);
+                    }
+                } else {
+                    return getEl(dbo, keys);
+                }
+            } else if (this.parent) {
+                return this.parent.__getDataOrDBOData__(keys, successOrChange);
+            }
+            return null;
+        }
+        else if (this.__ob__) {
+            this.__ob__.subscribe(keys, function (v) {
+                fn(getEl(self, keys));
+            });
+            return getEl(this, keys);
+        }
+        return null;
+    },
+
+    final$__onDataChange__: function (keys, success) {
+        var _key = keys.split(".").shift();
+        var self = this;
+        // nếu không có __ob__ hoặc không tồn tại key và cũng ko có trong obj
+        var fn = typeof success == "function" ? success : function (v) {
+            console.log(v);
+        };
+
+        if (!this.__ob__ || (!inArray(this.__ob__.indexKeys, _key) && typeof this[_key] == "undefined")) {
+            var dbo = __get__.call(self, DOM_BASE_OBJECT);
+            if (dbo) {
+                dbo.__ob__.subscribe(keys, function (v) {
+                    fn(getEl(dbo, keys));
+                });
+                if (!dbo.__ob__ || (!inArray(dbo.__ob__.indexKeys, _key) && typeof dbo[_key] == "undefined")) {
+                    if (this.parent) {
+                        return this.parent.__onDataChange__(keys, success);
+                    }
+                }
+            } else if (this.parent) {
+                return this.parent.__onDataChange__(keys, success);
+            }
+            return null;
+        }
+        else if (this.__ob__) {
+            this.__ob__.subscribe(keys, function (v) {
+                fn(getEl(self, keys));
+            })
+
+        }
+        return null;
     },
 
     static$toString: function () {
@@ -2527,25 +2669,22 @@ Dom = _class("Dom")({
     },
     static$with: function (data, args) {
         var self = this;
+        oneTimeData[self.__CLASS_ID__] = {};
         if (isObject(data)) {
-            oneTimeData = {};
-            assignValue(oneTimeData, data);
+
+            assignValue(oneTimeData[self.__CLASS_ID__], data);
             return createInstance(self, isArray(args) ? args : []);
         }
         if (isString(data)) {
-            oneTimeData = {};
-            oneTimeData[data] = args;
+            oneTimeData[self.__CLASS_ID__][data] = args;
             return createInstance(self, arguments.length == 3 ? (
                 isArray(arguments[2]) ? arguments[2] : [arguments[2]]
             ) : (arguments.length > 3 ? getArguments(arguments, 2) : []));
         }
         return new self();
-
-
     }
-
-
 });
+
 function __setElement__(params) {
     var args = getArguments(arguments);
     if (args.length && typeof args[0] != "string") {
@@ -3594,10 +3733,10 @@ function addOneWayBindingAttr(attr, value, type) {
         }
         else if (type == 'proptext') {
             var texts = parseTextData(self, value);
-            if(isFunction(texts)){
+            if (isFunction(texts)) {
                 if (key == 'value') {
                     self.val(texts(text => self.val(text)));
-    
+
                 } else {
                     self.attr(texts(text => self.attr(text)));
                 }
@@ -3788,7 +3927,7 @@ function addTwoWayBindingAttr(attr, value, type) {
         }
         else if (type == 'proptext') {
             var texts = parseTextData(self, value);
-            if(isFunction(texts)){
+            if (isFunction(texts)) {
                 var vld = null;
                 value = texts;
                 if (key == 'value') {
@@ -3797,7 +3936,7 @@ function addTwoWayBindingAttr(attr, value, type) {
                         if (PropChangeStatus[attrKey]) self.val(text);
                     });
                     self.val(vld);
-    
+
                 } else {
                     vld = value(text => {
                         vld = text;
@@ -3805,7 +3944,7 @@ function addTwoWayBindingAttr(attr, value, type) {
                     });
                     self.attr(vld);
                 }
-    
+
                 this.on("attribute.changed", function (event) {
                     var old = key == 'value' ? this.val() : this.attr(attr);
                     if (old != vld && PropChangeStatus[attrKey]) {
@@ -3823,7 +3962,7 @@ function addTwoWayBindingAttr(attr, value, type) {
                 self.attr(value);
             }
         }
-        
+
         else if (type == 'prop') {
             var vl = getEl(this, value);
             var vld = isState(vl) ? vl.__toData__() : vl;
@@ -4508,20 +4647,20 @@ function parseTextData(context, str) {
                         let key = value.key;
                         let text = '';
                         if (value.type == 'dbo') {
-                            let v = getEl(dbo, key);
+                            let v = dbo.__getDataOrDBOData__(key);
                             text = isState(v) ? v.__toData__() : v;
                         } else {
-                            let v = getEl(context, key);
+                            let v = context.__getDataOrDBOData__(key);
                             text = isState(v) ? v.__toData__() : v;
                         }
-                        if(texts.length == 1) _text_ = text;
+                        if (texts.length == 1) _text_ = text;
                         else _text_ += text;
 
-                        
+
 
 
                     } else {
-                        if(texts.length == 1)_text_ = value;
+                        if (texts.length == 1) _text_ = value;
                         else _text_ += value;
                     }
                 });
@@ -4533,12 +4672,12 @@ function parseTextData(context, str) {
                     if (value instanceof BindingText) {
                         let key = value.key;
                         if (value.type == 'dbo') {
-                            dbo.__ob__.subscribe(key, function (v) {
+                            dbo.__onDataChange__(key, function (v) {
                                 getText();
                                 subscribe(_text_);
                             })
                         } else {
-                            seo.__ob__.subscribe(key, function (v) {
+                            context.__onDataChange__(key, function (v) {
                                 getText();
                                 subscribe(_text_);
                             })
@@ -4562,6 +4701,9 @@ function parseTextData(context, str) {
         });
         return fn;
 
+    }
+    if (texts[0] == '') {
+        texts.shift();
     }
     return texts;
 }
@@ -4852,6 +4994,10 @@ var createEl = function createEl(tag, ...args) {
  */
 function parse(str) {
     var div = document.createElement('div');
+    if (!str) {
+        var a = document.createTextNode(str);
+        return a;
+    }
     if ((str instanceof Element)) return str;
     else if (typeof str == "object" && !isNull(str)) {
         if (isQuery(str)) {
@@ -5357,19 +5503,19 @@ function isQuery(obj) {
     return false;
 }
 
-function parseEventHandlerString(str){
+function parseEventHandlerString(str) {
     var actions = [];
     var isOpenFunc = false;
     var isInFunctionName = false;
     var stringType = "", stringOpen = false;
-    if(!isString(str)) return [];
+    if (!isString(str)) return [];
     var t = str.length;
     for (let index = 0; index < t; index++) {
         const c = str[index];
-        if(!isInFunctionName){
-            
+        if (!isInFunctionName) {
+
         }
-        
+
     }
 }
 
@@ -5382,6 +5528,7 @@ export {
   create,
   createEl,
   Dom,
+  DOM_BASE_OBJECT,
   domEvents,
   getDomInf,
   htmlTags,

@@ -1511,14 +1511,14 @@ const assignValue = function (target, key, value) {
     else if ((isString(key) || isNumber(key)) && String(key).length) {
         let sk = String(key);
         let ak = key;
-        if (String(key).substr(0, 1) == '@') {
-            var f = sk.substr(1);
+        if (String(key).substring(0, 1) == '@') {
+            var f = sk.substring(1);
             if (typeof target[f] == "function") {
                 target[f].apply(target, isArray(value) ? value : [value]);
             }
         }
         else if (isObject(value)) {
-            if (value.constructor == Object) {
+            if (value.constructor == Object && !value.__ob__) {
                 if (typeof target[ak] != "object") target[ak] = {};
                 assignValue(target[ak], value);
             }
@@ -1526,7 +1526,7 @@ const assignValue = function (target, key, value) {
                 target[ak] = value;
             }
         }
-        else if (isArray(value)) {
+        else if (isArray(value) && !value.__ob__) {
             if (typeof target[ak] == "undefined" || !isArray(target[ak])) {
                 target[ak] = [];
                 assignValue(target[ak], value);

@@ -399,6 +399,13 @@ export const createClass = function (className, makeGlobal) {
             value: $className
         });
 
+        Object.defineProperty(ES5Class, "__CLASS_ID__", {
+            enumerable: false,
+            configurable: false,
+            writable: false,
+            value: Str.rand()
+        });
+
         
         var classData = addClass(ES5Class);
         
@@ -1193,7 +1200,7 @@ export const createClass = function (className, makeGlobal) {
                             }
 
                         } else {
-                            throw new Error("Bạn không thể ghi đè một Hằng");
+                            throw new Error("Bạn không thể ghi đè một Hằng ["+a[1]+"]");
                         }
                     }
                     else if (s == 'onset' || s == 'set') {

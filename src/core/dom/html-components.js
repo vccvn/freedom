@@ -6,6 +6,7 @@ import {
   assignValue,
   getArguments,
   getType,
+  inArray,
   isArray,
   isBoolean,
   isEmpty,
@@ -1018,18 +1019,19 @@ const Wbr = createElementClass("wbr");
 
 
 
-const ForLoop = createClass("ForLoop")({
-    static$isDomClass: true,
-    $el: null,
-    const$isDom: true,
+const Loop = createClass("Loop").extends(Dom)({
+    // static$isDomClass: true,
+    // $el: null,
+    // const$isDom: true,
     $target: null,
-    $parent: null,
+    // $parent: null,
     $eachFn: null,
-    $children: null,
+    $__children: null,
     $index: 0,
     $key: 0,
     $value: undefined,
     $object: null,
+    $itemkey: "item",
 
     $isFirst: false,
     $isLast: false,
@@ -1038,6 +1040,8 @@ const ForLoop = createClass("ForLoop")({
 
     $args: null,
 
+    $inited: false,
+    
     /**
      * ham khoi tao
      * @param {*} arrObj data đầu vào
@@ -1045,104 +1049,160 @@ const ForLoop = createClass("ForLoop")({
      */
     constructor: function (arrObj, ...args) {
         this._object = arrObj;
-        this.args = getArguments(arguments, 1);
+        var args = getArguments(arguments, 1);
+        if (args.length == 2 && isString(args[0])) {
+            this.itemkey = args.shift();
+        }
+        this.args = args;
+
     },
     __boot__: function () {
-        this.children = [];
-        this.el = document.createComment('For Loop Elememt');
+        this.__children = [];
+        this.el = document.createComment(this.static.__class__ + ' Wrapper Elememt');
         this.object = [];
     },
+    __call__: function (...args) {
+        var Component = this;
+        var arg = getArguments(arguments);
+        
+        Object.defineProperty(arg, 'isDomComponentBag', {
+            value: true,
+            enumerable: false,
+            writable: false,
+            configurable: false,
+        })
+        Object.defineProperty(arg, 'Component', {
+            value: Component,
+            enumerable: false,
+            writable: false,
+            configurable: false,
+        })
+        return arg;
+    },
     __init__: function () {
+        this.inited = true;
 
     },
     __destroy__: function () {
-        this.removeChild();
+        this.__removeChild();
+
     },
     __setElement__: function setElement(params) {
         // var args = getArguments(arguments);
         // return __setElement__.apply(this, args);
     },
-    
-    afterSet$parent: function (parent) {
-        this.render();
+
+    becomeAChild: function (parent) {
+        if(this.inited){
+            this.__render();
+        }
+        
     },
 
-    
+    __renderChild: function (arg, key, index, obj) {
+        if (this.parent) {
+            var widthData = {};
+            widthData[this.itemkey] = obj;
+            widthData.key = key;
+            widthData.index = index;
+            widthData.isLoopElement = true;
+            if (isFunction(arg) && !arg.isDomClass) {
+                var r = null;
+                if (arg.length > 1) {
+                    r = arg(key, obj);
+                } else {
+                    r = arg(obj);
+                }
+                if (r) {
+                    this.__children.push(this.parent.before(r, this));
+                }
+            }
+            else {
+                var child = this.parent.before(arg, this, widthData);
+                this.__children.push(child);
+            }
+        }
+    },
 
-    render: function () {
-        this.removeChild();
+    __renderChildren: function (obj, type) {
+        this.__removeChild();
+        var self = this;
+        if (type == 'array') {
+            for (let i = 0; i < obj.length; i++) {
+                const v = obj[i];
+                this.args.map(function (domArg) {
+                    self.__renderChild(domArg, i, i, v);
+                });
+            }
+        }
+        else if (type == 'object') {
+            var keys = objectKeys(obj);
+            for (let i = 0; i < keys.length; i++) {
+                const k = keys[i];
+                const v = obj[k];
+                this.args.map(function (domArg) {
+                    self.__renderChild(domArg, k, i, v);
+                });
+            }
+        }
+    },
 
 
+    __render: function () {
+        
+        var self = this;
         let arrObj = null;
-        let mode = "null"
+        let mode = "null";
         var objType = getType(this._object);
-        if(objType){
-            arrObj = this._object;
-            mode = "array";
+        if (inArray(['object', 'array'], getType(objType))) {
+            self.__renderChildren(this._object, objType);
         }
-
-
-        if (isFunction(this.eachFn)) {
-            if (isObject(this.object)) {
-                var keys = objectKeys(this.object);
-                var length = keys.length;
-                var i = 0;
-                for (const key in this.object) {
-                    if (Object.hasOwnProperty.call(this.object, key)) {
-                        const value = this.object[key];
-                        this.value = value;
-                        this.key = key;
-                        this.index = i;
-                        this.isFirst = i == 0;
-                        this.isLast = i == length - 1;
-                        if (this.eachFn.length == 1) {
-                            this.addChild(this.eachFn.apply(this, [value]));
-                        } else if (this.eachFn.length == 2) {
-                            this.addChild(this.eachFn.apply(this, [key, value]));
-                        }
-                        i++;
-                    }
-                }
-            }
-            else if (isArray(this.object)) {
-                for (let index = 0; index < this.object.length; index++) {
-                    const value = this.object[index];
-                    this.key = key;
-                    this.index = index;
-                    this.isFirst = index == 0;
-                    this.isLast = index == this.object.length - 1;
-                    if (this.eachFn.length == 1) {
-                        this.addChild(this.eachFn.apply(this, [value]));
-                    } else if (this.eachFn.length == 2) {
-                        this.addChild(this.eachFn.apply(this, [key, value]));
-                    }
-                }
-            }
-        }
-    },
-
-    addChild: function (child) {
-        if (child) {
-            this.children.push(child);
+        else if (objType == 'string') {
             if (this.parent) {
-                this.parent.before(child, this);
+                var objLength = 0;
+                var first = null;
+                var rs = this.parent.__getDataOrDBOData__(this._object, function (v) {
+                    var t = getType(v);
+                    if (inArray(['object', 'array'], t)) {
+                        if (t == 'object') {
+                            var ol = Object.keys(v).length;
+                            if (ol != objLength) {
+                                objLength = ol;
+                                self.__renderChildren(v, t);
+                            }
+                        } else if (v.length != objLength || (v.length && v[0] != first)) {
+                            if(v.length && v[0] != first){
+                                first = v[0];
+                            }
+                            objLength = v.length;
+                            self.__renderChildren(v, t);
+                        }
+
+                    }
+                });
+                var vtv1 = getType(rs);
+                if (inArray(['object', 'array'], vtv1)) {
+                    objLength = vtv1 == 'array' ? rs.length : Object.keys(rs).length;
+                    if(vtv1 == 'array' && rs.length) first = rs[0];
+                    self.__renderChildren(rs, vtv1);
+                }
             }
         }
-    },
 
+    },
     /**
      * xóa phần tử con
      * @param {Element|Dom|Dom|Dom.Query} child 
      * @param {boolean} removeDomEl Xóa dom el
      */
-    final$removeChild: function (child, removeDomEl) {
+    final$__removeChild: function (child, removeDomEl) {
         if (typeof removeDomEl == "undefined" || !isBoolean(removeDomEl) || child === true) removeDomEl = true;
 
         if (child) {
             var self = this;
-            let index = this.children.indexOf(child);
+            let index = this.__children.indexOf(child);
             if (index != -1) {
-                this.children.splice(index, 1);
+                this.__children.splice(index, 1);
                 if (child.isDom) {
                     child.remove(true);
                     child.__destroy__();
@@ -1150,10 +1210,10 @@ const ForLoop = createClass("ForLoop")({
 
             }
             else if (child instanceof Element) {
-                for (let i = 0; i < this.children.length; i++) {
-                    const c = this.children[i];
+                for (let i = 0; i < this.__children.length; i++) {
+                    const c = this.__children[i];
                     if (c.el == child) {
-                        this.children.splice(i, 1);
+                        this.__children.splice(i, 1);
                         child.remove(true);
                         child.__destroy__();
                     }
@@ -1162,295 +1222,50 @@ const ForLoop = createClass("ForLoop")({
 
         }
         else {
-            if (!isArray(this.children)) return this;
-            while (this.children.length > 0) {
-                let child = this.children.shift();
-                child.remove(true);
-                child.__destroy__();
+            if (!isArray(this.__children)) return this;
+            while (this.__children.length > 0) {
+                let child = this.__children.shift();
+                child.remove();
             }
         }
         return this;
 
-    },
-
-    /**
-     * Xóa
-     */
-    final$remove: function () {
-        var children = getArguments(arguments);
-        if (!children.length || (children.length == 1 && children[0] == true)) {
-            this.removeChild();
-            if (this.parent) {
-                this.parent.removeChild(this);
-            }
-            else if (this.el.parentNode) {
-                this.el.parentNode.removeChild(this.el);
-            }
-            if (children[0] == true) {
-                this.removeChild();
-            }
-
-        }
-        else if (children.length) {
-            var self = this;
-            children.map(function (child) {
-                self.removeChild(child);
-            });
-        }
-        return this;
-    }
-})
-
-
-const Loop = _class("Loop")({
-    static$isDomClass: true,
-    $el: null,
-    const$isDom: true,
-    $target: null,
-    $parent: null,
-    $eachFn: null,
-    $children: null,
-    $index: 0,
-    $key: 0,
-    $value: undefined,
-    $object: null,
-
-    $isFirst: false,
-    isLast: false,
-
-    __boot__: function () {
-        this.children = [];
-        this.el = document.createComment('Loop Elememt');
-        this.object = [];
-    },
-    __destroy__: function () {
-        this.removeChild();
-    },
-
-    /**
-     * ham khoi tao
-     * @param {*} arrObj data đầu vào
-     * @param {function(*)} eachFactory ham trả về đối tượng dom hoặc bất kỳ
-     */
-    constructor: function (arrObj, eachFactory) {
-        this.object = arrObj;
-        this.eachFn = eachFactory;
-    },
-
-    __init__: function () {
-
-    },
-
-    afterSet$parent: function (parent) {
-        this.render();
-    },
-
-    render: function () {
-        this.removeChild();
-        if (isFunction(this.eachFn)) {
-            if (isObject(this.object)) {
-                var keys = objectKeys(this.object);
-                var length = keys.length;
-                var i = 0;
-                for (const key in this.object) {
-                    if (Object.hasOwnProperty.call(this.object, key)) {
-                        const value = this.object[key];
-                        this.value = value;
-                        this.key = key;
-                        this.index = i;
-                        this.isFirst = i == 0;
-                        this.isLast = i == length - 1;
-                        if (this.eachFn.length == 1) {
-                            this.addChild(this.eachFn.apply(this, [value]));
-                        } else if (this.eachFn.length == 2) {
-                            this.addChild(this.eachFn.apply(this, [key, value]));
-                        }
-                        i++;
-                    }
-                }
-            }
-            else if (isArray(this.object)) {
-                for (let index = 0; index < this.object.length; index++) {
-                    const value = this.object[index];
-                    this.key = key;
-                    this.index = index;
-                    this.isFirst = index == 0;
-                    this.isLast = index == this.object.length - 1;
-                    if (this.eachFn.length == 1) {
-                        this.addChild(this.eachFn.apply(this, [value]));
-                    } else if (this.eachFn.length == 2) {
-                        this.addChild(this.eachFn.apply(this, [key, value]));
-                    }
-                }
-            }
-        }
-    },
-
-    addChild: function (child) {
-        if (child) {
-            this.children.push(child);
-            if (this.parent) {
-                this.parent.before(child, this);
-            }
-        }
-    },
-
-    /**
-     * xóa phần tử con
-     * @param {Element|Dom|Dom|Dom.Query} child 
-     * @param {boolean} removeDomEl Xóa dom el
-     */
-    final$removeChild: function (child, removeDomEl) {
-        if (typeof removeDomEl == "undefined" || !isBoolean(removeDomEl) || child === true) removeDomEl = true;
-
-        if (child) {
-            var self = this;
-            let index = this.children.indexOf(child);
-            if (index != -1) {
-                this.children.splice(index, 1);
-                if (child.isDom) {
-                    child.remove(true);
-                    child.__destroy__();
-                }
-
-            }
-            else if (child instanceof Element) {
-                for (let i = 0; i < this.children.length; i++) {
-                    const c = this.children[i];
-                    if (c.el == child) {
-                        this.children.splice(i, 1);
-                        child.remove(true);
-                        child.__destroy__();
-                    }
-                }
-            }
-
-        }
-        else {
-            if (!isArray(this.children)) return this;
-            while (this.children.length > 0) {
-                let child = this.children.shift();
-                child.remove(true);
-                child.__destroy__();
-            }
-        }
-        return this;
-
-    },
-
-    /**
-     * Xóa
-     */
-    final$remove: function () {
-        var children = getArguments(arguments);
-        if (!children.length || (children.length == 1 && children[0] == true)) {
-            this.removeChild();
-            if (this.parent) {
-                this.parent.removeChild(this);
-            }
-            else if (this.el.parentNode) {
-                this.el.parentNode.removeChild(this.el);
-            }
-            if (children[0] == true) {
-                this.removeChild();
-            }
-
-        }
-        else if (children.length) {
-            var self = this;
-            children.map(function (child) {
-                self.removeChild(child);
-            });
-        }
-        return this;
     }
 });
 
-const ForInc = _class("ForInc").extends(Loop)({
-    const$isForLoop: true,
-    render: function () {
-        this.removeChild();
-        if (isFunction(this.eachFn)) {
-            if (isObject(this.object)) {
-                var keys = Object.keys(this.object);
-                var length = keys.length;
-                for (let index = 0; index < length; index++) {
-                    const key = keys[index];
-                    if (Object.hasOwnProperty.call(this.object, key)) {
-                        const value = this.object[key];
-                        this.value = value;
-                        this.key = key;
-                        this.index = i;
-                        this.isFirst = index == 0;
-                        this.isLast = index == length - 1;
-                        if (this.eachFn.length == 1) {
-                            this.addChild(this.eachFn.apply(this, [value]));
-                        } else if (this.eachFn.length == 2) {
-                            this.addChild(this.eachFn.apply(this, [key, value]));
-                        }
-                    }
-                }
+const ForEach = _class("ForEach").extends(Loop)({
+    // foreach
+})
 
+const ForDown = _class("ForDown").extends(Loop)({
+    // foreach
+    
+    __renderChildren: function (obj, type) {
+        this.__removeChild();
+        var self = this;
+        if (type == 'array') {
+            for (let i = obj.length -1; i >= 0; i--) {
+                const v = obj[i];
+                this.args.map(function (domArg) {
+                    self.__renderChild(domArg, i, i, v);
+                });
             }
-            else if (isArray(this.object)) {
-                for (let index = 0; index < this.object.length; index++) {
-                    const value = this.object[index];
-                    this.key = index;
-                    this.index = index;
-                    this.isFirst = index == 0;
-                    this.isLast = index == this.object.length - 1;
-                    if (this.eachFn.length == 1) {
-                        this.addChild(this.eachFn.apply(this, [value]));
-                    } else if (this.eachFn.length == 2) {
-                        this.addChild(this.eachFn.apply(this, [index, value]));
-                    }
-                }
+        }
+        else if (type == 'object') {
+            var keys = objectKeys(obj);
+            for (let i = keys.length; i >= 0; i--) {
+                const k = keys[i];
+                const v = obj[k];
+                this.args.map(function (domArg) {
+                    self.__renderChild(domArg, k, i, v);
+                });
             }
         }
     }
 })
-const ForDec = _class("ForDec").extends(Loop)({
-    const$isForLoop: true,
-    render: function () {
-        this.removeChild();
-        if (isFunction(this.eachFn)) {
-            if (isObject(this.object)) {
-                var keys = Object.keys(this.object);
-                var length = keys.length;
-                for (let index = length - 1; index > -1; index--) {
-                    const key = keys[index];
-                    if (Object.hasOwnProperty.call(this.object, key)) {
-                        const value = this.object[key];
-                        this.value = value;
-                        this.key = key;
-                        this.index = i;
-                        this.isFirst = index == 0;
-                        this.isLast = index == length - 1;
-                        if (this.eachFn.length == 1) {
-                            this.addChild(this.eachFn.apply(this, [value]));
-                        } else if (this.eachFn.length == 2) {
-                            this.addChild(this.eachFn.apply(this, [key, value]));
-                        }
-                    }
-                }
-            }
-            else if (isArray(this.object)) {
-                for (let index = this.object.length - 1; index > -1; index--) {
-                    const value = this.object[index];
-                    this.key = index;
-                    this.index = index;
-                    this.isFirst = index == 0;
-                    this.isLast = index == this.object.length - 1;
-                    if (this.eachFn.length == 1) {
-                        this.addChild(this.eachFn.apply(this, [value]));
-                    } else if (this.eachFn.length == 2) {
-                        this.addChild(this.eachFn.apply(this, [index, value]));
-                    }
-                }
-            }
-        }
-    }
-})
+
+
+
 
 const a = createHtmlElementFunction("a"), abbr = createHtmlElementFunction("abbr"), acronym = createHtmlElementFunction("acronym"), address = createHtmlElementFunction("address"), applet = createHtmlElementFunction("applet"), area = createHtmlElementFunction("area"), article = createHtmlElementFunction("article"), aside = createHtmlElementFunction("aside"), audio = createHtmlElementFunction("audio"),
     b = createHtmlElementFunction("b"), base = createHtmlElementFunction("base"), basefont = createHtmlElementFunction("basefont"), bb = createHtmlElementFunction("bb"), bdo = createHtmlElementFunction("bdo"), big = createHtmlElementFunction("big"), blockquote = createHtmlElementFunction("blockquote"), body = createHtmlElementFunction("body"), br = createHtmlElementFunction("br"), button = createHtmlElementFunction("button"),
@@ -1530,7 +1345,7 @@ Html.static({
     Table: Table, Tbody: Tbody, Td: Td, Textarea: Textarea, Tfoot: Tfoot, Th: Th, Thead: Thead, Time: Time, Title: Title, Tr: Tr, Track: Track, Tt: Tt,
     U: U, Ul: Ul,
     Video: Video, Wbr: Wbr,
-    Loop: Loop, ForInc: ForInc, ForDec: ForDec,
+    Loop: Loop, ForEach: ForEach, ForDown: ForDown,
     a: a, abbr: abbr, acronym: acronym, address: address, applet: applet, area: area, article: article, aside: aside, audio: audio,
     b: b, base: base, basefont: basefont, bb: bb, bdo: bdo, big: big, blockquote: blockquote, body: body, br: br, button: button,
     canvas: canvas, caption: caption, center: center, cite: cite, code: code, col: col, colgroup: colgroup, command: command,
@@ -1651,8 +1466,8 @@ export {
   Font,
   footer,
   Footer,
-  ForDec,
-  ForInc,
+  ForDown,
+  ForEach,
   form,
   Form,
   frame,

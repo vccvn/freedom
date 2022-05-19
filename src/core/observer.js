@@ -441,6 +441,8 @@ var arrayKeys = Object.getOwnPropertyNames(arrayMethods);
 
 var obsDefaultKey = '___OBSERVER_DEFAULT_KEY___';
 
+var observerID = 0;
+
 /**
  * Observer class that is attached to each observed
  * object. Once attached, the observer converts the target
@@ -455,6 +457,8 @@ var Observer = function Observer(value, parent, isState) {
     this.parents = _instanceof(parent, Observer) ? [parent] : [];
     this.listeners = {};
     this.indexKeys = [];
+    this.observerID = ++observerID;
+    this.myIndexKeyMap = {};
     def(value, '__ob__', this);
     if (Array.isArray(value)) {
         if (hasProto) {
@@ -489,7 +493,10 @@ Observer.prototype.observeArray = function observeArray(items, isState) {
     this.indexKeys = [];
     for (var i = 0, l = items.length; i < l; i++) {
         this.indexKeys.push(i);
-        observe(items[i], this, isState);
+        var ob = observe(items[i], this, isState);
+        if(isObject(ob)){
+            ob.myIndexKeyMap[this.observerID] = i;
+        }
     }
 };
 
@@ -543,7 +550,7 @@ Observer.prototype.onTransfer = function (child, keys, listen) {
  * @param {Observer} parent doi tuong cha
  */
 Observer.prototype.addParent = function addParent(parent) {
-    if (_instanceof(parent, Observer) && this.indexOf(parent) == -1) {
+    if (_instanceof(parent, Observer) && this.parents.indexOf(parent) == -1) {
         this.parents.push(parent);
         var self = this;
         for (const key in this.listeners) {
@@ -619,36 +626,55 @@ Observer.prototype.on = function on(key, listen) {
  */
 Observer.prototype.onDispatch = function onDispatch(changes, child) {
     var key = null;
-    if (isArray(this.value)) {
+    var value = null;
+    if(typeof child.myIndexKeyMap[this.observerID] != "undefined"){
+        key = child.myIndexKeyMap[this.observerID];
+        value = child.value;
+    }
+    else if (isArray(this.value)) {
         for (let index = 0; index < this.value.length; index++) {
             const vl = this.value[index];
             if (vl == child.value) {
                 key = String(index);
+                value = child.value;
                 break;
             }
         }
     }
     else {
-        for (const k in this.value) {
-            if (Object.hasOwnProperty.call(this.value, k)) {
-                const vl = this.value[k];
+        var keys = Object.keys(this.value);
+        for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            const vl = this.value[k];
                 if (vl == child.value) {
                     key = k;
+                    value = child.value;
                     break;
                 }
-            }
         }
     }
+    
     for (let i = 0; i < changes.length; i++) {
         changes[i].key = key + "." + changes[i].key;
     }
-    changes.push({
-        key: key,
-        value: this.value,
-        old: this.value,
-        target: child.value
-    })
-
+    if(!changes.length){
+        changes.push({
+            key: key,
+            value: value,
+            old: value,
+            target: child
+        })
+    
+    }else{
+        changes.push({
+            key: key,
+            value: this.value,
+            old: this.value,
+            target: child.value
+        })
+    }
+    
+    
     var self = this;
     if (this.parents.length) {
         return this.parents.map(function (parent) {
@@ -692,6 +718,7 @@ Observer.prototype.dispatch = function dispatch(key, value, old, target) {
     else {
         if (key === undefined) {
             this.parents.map(function (parent) {
+                // console.log(self.value);
                 parent.onDispatch([], self);
             });
             return this;
@@ -790,6 +817,9 @@ function defineReactive$$1(obj, key, val, isState) {
     var type = getType(val);
 
     var childOb = observe(val, this, isState);
+    if(isObject(childOb)){
+        childOb.myIndexKeyMap[this.observerID] = key;
+    }
     if(isState === true){
         if ((type == "object" && val.isPrimitive) || (isFunction(val) && val.isPrimitive)) {
             if (val.parents.indexOf(this) == -1) {
@@ -846,6 +876,9 @@ function defineReactive$$1(obj, key, val, isState) {
                 val = newVal;
             }
             childOb = observe(newVal, self, isState);
+            if(isObject(childOb)){
+                childOb.myIndexKeyMap[self.observerID] = key;
+            }
             obj.__ob__.dispatch(key, val, old, obj);
         }
     });

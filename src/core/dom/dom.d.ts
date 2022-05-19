@@ -1,4 +1,8 @@
-import { ES5Class, Wrapper } from "../es5-class";
+import {
+  ES5Class,
+  Wrapper,
+} from '../es5-class';
+
 type subscribeHandle = (value: any, ...args: any[]) => any
 type Subscribe = string | {[key:string]: subscribeHandle};
 export interface DomBag{
@@ -51,8 +55,9 @@ export interface DomElement {
     css(prop: any, value?: any): any
     height(height?: any): number
     width(width?: any): number
-    append(child: any): this
-    prepend(child: any): this,
+    append(child: any, withKey?:string|{[prop:string]:any}, withValue?:any): this
+    prepend(child: any, withKey?:string|{[prop:string]:any}, withValue?:any): this,
+    before(child:Array<any>|DomElement, childTarget:Element|DomElement, withKey?:string|{[prop:string]:any}, withValue?:any): this,
     appendTo(parent: any): this,
     prependTo(parent: any): this,
     hasDomChild(child?: any): boolean,
