@@ -13,7 +13,7 @@ type OnEventListener = {
 
 
 
-declare class EventService {
+export declare class EventService {
     [prop:string]: any;
     app: any;
     _listeners: {[event:string]: Listener[]};

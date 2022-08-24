@@ -129,9 +129,16 @@ export interface DomFactory extends ES5Class {
     (attributes: { [x: string]: any }, children?: (DomElement | string | Element)[], ...args: ((DomElement | string | Element) | ((DomElement | string | Element))[] | any)[]): DomElement
     (...args:any[]): DomElement,
     (): DomElement
-    // with(key:any, value?:any):DomElement,
+    with(key:any, value?:any):DomElement,
     withParent(parent: DomElement): DomElement
+    if(condition:any): (...args:any[]) => DomElement
+    elseif(condition:any): (...args:any[]) => DomElement
+    else(...args:any[]): (...args:any[]) => DomElement
 
+    switch(_any:any): (...args) => DomElement
+    case(condition:any): (...args:any[]) => DomElement
+    default(...args:any[]): (...args:any[]) => DomElement
+    
 
 }
 export interface DomWrapper extends Wrapper {

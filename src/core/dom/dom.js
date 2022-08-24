@@ -2683,6 +2683,12 @@ Dom = _class("Dom")({
         }
         return new self();
     }
+
+    
+    
+
+    
+
 });
 
 function __setElement__(params) {

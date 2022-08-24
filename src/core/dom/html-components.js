@@ -1230,7 +1230,28 @@ const Loop = createClass("Loop").extends(Dom)({
         }
         return this;
 
-    }
+    },
+    static$if: function (condition){
+
+    },
+
+    static$elseif: function (condition){
+
+    },
+    static$else: function (){
+
+    },
+    
+    static$switch: function (_any){
+
+    },
+    static$case: function (value){
+
+    },
+
+    static$default: function (){
+        
+    },
 });
 
 const ForEach = _class("ForEach").extends(Loop)({
@@ -1263,8 +1284,6 @@ const ForDown = _class("ForDown").extends(Loop)({
         }
     }
 })
-
-
 
 
 const a = createHtmlElementFunction("a"), abbr = createHtmlElementFunction("abbr"), acronym = createHtmlElementFunction("acronym"), address = createHtmlElementFunction("address"), applet = createHtmlElementFunction("applet"), area = createHtmlElementFunction("area"), article = createHtmlElementFunction("article"), aside = createHtmlElementFunction("aside"), audio = createHtmlElementFunction("audio"),

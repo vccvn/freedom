@@ -8,7 +8,7 @@ const mode = 'production';
 module.exports = {
     mode: mode,
     entry: {
-        main: './src/freedom.ts',
+        freedom: './src/freedom.ts',
         // components: './src/components.ts',
         // shared: 'lodash',
     },
