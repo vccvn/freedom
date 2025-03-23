@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freedom.js Demo</title>
+    <style>
+        .box {
+            padding: 20px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="box" id="demo1">
+            <h2>Demo 1: DOM Manipulation</h2>
+            <button id="toggleBtn">Toggle Highlight</button>
+            <p id="text1">Click button to toggle highlight</p>
+        </div>
+
+        <div class="box" id="demo2">
+            <h2>Demo 2: Event Handling</h2>
+            <input type="text" id="input1" placeholder="Type something...">
+            <p id="output1">You typed: </p>
+        </div>
+
+        <div class="box" id="demo3">
+            <h2>Demo 3: Dynamic Content</h2>
+            <button id="addItemBtn">Add Item</button>
+            <ul id="itemList"></ul>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import từ file đã được build
+        import FreeDom from '/freedom.js';
+
+        // Đợi DOM load xong
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('FreeDom:', FreeDom); // Debug log
+
+            // Demo 1: DOM Manipulation
+            const text1 = FreeDom.dom('#text1');
+            const toggleBtn = FreeDom.dom('#toggleBtn');
+            
+            toggleBtn.on('click', () => {
+                text1.toggleClass('highlight');
+            });
+
+            // Demo 2: Event Handling
+            const input1 = FreeDom.dom('#input1');
+            const output1 = FreeDom.dom('#output1');
+
+            input1.on('input', () => {
+                output1.html('You typed: ' + input1.val());
+            });
+
+            // Demo 3: Dynamic Content
+            const addItemBtn = FreeDom.dom('#addItemBtn');
+            const itemList = FreeDom.dom('#itemList');
+            let itemCount = 0;
+
+            addItemBtn.on('click', () => {
+                itemCount++;
+                const li = FreeDom.dom.create('li', {
+                    text: `Item ${itemCount}`,
+                    class: 'list-item'
+                });
+                itemList.append(li);
+            });
+        });
+    </script>
+</body>
+</html> 
